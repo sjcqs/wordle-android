@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Color palette-->
+    <color name="persian_gray">#007167</color> <!--Color primary (dark)-->
+    <color name="monte_carlo">#80cbc4</color> <!--Color primary (light)-->
+    <color name="breaker_bay">#4F9892</color> <!--Color primary variant (dark)-->
+    <color name="sherpa_blue">#00534C</color> <!--Color primary variant (light)-->
+    <color name="oslo_gray">#808e95</color> <!--Color secondary-->
+    <color name="cutty_shark">#546e7a</color> <!--Color secondary variant-->
+    <color name="red_200">#cf6679</color> <!--Color error (dark)-->
+    <color name="red_600">#b00020</color> <!--Color error (light)-->
+    <!--Color surface (light), color on error (light), -->
+    <!--color on surface (dark), color on surface (dark)-->
+    <color name="white_50">#ffffff</color>
+    <color name="offwhite">#FCFCFC</color>
+    <color name="black_800">#1C1C1C</color> <!--Color surface (dark)-->
+    <!--Color on secondary (light), color on background (light),-->
+    <!--color on surface (light)-->
+    <color name="black_900">#000000</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="robinEggBlue">#ff05d6c4</color>
+    <color name="iceCold">#FFB4F3ED</color>
+    <color name="brightTurquoise">#FF11eddb</color>
+    <color name="charlotte">#ffb8faf4</color>
+    <color name="pomegranate">#FFED5911</color>
+    <color name="trinidad">#FFe53e0a</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

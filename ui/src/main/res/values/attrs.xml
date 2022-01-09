@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Common attributes-->
+    <attr name="overlayHeight" format="dimension" />
+    <attr name="smallOverlayHeight" format="dimension" />
+    <attr name="colorOverlayBackground" format="color" />
+    <attr name="colorFillColor" format="color"/>
+    <attr name="colorStrokeColor" format="color"/>
+    <attr name="textAppearanceTimer" format="reference"/>
+</resources>

@@ -1,0 +1,1 @@
+fun Any.lifecycleTag(): String = "lifecycle:${tag()}"

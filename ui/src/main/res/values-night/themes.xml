@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Wordle" parent="Base.Theme.Wordle">
+        <item name="backgroundColor">@color/black_900</item>
+        <item name="colorPrimary">@color/persian_gray</item>
+        <item name="colorPrimaryVariant">@color/breaker_bay</item>
+        <item name="colorSecondary">@color/oslo_gray</item>
+        <item name="colorSecondaryVariant">@color/cutty_shark</item>
+        <item name="android:colorBackground">@color/black_900</item>
+        <item name="colorSurface">@color/black_800</item>
+        <item name="colorError">@color/red_200</item>
+        <item name="colorOnPrimary">@color/black_900</item>
+        <item name="colorOnSecondary">@color/black_900</item>
+        <item name="colorOnBackground">@color/white_50</item>
+        <item name="colorOnSurface">@color/white_50</item>
+        <item name="colorOnError">@color/black_900</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+        <item name="elevationOverlayEnabled">true</item>
+        <item name="elevationOverlayColor">?colorPrimaryVariant</item>
+    </style>
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Wordle" parent="Base.Theme.Wordle"/>
+    <style name="Base.Theme.Wordle" parent="Base.Theme.Window">
+        <item name="backgroundColor">@color/offwhite</item>
+        <item name="colorPrimary">@color/monte_carlo</item>
+        <item name="colorPrimaryVariant">@color/sherpa_blue</item>
+        <item name="colorSecondary">@color/oslo_gray</item>
+        <item name="colorSecondaryVariant">@color/cutty_shark</item>
+        <item name="android:colorBackground">@color/offwhite</item>
+        <item name="colorSurface">@color/white_50</item>
+        <item name="colorError">@color/red_600</item>
+        <item name="overlayHeight">128dp</item>
+        <item name="smallOverlayHeight">80dp</item>
+
+        <item name="colorOnPrimary">@color/white_50</item>
+        <item name="colorOnSecondary">@color/black_900</item>
+        <item name="colorOnBackground">@color/black_900</item>
+        <item name="colorOnSurface">@color/black_900</item>
+        <item name="colorOnError">@color/white_50</item>
+        <!-- Type  -->
+        <item name="textAppearanceTimer">@style/TextAppearance.Wordle.Timer</item>
+        <item name="textAppearanceHeadline1">@style/TextAppearance.Wordle.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.Wordle.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.Wordle.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.Wordle.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Wordle.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Wordle.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Wordle.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Wordle.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Wordle.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.Wordle.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.Wordle.Button</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.Wordle.Caption</item>
+        <item name="textAppearanceOverline">@style/TextAppearance.Wordle.Overline</item>
+        <!-- Shape -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Wordle.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Wordle.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Wordle.LargeComponent</item>
+    </style>
+    <style name="Base.Theme.Window" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">?attr/colorControlHighlight</item>
+    </style>
+</resources>
