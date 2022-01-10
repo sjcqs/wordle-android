@@ -15,7 +15,9 @@
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />-->
 
-        <activity android:name=".HostActivity" />
+        <activity
+            android:name=".HostActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity-alias
             android:name="launcher"
