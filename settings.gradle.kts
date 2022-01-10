@@ -37,7 +37,7 @@ include(":tools:logger:impl")
 include(":tools:logger:wiring")
 include(":tools:lifecycle-logging:public")
 include(":tools:lifecycle-logging:wiring")
-include(":tools:molecule-viewmodel")
+//include(":tools:molecule-viewmodel")
 
 include(":ui")
 include(":wiring")

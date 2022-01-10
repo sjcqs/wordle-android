@@ -7,20 +7,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import src.fr.sjcqs.wordle.feature.session.configuration.Guessing
+import fr.sjcqs.wordle.feature.guessing.Guessing
 
 private sealed interface Screen {
     val route: String
 
-    sealed interface Session : Screen {
-
-        object Guessing : Session {
-            override val route = "guessing"
-        }
+    object Guessing : Screen {
+        override val route = "guessing"
     }
 
     companion object {
-        val startDestination = Session.Guessing.route
+        val startDestination = Guessing.route
     }
 }
 
@@ -38,7 +35,7 @@ private fun NavGraphBuilder.sessionScreens(navController: NavHostController) {
 }
 
 private fun NavGraphBuilder.guessingScreen(navController: NavHostController) {
-    composable(route = Screen.Session.Guessing.route) {
+    composable(route = Screen.Guessing.route) {
         Guessing()
     }
 }

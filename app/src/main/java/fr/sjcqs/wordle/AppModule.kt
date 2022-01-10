@@ -1,6 +1,7 @@
 package fr.sjcqs.wordle
 
 import android.content.Context
+import android.content.res.Resources
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,13 +11,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext as HiltApplicationConte
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+internal object AppModule {
     @Provides
     @ApplicationContext
     fun provideApplicationContext(@HiltApplicationContext context: Context) = context
 
     @Provides
     @ApplicationContext
-    fun provideApplicationResources(@HiltApplicationContext context: Context) = context.resources
+    fun provideApplicationResources(
+        @HiltApplicationContext context: Context
+    ): Resources = context.resources
 
 }

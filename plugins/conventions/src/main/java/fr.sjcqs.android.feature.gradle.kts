@@ -3,11 +3,15 @@ plugins {
     id("kotlin-kapt")
 }
 
-apply(plugin = "app.cash.molecule")
+//apply(plugin = "app.cash.molecule")
+
+android.buildFeatures {
+    resValues = true
+}
 
 dependencies {
     implementation(project(":ui"))
-    implementation(project(":tools:molecule-viewmodel"))
+    //implementation(project(":tools:molecule-viewmodel"))
 
     implementation(libs["androidx.lifecycle.viewmodel.ktx"])
 

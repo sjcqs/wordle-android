@@ -9,7 +9,7 @@ buildscript {
         classpath(libs.hilt.gradle)
         classpath(libs.kotlin.gradle)
         classpath(libs.sqldelight.gradle)
-        classpath(libs.molecule.gradle)
+        //classpath(libs.molecule.gradle)
     }
 }
 
