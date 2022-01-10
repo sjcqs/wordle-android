@@ -42,15 +42,7 @@ import fr.sjcqs.wordle.ui.components.Word
 fun Guessing() {
     val viewModel: GuessingViewModel = hiltViewModel()
     val ime = LocalWindowInsets.current.ime
-    val elevation: Dp by remember {
-        derivedStateOf {
-            if (ime.isVisible) {
-                4.dp
-            } else {
-                0.dp
-            }
-        }
-    }
+    val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
     Scaffold(
         topBar = {
             Surface(
@@ -70,8 +62,8 @@ fun Guessing() {
                 }
             }
         },
-        content = {
-            Box(modifier = Modifier.padding(it)) {
+        content = { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
                 Guessing(viewModel = viewModel)
             }
         })

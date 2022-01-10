@@ -22,6 +22,10 @@ dependencyResolutionManagement {
 
 include(":app")
 
+include(":data:game:public")
+include(":data:game:impl")
+include(":data:game:wiring")
+
 include(":feature:guessing")
 
 include(":navigation")

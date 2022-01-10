@@ -26,11 +26,11 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(navController = navController, startDestination = Screen.startDestination) {
-        sessionScreens(navController)
+        guessingScreens(navController)
     }
 }
 
-private fun NavGraphBuilder.sessionScreens(navController: NavHostController) {
+private fun NavGraphBuilder.guessingScreens(navController: NavHostController) {
     guessingScreen(navController)
 }
 

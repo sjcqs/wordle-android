@@ -9,8 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
-internal class GuessingViewModel @Inject constructor(
-) : ViewModel() {
+internal class GuessingViewModel @Inject constructor() : ViewModel() {
     fun onSubmit(word: String) {
         //TODO("Not yet implemented")
     }
