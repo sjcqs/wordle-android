@@ -1,8 +1,21 @@
 package fr.sjcqs.wordle.ui.theme
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.material3.contentColorFor as materialContentColorFor
 
 internal object Colors {
     val Black = Color(0xFF000000)
@@ -33,6 +46,53 @@ internal object Colors {
     val White = Color(0xFFFFFFFF)
 }
 
+internal val LocalLetterColors = staticCompositionLocalOf { LetterColorScheme() }
+
+@Stable
+internal class LetterColorScheme(
+    present: Color = Color(201, 180, 88),
+    onPresent: Color = Color.White,
+    correct: Color = Color(106, 170, 100),
+    onCorrect: Color = Color.White,
+    absent: Color = Color(120, 124, 126),
+    onAbsent: Color = Color.White,
+) {
+    var present by mutableStateOf(present, structuralEqualityPolicy())
+        internal set
+    var onPresent by mutableStateOf(onPresent, structuralEqualityPolicy())
+        internal set
+    var correct by mutableStateOf(correct, structuralEqualityPolicy())
+        internal set
+    var onCorrect by mutableStateOf(onCorrect, structuralEqualityPolicy())
+        internal set
+    var absent by mutableStateOf(absent, structuralEqualityPolicy())
+        internal set
+    var onAbsent by mutableStateOf(onAbsent, structuralEqualityPolicy())
+        internal set
+}
+
+@Composable
+@ReadOnlyComposable
+fun contentColorFor(backgroundColor: Color): Color {
+    return MaterialTheme.colorScheme.contentColorFor(backgroundColor = backgroundColor)
+        .takeOrElse { LocalContentColor.current }
+}
+
+@Composable
+@ReadOnlyComposable
+fun ColorScheme.contentColorFor(backgroundColor: Color) = when (backgroundColor) {
+    present -> onPresent
+    correct -> onCorrect
+    absent -> onAbsent
+    else -> materialContentColorFor(backgroundColor)
+}
+
+internal val DarkLetterColorScheme = LetterColorScheme(
+    present = Color(181, 159, 59),
+    correct = Color(83, 141, 78),
+    absent = Color(58, 58, 60),
+)
+
 internal val DarkColorScheme = darkColorScheme(
     background = Colors.Black,
     error = Colors.Red200,
@@ -46,7 +106,10 @@ internal val DarkColorScheme = darkColorScheme(
     secondary = Colors.Oslogray,
     secondaryContainer = Colors.Cuttyshark,
     surface = Colors.Black800,
+    outline = Color(58, 58, 60)
 )
+
+internal val LightLetterColorScheme = LetterColorScheme()
 
 internal val LightColorScheme = lightColorScheme(
     background = Colors.Offwhite,
@@ -61,4 +124,5 @@ internal val LightColorScheme = lightColorScheme(
     secondary = Colors.Oslogray,
     secondaryContainer = Colors.Cuttyshark,
     surface = Colors.White,
+    outline = Color(135, 138, 140)
 )

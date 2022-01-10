@@ -1,31 +1,50 @@
 package fr.sjcqs.wordle.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+
+@Suppress("unused")
+val ColorScheme.present: Color
+    @Composable @ReadOnlyComposable
+    get() = LocalLetterColors.current.present
+
+@Suppress("unused")
+val ColorScheme.correct: Color
+    @Composable @ReadOnlyComposable
+    get() = LocalLetterColors.current.correct
+
+@Suppress("unused")
+val ColorScheme.absent: Color
+    @Composable @ReadOnlyComposable
+    get() = LocalLetterColors.current.absent
+
+@Suppress("unused")
+val ColorScheme.onPresent: Color
+    @Composable @ReadOnlyComposable
+    get() = LocalLetterColors.current.onPresent
+
+@Suppress("unused")
+val ColorScheme.onCorrect: Color
+    @Composable @ReadOnlyComposable
+    get() = LocalLetterColors.current.onCorrect
+
+@Suppress("unused")
+val ColorScheme.onAbsent: Color
+    @Composable @ReadOnlyComposable
+    get() = LocalLetterColors.current.onAbsent
 
 @Composable
 fun WordleTheme(
     isInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isInDarkTheme -> {
-            dynamicDarkColorScheme(LocalContext.current)
-        }
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !isInDarkTheme -> {
-            dynamicLightColorScheme(LocalContext.current)
-        }
-        isInDarkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (isInDarkTheme) DarkColorScheme else LightColorScheme
+    val letterColorScheme = if (isInDarkTheme) DarkLetterColorScheme else LightLetterColorScheme
+    LocalLetterColors.provides(letterColorScheme)
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
