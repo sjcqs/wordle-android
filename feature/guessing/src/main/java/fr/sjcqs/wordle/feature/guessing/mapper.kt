@@ -11,8 +11,8 @@ internal fun TileState.toUiState(): TileUiState = when (this) {
 }
 
 internal fun Guess.toUiModel(): GuessUiModel = when (this) {
-    Guess.Current -> GuessUiModel(isEditable = true)
-    Guess.Empty -> GuessUiModel()
+    is Guess.Current -> GuessUiModel(isEditable = true)
+    is Guess.Empty -> GuessUiModel()
     is Guess.Submitted -> GuessUiModel(
         word = word,
         tileState = tiles.mapIndexed { index, state ->

@@ -8,8 +8,10 @@ import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -19,28 +21,40 @@ internal class GuessingViewModel @Inject constructor(
     private val gameRepository: GameRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<GuessingUiState>(GuessingUiState.Loading)
-    val uiState: StateFlow<GuessingUiState> = _uiState
+    private val _uiStateFlow = MutableStateFlow<GuessingUiState>(GuessingUiState.Loading)
+    val uiStateFlow = _uiStateFlow.asStateFlow()
+
+    private val _uiEventFlow = MutableSharedFlow<GuessingUiEvent>()
+    val uiEventFlow = _uiEventFlow.asSharedFlow()
 
     init {
         gameRepository.dailyGame
             .onEach { game ->
                 val guesses = game.guesses.map(Guess::toUiModel)
-                _uiState.value = GuessingUiState.Guessing(guesses)
+                _uiStateFlow.value = GuessingUiState.Guessing(guesses)
             }.launchIn(viewModelScope)
     }
 
     fun onSubmit(word: String) {
         viewModelScope.launch {
-            gameRepository.submit(word)
+            val wasSubmitted = gameRepository.submit(word)
+            if (!wasSubmitted) {
+                _uiEventFlow.emit(GuessingUiEvent.ClearInput)
+            }
         }
     }
 }
 
-@Immutable
 internal sealed interface GuessingUiState {
+    @Immutable
     object Loading : GuessingUiState
+
+    @Immutable
     data class Guessing(val guesses: List<GuessUiModel>) : GuessingUiState
+}
+
+internal sealed interface GuessingUiEvent {
+    object ClearInput : GuessingUiEvent
 }
 
 @Immutable

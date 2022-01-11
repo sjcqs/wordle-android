@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface GameRepository {
     val dailyGame: Flow<Game>
 
-    suspend fun submit(word: String)
+    suspend fun submit(word: String): Boolean
 }

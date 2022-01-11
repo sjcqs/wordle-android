@@ -15,7 +15,7 @@ data class Game(
                     else -> guess
                 }
             },
-            isFinished = indexOfCurrent == guesses.lastIndex
+            isFinished = indexOfCurrent == guesses.lastIndex || submittedGuess.word == word
         )
     }
 }

@@ -1,6 +1,5 @@
 package fr.sjcqs.wordle.feature.guessing
 
-import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -43,6 +41,7 @@ import fr.sjcqs.wordle.ui.components.Word
 @Composable
 fun Guessing() {
     val viewModel: GuessingViewModel = hiltViewModel()
+    val uiState by viewModel.uiStateFlow.collectAsState()
     val ime = LocalWindowInsets.current.ime
     val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
     Scaffold(
@@ -66,19 +65,18 @@ fun Guessing() {
         },
         content = { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                Guessing(viewModel = viewModel)
+                Guessing(uiState = uiState) { viewModel.onSubmit(it) }
             }
         })
 }
 
 @Composable
-private fun Guessing(viewModel: GuessingViewModel) {
-    val state = viewModel.uiState.collectAsState()
-    LocalLogger.current.d(state.value.toString())
-    when (val uiState = state.value) {
+private fun Guessing(uiState: GuessingUiState, onSubmit: (word: String) -> Unit) {
+    LocalLogger.current.d(uiState.toString())
+    when (uiState) {
         is GuessingUiState.Guessing -> Guessing(
             guesses = uiState.guesses,
-            onSubmit = { word -> viewModel.onSubmit(word) }
+            onSubmit = onSubmit
         )
         GuessingUiState.Loading -> CircularProgressIndicator()
     }
@@ -104,7 +102,7 @@ private fun Guessing(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         guesses.forEachIndexed { index, guess ->
-            Word(
+            Guess(
                 scrollState = scrollState,
                 guess = guess,
                 bottomSpacing = navigationWithImeBottom,
@@ -120,7 +118,7 @@ private fun Guessing(
 }
 
 @Composable
-private fun Word(
+private fun Guess(
     guess: GuessUiModel,
     scrollState: ScrollState,
     bottomSpacing: Dp,
@@ -134,7 +132,6 @@ private fun Word(
             scrollState.scrollBy(scrollBy.value)
         }
     }
-    val context = LocalContext.current
     Word(
         modifier = if (guess.isEditable) {
             Modifier.onGloballyPositioned { coordinates ->
@@ -151,7 +148,6 @@ private fun Word(
         value = guess.word,
         onSubmit = { word ->
             if (guess.isEditable) {
-                Toast.makeText(context, "Submit: $word", Toast.LENGTH_SHORT).show()
                 onSubmit(word)
             }
         },

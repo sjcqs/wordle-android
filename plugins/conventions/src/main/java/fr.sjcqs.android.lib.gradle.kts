@@ -47,6 +47,7 @@ android {
 
 dependencies {
     implementation(project(":tools:annotations"))
+    implementation(project(":tools:logger:public"))
 
     compileOnly(libs["javaxInject"])
 
