@@ -46,10 +46,10 @@ internal object Colors {
     val White = Color(0xFFFFFFFF)
 }
 
-internal val LocalLetterColors = staticCompositionLocalOf { LetterColorScheme() }
+internal val LocalTileColors = staticCompositionLocalOf { TileColorScheme() }
 
 @Stable
-internal class LetterColorScheme(
+internal class TileColorScheme(
     present: Color = Color(201, 180, 88),
     onPresent: Color = Color.White,
     correct: Color = Color(106, 170, 100),
@@ -87,7 +87,7 @@ fun ColorScheme.contentColorFor(backgroundColor: Color) = when (backgroundColor)
     else -> materialContentColorFor(backgroundColor)
 }
 
-internal val DarkLetterColorScheme = LetterColorScheme(
+internal val DarkTileColorScheme = TileColorScheme(
     present = Color(181, 159, 59),
     correct = Color(83, 141, 78),
     absent = Color(58, 58, 60),
@@ -109,7 +109,7 @@ internal val DarkColorScheme = darkColorScheme(
     outline = Color(58, 58, 60)
 )
 
-internal val LightLetterColorScheme = LetterColorScheme()
+internal val LightTileColorScheme = TileColorScheme()
 
 internal val LightColorScheme = lightColorScheme(
     background = Colors.Offwhite,

@@ -5,6 +5,8 @@ plugins {
 dependencies {
     api(projects.feature.guessing)
 
+    api(projects.data.game.wiring)
+
     api(projects.tools.annotations)
     api(projects.tools.haptics.wiring)
     api(projects.tools.logger.wiring)

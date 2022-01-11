@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.derivedWindowInsetsTypeOf
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.insets.ui.Scaffold
+import fr.sjcqs.wordle.logger.LocalLogger
 import fr.sjcqs.wordle.ui.components.Word
 
 
@@ -71,11 +73,15 @@ fun Guessing() {
 
 @Composable
 private fun Guessing(viewModel: GuessingViewModel) {
-    val uiModel by viewModel.uiState.collectAsState()
-    Guessing(
-        guesses = uiModel.guesses,
-        onSubmit = { viewModel.onSubmit(it) }
-    )
+    val state = viewModel.uiState.collectAsState()
+    LocalLogger.current.d(state.value.toString())
+    when (val uiState = state.value) {
+        is GuessingUiState.Guessing -> Guessing(
+            guesses = uiState.guesses,
+            onSubmit = { word -> viewModel.onSubmit(word) }
+        )
+        GuessingUiState.Loading -> CircularProgressIndicator()
+    }
 }
 
 @Composable
@@ -98,7 +104,7 @@ private fun Guessing(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         guesses.forEachIndexed { index, guess ->
-            Guess(
+            Word(
                 scrollState = scrollState,
                 guess = guess,
                 bottomSpacing = navigationWithImeBottom,
@@ -114,7 +120,7 @@ private fun Guessing(
 }
 
 @Composable
-private fun Guess(
+private fun Word(
     guess: GuessUiModel,
     scrollState: ScrollState,
     bottomSpacing: Dp,
@@ -150,6 +156,6 @@ private fun Guess(
             }
         },
         isEditable = guess.isEditable,
-        letterStates = guess.letterState
+        tileStates = guess.tileState
     )
 }

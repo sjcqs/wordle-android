@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.with
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +18,13 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.TextField
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
@@ -35,6 +37,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -46,14 +49,14 @@ import fr.sjcqs.wordle.ui.theme.contentColorFor
 import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.present
 
-enum class LetterUiState { Correct, Absent, Present }
+enum class TileUiState { Present, Correct, Absent }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Word(
     value: String,
     modifier: Modifier = Modifier,
-    letterStates: Map<Int, LetterUiState> = emptyMap(),
+    tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
     isEditable: Boolean = true,
     onSubmit: (word: String) -> Unit
@@ -71,7 +74,9 @@ fun Word(
     if (isEditable) {
         DisposableEffect(Unit) {
             focusRequester.requestFocus()
-            onDispose { }
+            onDispose {
+                /* no-op */
+            }
         }
     }
     TextField(
@@ -100,24 +105,41 @@ fun Word(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
+        val tileModifier = Modifier
+            .weight(1f)
+            .aspectRatio(1f)
+            .run {
+                if (isEditable) {
+                    clickable {
+                        focusRequester.requestFocus()
+                        keyboard?.show()
+                    }
+                } else this
+            }
         repeat(length) { index ->
-            val letter = currentValue.getOrNull(index)
-            val state = letterStates[index]
-            Letter(
-                modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f)
-                    .run {
-                        if (isEditable) {
-                            clickable {
-                                focusRequester.requestFocus()
-                                keyboard?.show()
-                            }
-                        } else this
-                    },
-                value = letter,
-                state = state,
-            )
+            val letter = currentValue.getOrNull(index)?.toString().orEmpty()
+            when (tileStates[index]) {
+                TileUiState.Present -> BackgroundedTile(
+                    value = letter,
+                    modifier = tileModifier,
+                    backgroundColor = MaterialTheme.colorScheme.present,
+                )
+                TileUiState.Correct -> BackgroundedTile(
+                    value = letter,
+                    modifier = tileModifier,
+                    backgroundColor = MaterialTheme.colorScheme.correct,
+                )
+                TileUiState.Absent -> BackgroundedTile(
+                    value = letter,
+                    modifier = tileModifier,
+                    backgroundColor = MaterialTheme.colorScheme.absent,
+                )
+                null -> OutlinedTile(
+                    value = letter,
+                    modifier = tileModifier,
+                    outlineColor = MaterialTheme.colorScheme.outline
+                )
+            }
             if (index + 1 < length) {
                 Spacer(modifier = Modifier.size(8.dp))
             }
@@ -125,35 +147,59 @@ fun Word(
     }
 }
 
+private val TileShape
+    @Composable
+    get() = RoundedCornerShape(2.dp)
+
+@Composable
+private fun OutlinedTile(
+    value: String,
+    outlineColor: Color,
+    modifier: Modifier = Modifier,
+    contentColor: Color = LocalContentColor.current,
+) {
+    Tile(
+        value = value,
+        contentColor = contentColor,
+        modifier = modifier.border(width = 1.5.dp, outlineColor, TileShape),
+    )
+}
+
+@Composable
+private fun BackgroundedTile(
+    value: String,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier,
+    contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
+) {
+    Surface(
+        modifier,
+        shadowElevation = 2.dp,
+        color = backgroundColor,
+        shape = TileShape
+    ) {
+        Tile(
+            value = value,
+            contentColor = contentColor,
+        )
+    }
+}
+
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
-fun Letter(
-    value: Char?,
-    state: LetterUiState?,
+private fun Tile(
+    value: String,
     modifier: Modifier = Modifier,
+    contentColor: Color = LocalContentColor.current,
 ) {
-    val stateModifier = when (state) {
-        LetterUiState.Present -> Modifier.background(MaterialTheme.colorScheme.present)
-        LetterUiState.Correct -> Modifier.background(MaterialTheme.colorScheme.correct)
-        LetterUiState.Absent -> Modifier.background(MaterialTheme.colorScheme.absent)
-        null -> Modifier.border(1.5.dp, MaterialTheme.colorScheme.outline)
-    }
-    val color = contentColorFor(
-        backgroundColor = when (state) {
-            LetterUiState.Present -> MaterialTheme.colorScheme.present
-            LetterUiState.Correct -> MaterialTheme.colorScheme.correct
-            LetterUiState.Absent -> MaterialTheme.colorScheme.absent
-            null -> MaterialTheme.colorScheme.background
-        }
-    )
-    Box(modifier = modifier.then(stateModifier)) {
+    Box(modifier = modifier) {
         AnimatedContent(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(8.dp),
             targetState = value,
             transitionSpec = {
-                if (targetState != null) {
+                if (targetState.isEmpty()) {
                     expandIn { size -> size } + fadeIn() with
                             shrinkOut { IntSize.Zero } + fadeOut()
                 } else {
@@ -163,9 +209,9 @@ fun Letter(
             }
         ) { targetValue ->
             AutoSizeText(
-                text = targetValue?.toString().orEmpty(),
+                text = targetValue,
                 style = MaterialTheme.typography.labelLarge,
-                color = color,
+                color = contentColor,
             )
         }
     }

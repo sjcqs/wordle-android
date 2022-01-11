@@ -10,32 +10,32 @@ import androidx.compose.ui.graphics.Color
 @Suppress("unused")
 val ColorScheme.present: Color
     @Composable @ReadOnlyComposable
-    get() = LocalLetterColors.current.present
+    get() = LocalTileColors.current.present
 
 @Suppress("unused")
 val ColorScheme.correct: Color
     @Composable @ReadOnlyComposable
-    get() = LocalLetterColors.current.correct
+    get() = LocalTileColors.current.correct
 
 @Suppress("unused")
 val ColorScheme.absent: Color
     @Composable @ReadOnlyComposable
-    get() = LocalLetterColors.current.absent
+    get() = LocalTileColors.current.absent
 
 @Suppress("unused")
 val ColorScheme.onPresent: Color
     @Composable @ReadOnlyComposable
-    get() = LocalLetterColors.current.onPresent
+    get() = LocalTileColors.current.onPresent
 
 @Suppress("unused")
 val ColorScheme.onCorrect: Color
     @Composable @ReadOnlyComposable
-    get() = LocalLetterColors.current.onCorrect
+    get() = LocalTileColors.current.onCorrect
 
 @Suppress("unused")
 val ColorScheme.onAbsent: Color
     @Composable @ReadOnlyComposable
-    get() = LocalLetterColors.current.onAbsent
+    get() = LocalTileColors.current.onAbsent
 
 @Composable
 fun WordleTheme(
@@ -43,8 +43,8 @@ fun WordleTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (isInDarkTheme) DarkColorScheme else LightColorScheme
-    val letterColorScheme = if (isInDarkTheme) DarkLetterColorScheme else LightLetterColorScheme
-    LocalLetterColors.provides(letterColorScheme)
+    val tileColorScheme = if (isInDarkTheme) DarkTileColorScheme else LightTileColorScheme
+    LocalTileColors.provides(tileColorScheme)
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

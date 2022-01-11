@@ -1,12 +1,21 @@
 package fr.sjcqs.wordle.data.game.entity
 
 data class Game(
-    val world: String,
+    val word: String,
     val guesses: List<Guess>,
-    val state: State,
+    val isFinished: Boolean = false
 ) {
-    sealed interface State {
-        object Playing : State
-        data class Finished(val isWin: Boolean) : State
+    fun add(submittedGuess: Guess.Submitted): Game {
+        val indexOfCurrent = guesses.indexOfFirst { it is Guess.Current }
+        return copy(
+            guesses = guesses.mapIndexed { index, guess ->
+                when (index) {
+                    indexOfCurrent -> submittedGuess
+                    indexOfCurrent + 1 -> Guess.Current
+                    else -> guess
+                }
+            },
+            isFinished = indexOfCurrent == guesses.lastIndex
+        )
     }
 }

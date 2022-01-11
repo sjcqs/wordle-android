@@ -10,5 +10,5 @@ android {
 }
 
 dependencies {
-
+    implementation(projects.data.game.public)
 }
