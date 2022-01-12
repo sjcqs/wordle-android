@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.feature.guessing
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -108,12 +109,17 @@ fun Guessing() {
             }
         },
         content = { paddingValues ->
-            Surface(modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()) {
+            val scrollState = rememberScrollState()
+            Surface(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .verticalScroll(scrollState, enabled = false)
+            ) {
                 GuessingState(
                     uiState = uiState,
                     value = typingWord,
+                    scrollState = scrollState,
                     onValueChanged = setTypingWord,
                     onSubmit = { viewModel.onSubmit(it) }
                 )
@@ -125,6 +131,7 @@ fun Guessing() {
 private fun GuessingState(
     uiState: GuessingUiState,
     value: String,
+    scrollState: ScrollState,
     onValueChanged: (String) -> Unit,
     onSubmit: (word: String) -> Unit
 ) {
@@ -132,6 +139,7 @@ private fun GuessingState(
         is GuessingUiState.Guessing -> Guessing(
             uiModel = uiState,
             value = value,
+            scrollState = scrollState,
             onValueChanged = onValueChanged,
             onSubmit = onSubmit,
         )
@@ -143,6 +151,7 @@ private fun GuessingState(
 private fun Guessing(
     uiModel: GuessingUiState.Guessing,
     value: String,
+    scrollState: ScrollState,
     onValueChanged: (String) -> Unit,
     onSubmit: (word: String) -> Unit
 ) {
@@ -151,6 +160,7 @@ private fun Guessing(
         guesses = uiModel.guesses,
         length = uiModel.length,
         value = value,
+        scrollState = scrollState,
         onValueChanged = onValueChanged,
         isFinished = uiModel.isFinished,
         onSubmit = onSubmit
@@ -164,6 +174,7 @@ private fun Guessing(
     length: Int,
     isFinished: Boolean,
     value: String,
+    scrollState: ScrollState,
     onValueChanged: (String) -> Unit,
     onSubmit: (word: String) -> Unit,
 ) {
@@ -171,7 +182,6 @@ private fun Guessing(
     val navBars = LocalWindowInsets.current.navigationBars
     val insets = remember(ime, navBars) { derivedWindowInsetsTypeOf(ime, navBars) }
     val navigationWithImeBottom = with(LocalDensity.current) { insets.bottom.toDp() }
-    val scrollState = rememberScrollState()
 
     var currentValue by remember(value) { mutableStateOf(value) }
     val focusRequester = remember { FocusRequester() }
@@ -181,7 +191,7 @@ private fun Guessing(
     val keyboard = LocalSoftwareKeyboardController.current
 
     val openKeyboard = {
-        if (!isFinished) {
+        if (!isFinished && !ime.isVisible) {
             keyboard?.show()
             focusRequester.requestFocus()
         }
@@ -222,7 +232,6 @@ private fun Guessing(
 
     Column(
         modifier = Modifier
-            .verticalScroll(scrollState, enabled = false)
             .fillMaxWidth()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
