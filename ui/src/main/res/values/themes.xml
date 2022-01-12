@@ -3,6 +3,7 @@
     <style name="Theme.Wordle" parent="Base.Theme.Wordle"/>
     <style name="Base.Theme.Wordle" parent="Base.Theme.Window">
         <item name="backgroundColor">@color/offwhite</item>
+        <item name="android:windowBackground">@color/offwhite</item>
         <item name="colorPrimary">@color/monte_carlo</item>
         <item name="colorPrimaryVariant">@color/sherpa_blue</item>
         <item name="colorSecondary">@color/oslo_gray</item>
@@ -10,8 +11,6 @@
         <item name="android:colorBackground">@color/offwhite</item>
         <item name="colorSurface">@color/white_50</item>
         <item name="colorError">@color/red_600</item>
-        <item name="overlayHeight">128dp</item>
-        <item name="smallOverlayHeight">80dp</item>
 
         <item name="colorOnPrimary">@color/white_50</item>
         <item name="colorOnSecondary">@color/black_900</item>
@@ -19,7 +18,6 @@
         <item name="colorOnSurface">@color/black_900</item>
         <item name="colorOnError">@color/white_50</item>
         <!-- Type  -->
-        <item name="textAppearanceTimer">@style/TextAppearance.Wordle.Timer</item>
         <item name="textAppearanceHeadline1">@style/TextAppearance.Wordle.Headline1</item>
         <item name="textAppearanceHeadline2">@style/TextAppearance.Wordle.Headline2</item>
         <item name="textAppearanceHeadline3">@style/TextAppearance.Wordle.Headline3</item>
@@ -39,10 +37,6 @@
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Wordle.LargeComponent</item>
     </style>
     <style name="Base.Theme.Window" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
-        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">?attr/colorControlHighlight</item>
     </style>
 </resources>

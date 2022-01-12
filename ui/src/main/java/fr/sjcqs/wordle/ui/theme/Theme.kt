@@ -5,7 +5,9 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Suppress("unused")
 val ColorScheme.present: Color
@@ -42,6 +44,10 @@ fun WordleTheme(
     isInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = !isInDarkTheme)
+    }
     val colorScheme = if (isInDarkTheme) DarkColorScheme else LightColorScheme
     val tileColorScheme = if (isInDarkTheme) DarkTileColorScheme else LightTileColorScheme
     LocalTileColors.provides(tileColorScheme)

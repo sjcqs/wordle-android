@@ -4,6 +4,7 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -105,7 +107,9 @@ fun Guessing() {
             }
         },
         content = { paddingValues ->
-            Surface(modifier = Modifier.padding(paddingValues)) {
+            Surface(modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()) {
                 GuessingState(
                     uiState = uiState,
                     value = typingWord,
@@ -203,6 +207,7 @@ private fun Guessing(
             },
             modifier = Modifier
                 .size(0.dp)
+                .alpha(0f)
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Ascii,

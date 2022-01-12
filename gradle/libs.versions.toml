@@ -22,7 +22,7 @@ accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanist" }
 
-android-gradle = { module = "com.android.tools.build:gradle", version = "7.0.3" }
+android-gradle = { module = "com.android.tools.build:gradle", version = "7.0.4" }
 
 androidx-activity-compose = "androidx.activity:activity-compose:1.4.0"
 androidx-appcompat = "androidx.appcompat:appcompat:1.4.0"

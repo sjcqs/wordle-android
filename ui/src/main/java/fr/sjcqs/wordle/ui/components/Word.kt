@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalContentColor
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -135,7 +135,7 @@ private fun BackgroundedTile(
 private fun Tile(
     value: String,
     modifier: Modifier = Modifier,
-    contentColor: Color = LocalContentColor.current,
+    contentColor: Color = androidx.compose.material3.LocalContentColor.current,
 ) {
     Box(modifier = modifier) {
         AnimatedContent(
