@@ -14,7 +14,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.TextField
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,6 +38,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,11 +47,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.derivedWindowInsetsTypeOf
+import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.insets.ui.Scaffold
-import fr.sjcqs.wordle.logger.LocalLogger
 import fr.sjcqs.wordle.ui.components.TileUiState
 import fr.sjcqs.wordle.ui.components.Word
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 
 @Composable
@@ -57,7 +62,31 @@ fun Guessing() {
     val uiState by viewModel.uiStateFlow.collectAsState()
     val ime = LocalWindowInsets.current.ime
     val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
+    val scaffoldState = rememberScaffoldState()
+    val invalidWord = stringResource(id = R.string.guessing_invalid_word)
+
+    val (typingWord, setTypingWord) = remember(uiState) {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(key1 = viewModel) {
+        viewModel.uiEventFlow.onEach { event ->
+            when (event) {
+                GuessingUiEvent.InvalidWord -> {
+                    scaffoldState.snackbarHostState.showSnackbar(invalidWord)
+                }
+                GuessingUiEvent.ClearInput -> setTypingWord("")
+            }
+        }.launchIn(this)
+    }
     Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = it,
+                modifier = Modifier.navigationBarsWithImePadding()
+            )
+        },
         topBar = {
             Surface(
                 shadowElevation = elevation,
@@ -82,18 +111,29 @@ fun Guessing() {
                     .padding(paddingValues)
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                Guessing(uiState = uiState) { viewModel.onSubmit(it) }
+                Guessing(
+                    uiState = uiState,
+                    value = typingWord,
+                    onValueChanged = setTypingWord,
+                    onSubmit = { viewModel.onSubmit(it) }
+                )
             }
         })
 }
 
 @Composable
-private fun Guessing(uiState: GuessingUiState, onSubmit: (word: String) -> Unit) {
-    LocalLogger.current.d(uiState.toString())
+private fun Guessing(
+    uiState: GuessingUiState,
+    value: String,
+    onValueChanged: (String) -> Unit,
+    onSubmit: (word: String) -> Unit
+) {
     when (uiState) {
         is GuessingUiState.Guessing -> Guessing(
             uiModel = uiState,
-            onSubmit = onSubmit
+            value = value,
+            onValueChanged = onValueChanged,
+            onSubmit = onSubmit,
         )
         GuessingUiState.Loading -> CircularProgressIndicator()
     }
@@ -102,12 +142,16 @@ private fun Guessing(uiState: GuessingUiState, onSubmit: (word: String) -> Unit)
 @Composable
 private fun Guessing(
     uiModel: GuessingUiState.Guessing,
+    value: String,
+    onValueChanged: (String) -> Unit,
     onSubmit: (word: String) -> Unit
 ) {
 
     Guessing(
         guesses = uiModel.guesses,
         length = uiModel.length,
+        value = value,
+        onValueChanged = onValueChanged,
         isFinished = uiModel.isFinished,
         onSubmit = onSubmit
     )
@@ -119,6 +163,8 @@ private fun Guessing(
     guesses: List<GuessUiModel>,
     length: Int,
     isFinished: Boolean,
+    value: String,
+    onValueChanged: (String) -> Unit,
     onSubmit: (word: String) -> Unit,
 ) {
     val ime = LocalWindowInsets.current.ime
@@ -127,14 +173,14 @@ private fun Guessing(
     val navigationWithImeBottom = with(LocalDensity.current) { insets.bottom.toDp() }
     val scrollState = rememberScrollState()
 
-    var currentValue by remember(guesses) { mutableStateOf("") }
+    var currentValue by remember(value) { mutableStateOf(value) }
     val focusRequester = remember { FocusRequester() }
     val imeAction by derivedStateOf {
         if (currentValue.length == length) ImeAction.Done else ImeAction.None
     }
     val keyboard = LocalSoftwareKeyboardController.current
 
-    val openKeyboard =  {
+    val openKeyboard = {
         if (!isFinished) {
             keyboard?.show()
             focusRequester.requestFocus()
@@ -155,6 +201,7 @@ private fun Guessing(
                 val filteredNewValue = newValue.filter { it.isLetter() }
                 if (filteredNewValue.length <= length) {
                     currentValue = filteredNewValue
+                    onValueChanged(filteredNewValue)
                 }
             },
             modifier = Modifier

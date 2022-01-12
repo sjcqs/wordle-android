@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="guessing_invalid_word">"Ce mot n’existe pas. "</string>
+</resources>

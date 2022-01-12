@@ -36,8 +36,9 @@ internal class GuessingViewModel @Inject constructor(
     fun onSubmit(word: String) {
         viewModelScope.launch {
             val wasSubmitted = gameRepository.submit(word)
+            _uiEventFlow.emit(GuessingUiEvent.ClearInput)
             if (!wasSubmitted) {
-                _uiEventFlow.emit(GuessingUiEvent.ClearInput)
+                _uiEventFlow.emit(GuessingUiEvent.InvalidWord)
             }
         }
     }
@@ -56,6 +57,7 @@ internal sealed interface GuessingUiState {
 }
 
 internal sealed interface GuessingUiEvent {
+    object InvalidWord : GuessingUiEvent
     object ClearInput : GuessingUiEvent
 }
 
