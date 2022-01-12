@@ -1,6 +1,5 @@
 package fr.sjcqs.wordle.feature.guessing
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,12 +105,8 @@ fun Guessing() {
             }
         },
         content = { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                Guessing(
+            Surface(modifier = Modifier.padding(paddingValues)) {
+                GuessingState(
                     uiState = uiState,
                     value = typingWord,
                     onValueChanged = setTypingWord,
@@ -122,7 +117,7 @@ fun Guessing() {
 }
 
 @Composable
-private fun Guessing(
+private fun GuessingState(
     uiState: GuessingUiState,
     value: String,
     onValueChanged: (String) -> Unit,
@@ -198,7 +193,9 @@ private fun Guessing(
             value = currentValue,
             singleLine = true,
             onValueChange = { newValue ->
-                val filteredNewValue = newValue.filter { it.isLetter() }
+                val filteredNewValue = newValue.filter {
+                    it in 'A'..'Z'
+                }
                 if (filteredNewValue.length <= length) {
                     currentValue = filteredNewValue
                     onValueChanged(filteredNewValue)
