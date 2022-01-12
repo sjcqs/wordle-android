@@ -28,11 +28,10 @@ class GameRepositoryImpl @Inject constructor(
 
     private val gameFlow = MutableStateFlow(initialGame())
 
-    private fun initialGame(): Game = Game(
+    private fun initialGame() = Game(
         word = words.random(),
         guesses = emptyList(),
-        currentGuess = 0,
-        guessesCount = 6,
+        guessesCount = MAX_GUESSES,
     )
 
     override val dailyGame: Flow<Game>
@@ -84,4 +83,8 @@ class GameRepositoryImpl @Inject constructor(
             tiles = submitted.indices.map { tiles.getOrDefault(it, TileState.Absent) })
     }
 
+
+    companion object {
+        private const val MAX_GUESSES = 6
+    }
 }
