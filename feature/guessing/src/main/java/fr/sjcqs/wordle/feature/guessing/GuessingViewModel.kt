@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
-import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,8 +29,7 @@ internal class GuessingViewModel @Inject constructor(
     init {
         gameRepository.dailyGame
             .onEach { game ->
-                val guesses = game.guesses.map(Guess::toUiModel)
-                _uiStateFlow.value = GuessingUiState.Guessing(guesses)
+                _uiStateFlow.value = game.toUiModel()
             }.launchIn(viewModelScope)
     }
 
@@ -50,7 +48,11 @@ internal sealed interface GuessingUiState {
     object Loading : GuessingUiState
 
     @Immutable
-    data class Guessing(val guesses: List<GuessUiModel>) : GuessingUiState
+    data class Guessing(
+        val guesses: List<GuessUiModel>,
+        val isFinished: Boolean,
+        val length: Int,
+    ) : GuessingUiState
 }
 
 internal sealed interface GuessingUiEvent {

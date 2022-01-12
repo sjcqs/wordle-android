@@ -6,7 +6,6 @@ import fr.sjcqs.wordle.annotations.DefaultDispatcher
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.data.game.entity.TileState
-import fr.sjcqs.wordle.logger.Logger
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
 class GameRepositoryImpl @Inject constructor(
-    private val logger: Logger,
     @DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext
@@ -28,7 +26,14 @@ class GameRepositoryImpl @Inject constructor(
             .toHashSet()
     }
 
-    private val gameFlow = MutableStateFlow(INITIAL_STATE)
+    private val gameFlow = MutableStateFlow(initialGame())
+
+    private fun initialGame(): Game = Game(
+        word = words.random(),
+        guesses = emptyList(),
+        currentGuess = 0,
+        guessesCount = 6,
+    )
 
     override val dailyGame: Flow<Game>
         get() = gameFlow
@@ -50,7 +55,7 @@ class GameRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun computeGuess(expected: String, submitted: String): Guess.Submitted {
+    private fun computeGuess(expected: String, submitted: String): Guess {
         val letterVisits = mutableMapOf<Char, Int>()
         val tiles = buildMap {
             expected.onEachIndexed { index, expectedLetter ->
@@ -74,23 +79,9 @@ class GameRepositoryImpl @Inject constructor(
                 }
             }
         }
-        return Guess.Submitted(
+        return Guess(
             word = submitted,
             tiles = submitted.indices.map { tiles.getOrDefault(it, TileState.Absent) })
-    }
-
-    companion object {
-        private val INITIAL_STATE = Game(
-            word = "GAREE",
-            guesses = listOf(
-                Guess.Current,
-                Guess.Empty,
-                Guess.Empty,
-                Guess.Empty,
-                Guess.Empty,
-                Guess.Empty,
-            ),
-        )
     }
 
 }

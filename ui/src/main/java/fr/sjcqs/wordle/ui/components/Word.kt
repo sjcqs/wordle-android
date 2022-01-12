@@ -19,29 +19,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.TextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import fr.sjcqs.wordle.ui.theme.absent
@@ -51,55 +36,24 @@ import fr.sjcqs.wordle.ui.theme.present
 
 enum class TileUiState { Present, Correct, Absent }
 
+private val TileShape
+    @Composable
+    get() = RoundedCornerShape(2.dp)
+
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Word(
-    value: String,
     modifier: Modifier = Modifier,
+    word: String = "",
     tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
-    isEditable: Boolean = true,
-    onSubmit: (word: String) -> Unit
+    onTileClicked: () -> Unit,
+    onSubmit: (word: String) -> Unit = {}
 ) {
-    require(value.length <= length) {
-        "$value is too long (max $length, current: ${value.length})"
+    require(word.length <= length) {
+        "$word is too long (max $length, current: ${word.length})"
     }
-    var currentValue by remember { mutableStateOf(value.uppercase()) }
-    val focusRequester = remember { FocusRequester() }
-    val imeAction by derivedStateOf {
-        if (currentValue.length == length) ImeAction.Done else ImeAction.None
-    }
-    val keyboard = LocalSoftwareKeyboardController.current
-
-    if (isEditable) {
-        DisposableEffect(Unit) {
-            focusRequester.requestFocus()
-            onDispose {
-                /* no-op */
-            }
-        }
-    }
-    TextField(
-        value = currentValue,
-        readOnly = !isEditable,
-        singleLine = true,
-        onValueChange = { newValue ->
-            val filteredNewValue = newValue.filter { it.isLetter() }
-            if (filteredNewValue.length <= length) {
-                currentValue = filteredNewValue
-            }
-        },
-        modifier = Modifier
-            .size(0.dp)
-            .focusRequester(focusRequester),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Ascii,
-            capitalization = KeyboardCapitalization.Characters,
-            autoCorrect = false,
-            imeAction = imeAction
-        ),
-        keyboardActions = KeyboardActions(onDone = { onSubmit(currentValue) })
-    )
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -108,16 +62,11 @@ fun Word(
         val tileModifier = Modifier
             .weight(1f)
             .aspectRatio(1f)
-            .run {
-                if (isEditable) {
-                    clickable {
-                        focusRequester.requestFocus()
-                        keyboard?.show()
-                    }
-                } else this
+            .clickable {
+                onTileClicked()
             }
         repeat(length) { index ->
-            val letter = currentValue.getOrNull(index)?.toString().orEmpty()
+            val letter = word.getOrNull(index)?.toString().orEmpty()
             when (tileStates[index]) {
                 TileUiState.Present -> BackgroundedTile(
                     value = letter,
@@ -146,10 +95,6 @@ fun Word(
         }
     }
 }
-
-private val TileShape
-    @Composable
-    get() = RoundedCornerShape(2.dp)
 
 @Composable
 private fun OutlinedTile(
