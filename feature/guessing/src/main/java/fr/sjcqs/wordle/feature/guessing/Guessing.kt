@@ -73,10 +73,11 @@ fun Guessing() {
     LaunchedEffect(key1 = viewModel) {
         viewModel.uiEventFlow.onEach { event ->
             when (event) {
+                GuessingUiEvent.ClearInput -> setTypingWord("")
                 GuessingUiEvent.InvalidWord -> {
+                    setTypingWord("")
                     scaffoldState.snackbarHostState.showSnackbar(invalidWord)
                 }
-                GuessingUiEvent.ClearInput -> setTypingWord("")
             }
         }.launchIn(this)
     }
