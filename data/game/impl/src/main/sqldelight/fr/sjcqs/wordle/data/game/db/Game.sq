@@ -1,0 +1,10 @@
+import fr.sjcqs.wordle.data.game.entity.Guess;
+import java.time.LocalDate;
+import kotlin.collections.List;
+
+CREATE TABLE game (
+  word TEXT NOT NULL,
+  date TEXT AS LocalDate NOT NULL,
+  guesses TEXT AS List<Guess> NOT NULL,
+  isFinished INTEGER AS Boolean DEFAULT 0
+);
