@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
@@ -58,6 +59,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Guessing() {
     val viewModel: GuessingViewModel = hiltViewModel()
@@ -197,39 +199,6 @@ private fun Guessing(
         }
     }
 
-    if (!isFinished) {
-        DisposableEffect(Unit) {
-            focusRequester.requestFocus()
-            onDispose {
-                /* no-op */
-            }
-        }
-        TextField(
-            value = currentValue,
-            singleLine = true,
-            onValueChange = { newValue ->
-                val filteredNewValue = newValue.filter {
-                    it in 'A'..'Z'
-                }
-                if (filteredNewValue.length <= length) {
-                    currentValue = filteredNewValue
-                    onValueChanged(filteredNewValue)
-                }
-            },
-            modifier = Modifier
-                .size(0.dp)
-                .alpha(0f)
-                .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Ascii,
-                capitalization = KeyboardCapitalization.Characters,
-                autoCorrect = false,
-                imeAction = imeAction
-            ),
-            keyboardActions = KeyboardActions(onDone = { onSubmit(currentValue) })
-        )
-    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -268,6 +237,38 @@ private fun Guessing(
             }
         }
         Spacer(modifier = Modifier.height(navigationWithImeBottom))
+        if (!isFinished) {
+            DisposableEffect(Unit) {
+                openKeyboard()
+                onDispose {
+                    /* no-op */
+                }
+            }
+            TextField(
+                value = currentValue,
+                singleLine = true,
+                onValueChange = { newValue ->
+                    val filteredNewValue = newValue.filter {
+                        it in 'A'..'Z'
+                    }
+                    if (filteredNewValue.length <= length) {
+                        currentValue = filteredNewValue
+                        onValueChanged(filteredNewValue)
+                    }
+                },
+                modifier = Modifier
+                    .size(0.dp)
+                    .alpha(0f)
+                    .focusRequester(focusRequester),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Ascii,
+                    capitalization = KeyboardCapitalization.Characters,
+                    autoCorrect = false,
+                    imeAction = imeAction
+                ),
+                keyboardActions = KeyboardActions(onDone = { onSubmit(currentValue) })
+            )
+        }
     }
 }
 
