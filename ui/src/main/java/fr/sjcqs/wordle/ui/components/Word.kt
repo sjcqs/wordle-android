@@ -1,13 +1,5 @@
 package fr.sjcqs.wordle.ui.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.expandIn
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
-import androidx.compose.animation.with
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,14 +19,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import fr.sjcqs.wordle.ui.theme.absent
 import fr.sjcqs.wordle.ui.theme.contentColorFor
 import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.present
 
-enum class TileUiState { Present, Correct, Absent }
+enum class TileUiState {
+    Present,
+    Correct,
+    Absent,
+    HintCorrect,
+    HintAbsent,
+}
 
 private val TileShape
     @Composable
@@ -82,6 +79,16 @@ fun Word(
                     value = letter,
                     modifier = tileModifier,
                     backgroundColor = MaterialTheme.colorScheme.absent,
+                )
+                TileUiState.HintCorrect -> OutlinedTile(
+                    value = letter,
+                    modifier = tileModifier,
+                    outlineColor = MaterialTheme.colorScheme.correct
+                )
+                TileUiState.HintAbsent -> OutlinedTile(
+                    value = letter,
+                    modifier = tileModifier,
+                    outlineColor = MaterialTheme.colorScheme.absent
                 )
                 null -> OutlinedTile(
                     value = letter,
@@ -131,33 +138,19 @@ private fun BackgroundedTile(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun Tile(
     value: String,
     modifier: Modifier = Modifier,
-    contentColor: Color = androidx.compose.material3.LocalContentColor.current,
+    contentColor: Color = LocalContentColor.current,
 ) {
     Box(modifier = modifier) {
-        AnimatedContent(
+        AutoSizeText(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(8.dp),
-            targetState = value,
-            transitionSpec = {
-                if (targetState.isEmpty()) {
-                    expandIn { size -> size } + fadeIn() with
-                            shrinkOut { IntSize.Zero } + fadeOut()
-                } else {
-                    expandIn { IntSize.Zero } + fadeIn() with
-                            shrinkOut { size -> size } + fadeOut()
-                }.using(SizeTransform(clip = false))
-            }
-        ) { targetValue ->
-            AutoSizeText(
-                text = targetValue,
-                style = MaterialTheme.typography.labelLarge,
-                color = contentColor,
-            )
-        }
+            text = value,
+            style = MaterialTheme.typography.labelLarge,
+            color = contentColor,
+        )
     }
 }

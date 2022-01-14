@@ -67,6 +67,9 @@ fun Guessing() {
     val ime = LocalWindowInsets.current.ime
     val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
     val scaffoldState = rememberScaffoldState()
+    val snackbarState by derivedStateOf {
+        scaffoldState.snackbarHostState
+    }
     val invalidWord = stringResource(id = R.string.guessing_invalid_word)
 
     val (typingWord, setTypingWord) = remember(uiState) {
@@ -78,8 +81,7 @@ fun Guessing() {
             when (event) {
                 GuessingUiEvent.ClearInput -> setTypingWord("")
                 GuessingUiEvent.InvalidWord -> {
-                    setTypingWord("")
-                    scaffoldState.snackbarHostState.showSnackbar(invalidWord)
+                    snackbarState.showSnackbar(invalidWord)
                 }
             }
         }.launchIn(this)
@@ -118,19 +120,22 @@ fun Guessing() {
                     .fillMaxSize()
                     .verticalScroll(scrollState, enabled = false)
             ) {
-                GuessingState(
+                Guessing(
                     uiState = uiState,
                     value = typingWord,
                     scrollState = scrollState,
                     onValueChanged = setTypingWord,
-                    onSubmit = { viewModel.onSubmit(it) }
+                    onSubmit = { word ->
+                        snackbarState.currentSnackbarData?.dismiss()
+                        viewModel.onSubmit(word)
+                    }
                 )
             }
         })
 }
 
 @Composable
-private fun GuessingState(
+private fun Guessing(
     uiState: GuessingUiState,
     value: String,
     scrollState: ScrollState,
@@ -160,6 +165,7 @@ private fun Guessing(
 
     Guessing(
         guesses = uiModel.guesses,
+        tilesLetters = uiModel.tilesLetters,
         length = uiModel.length,
         value = value,
         scrollState = scrollState,
@@ -173,6 +179,7 @@ private fun Guessing(
 @Composable
 private fun Guessing(
     guesses: List<GuessUiModel>,
+    tilesLetters: Map<Int, Map<Char, TileUiState>>,
     length: Int,
     isFinished: Boolean,
     value: String,
@@ -186,6 +193,12 @@ private fun Guessing(
     val navigationWithImeBottom = with(LocalDensity.current) { insets.bottom.toDp() }
 
     var currentValue by remember(value) { mutableStateOf(value) }
+    val currentTiles: Map<Int, TileUiState> by derivedStateOf {
+        currentValue.mapIndexedNotNull { index, letter ->
+            val tileState = tilesLetters[index]?.get(letter)
+            if (tileState != null) (index to tileState) else null
+        }.toMap()
+    }
     val focusRequester = remember { FocusRequester() }
     val imeAction by derivedStateOf {
         if (currentValue.length == length) ImeAction.Done else ImeAction.None
@@ -228,7 +241,7 @@ private fun Guessing(
                             }
                         }
                 } else Modifier,
-                tiles = guess.tileState,
+                tiles = if (guess.isEditable) currentTiles else guess.tileState,
                 onSubmit = onSubmit,
                 onTileClicked = openKeyboard
             )

@@ -51,6 +51,7 @@ internal sealed interface GuessingUiState {
     @Immutable
     data class Guessing(
         val guesses: List<GuessUiModel>,
+        val tilesLetters: Map<Int, Map<Char, TileUiState>>,
         val isFinished: Boolean,
         val length: Int,
     ) : GuessingUiState
@@ -66,4 +67,10 @@ internal data class GuessUiModel(
     val word: String = "",
     val tileState: Map<Int, TileUiState> = emptyMap(),
     val isEditable: Boolean = false,
+)
+
+@Immutable
+internal data class LetterUiModel(
+    val letter: Char,
+    val state: TileUiState
 )
