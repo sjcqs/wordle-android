@@ -13,7 +13,6 @@ import fr.sjcqs.wordle.logger.Logger
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -50,7 +49,6 @@ class GameRepositoryImpl @Inject constructor(
 
     override val dailyGame: Flow<Game> = dbDataSource.watchLatest()
         .onStart {
-            delay(2000)
             val latest = dbDataSource.getLatest()
             if (latest == null || latest.isExpired) {
                 val randomGame = randomGame()
