@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -40,6 +42,7 @@ internal fun Finished(
         guesses = uiState.guesses,
         isWon = uiState.isWon,
         length = uiState.length,
+        onReload = uiState.onReload
     )
 }
 
@@ -49,18 +52,35 @@ private fun Finished(
     guesses: List<GuessUiModel>,
     isWon: Boolean,
     length: Int,
+    onReload: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val tileSize = 48.dp
-        guesses.forEach { guess ->
-            Tiles(guess, tileSize)
+        Tiles(guesses, tileSize)
+        Spacer(modifier = Modifier.height(4.dp))
+        Word(word, tileSize)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onReload) {
+            Text(text = "Recommencer")
+        }
+    }
+}
+
+@Composable
+private fun Tiles(
+    guesses: List<GuessUiModel>,
+    tileSize: Dp,
+) {
+    guesses.forEachIndexed { index, guess ->
+        Guess(guess, tileSize)
+        if (index != guesses.lastIndex) {
             Spacer(modifier = Modifier.height(4.dp))
         }
-        Word(word, tileSize)
     }
 }
 
@@ -88,7 +108,7 @@ private fun Word(word: String, tileSize: Dp) {
 }
 
 @Composable
-private fun Tiles(
+private fun Guess(
     guess: GuessUiModel,
     tileSize: Dp,
 ) {

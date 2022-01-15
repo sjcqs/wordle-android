@@ -91,6 +91,6 @@ class GameRepositoryImpl @Inject constructor(
 
 
     companion object {
-        private const val MAX_GUESSES = 3
+        private const val MAX_GUESSES = 6
     }
 }
