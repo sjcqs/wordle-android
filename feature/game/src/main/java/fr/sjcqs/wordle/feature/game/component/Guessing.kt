@@ -55,6 +55,13 @@ internal fun Guessing(
     val insets = remember(ime, navBars) { derivedWindowInsetsTypeOf(ime, navBars) }
     val navigationWithImeBottom = with(LocalDensity.current) { insets.bottom.toDp() }
 
+    val keyboard = LocalSoftwareKeyboardController.current
+    val openKeyboard = {
+        if (!ime.isVisible) {
+            keyboard?.show()
+        }
+    }
+
     val focusRequester = remember { FocusRequester() }
     var currentValue by remember(value) { mutableStateOf(value) }
     val currentTiles: Map<Int, TileUiState> by derivedStateOf {
@@ -66,27 +73,22 @@ internal fun Guessing(
     val imeAction by derivedStateOf {
         if (currentValue.length == uiState.length) ImeAction.Done else ImeAction.None
     }
-    val keyboard = LocalSoftwareKeyboardController.current
-
-    val openKeyboard = {
-        if (!ime.isVisible) {
-            keyboard?.show()
-            focusRequester.requestFocus()
-        }
-    }
 
     Guessing(
         guesses = uiState.guesses,
         value = currentValue,
         currentTiles = currentTiles,
         isImeVisible = ime.isVisible,
-        openKeyboard = openKeyboard,
+        openKeyboard = {
+            focusRequester.requestFocus()
+            openKeyboard()
+        },
         navigationWithImeBottom = navigationWithImeBottom,
         scrollState = scrollState
     )
     if (!isFinished) {
         DisposableEffect(uiState) {
-            openKeyboard()
+            focusRequester.requestFocus()
             onDispose {
                 /* no-op */
             }

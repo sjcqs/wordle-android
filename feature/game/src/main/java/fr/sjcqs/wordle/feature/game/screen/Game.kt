@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,18 +42,24 @@ import fr.sjcqs.wordle.feature.game.component.Guessing
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
 fun Game() {
     val invalidWord = stringResource(id = R.string.guessing_invalid_word)
 
     val viewModel: GameViewModel = hiltViewModel()
-    val uiState by viewModel.uiStateFlow.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val ime = LocalWindowInsets.current.ime
     val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
     val coroutineScope = rememberCoroutineScope()
+
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    val closeKeyboard = {
+        keyboard?.hide()
+    }
 
     fun snackbar(message: String) {
         coroutineScope.launch {
@@ -65,11 +72,12 @@ fun Game() {
     }
 
     LaunchedEffect(key1 = viewModel) {
-        viewModel.uiEventFlow.collect { event ->
+        viewModel.uiEvent.collect { event ->
             when (event) {
                 GameUiEvent.ClearInput -> setTypingWord("")
                 GameUiEvent.InvalidWord -> snackbar(invalidWord)
                 GameUiEvent.Dismiss -> snackbarState.currentSnackbarData?.dismiss()
+                GameUiEvent.CloseKeyboard -> closeKeyboard()
             }
         }
     }
