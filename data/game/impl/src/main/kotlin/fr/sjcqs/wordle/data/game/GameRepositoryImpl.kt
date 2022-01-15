@@ -3,23 +3,35 @@ package fr.sjcqs.wordle.data.game
 import android.content.Context
 import fr.sjcqs.wordle.annotations.ApplicationContext
 import fr.sjcqs.wordle.annotations.DefaultDispatcher
+import fr.sjcqs.wordle.data.game.db.GameDbDataSource
+import fr.sjcqs.wordle.data.game.db.fromDb
+import fr.sjcqs.wordle.data.game.db.toDb
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.data.game.entity.TileState
+import fr.sjcqs.wordle.logger.Logger
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
+import fr.sjcqs.wordle.data.game.db.Game as DbGame
 
 class GameRepositoryImpl @Inject constructor(
     @DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext
     private val context: Context,
-    // db datasource
+    private val dbDataSource: GameDbDataSource,
+    private val logger: Logger,
     // network datasource
 ) : GameRepository {
+    private lateinit var game: Game
     private val words: HashSet<String> = assertsWords("words.txt")
 
     private fun assertsWords(fileName: String): HashSet<String> {
@@ -29,26 +41,35 @@ class GameRepositoryImpl @Inject constructor(
             .toHashSet()
     }
 
-    private val gameFlow = MutableStateFlow(initialGame())
-
-    private fun initialGame() = Game(
+    private fun randomGame() = Game(
         word = assertsWords("suggested_words.txt").random(),
         guesses = emptyList(),
         guessesCount = MAX_GUESSES,
+        expiredAt = LocalDate.now().plusDays(1)
     )
 
-    override val dailyGame: Flow<Game> = gameFlow
+    override val dailyGame: Flow<Game> = dbDataSource.watchLatest()
+        .onStart {
+            delay(2000)
+            val latest = dbDataSource.getLatest()
+            if (latest == null || latest.isExpired) {
+                val randomGame = randomGame()
+                dbDataSource.insertOrUpdate(randomGame.toDb())
+            }
+        }.map { it.fromDb(MAX_GUESSES) }
+        .onEach { game = it }
+        .distinctUntilChanged()
 
     override suspend fun submit(word: String): Boolean {
         return withContext(defaultDispatcher) {
             if (words.contains(word)) {
-                val game = gameFlow.value
                 if (game.isFinished) {
                     return@withContext false
                 }
 
                 val guess = computeGuess(expected = game.word, submitted = word)
-                gameFlow.value = game.add(guess)
+                val updatedGame = game.add(guess)
+                dbDataSource.insertOrUpdate(updatedGame.toDb())
                 true
             } else {
                 false
@@ -58,7 +79,8 @@ class GameRepositoryImpl @Inject constructor(
 
     override suspend fun refresh() {
         withContext(defaultDispatcher) {
-            gameFlow.value = initialGame()
+            val randomGame = randomGame()
+            dbDataSource.insertOrUpdate(randomGame.toDb())
         }
     }
 
@@ -91,6 +113,8 @@ class GameRepositoryImpl @Inject constructor(
             tiles = submitted.indices.map { tiles.getOrDefault(it, TileState.Absent) })
     }
 
+    private val DbGame.isExpired: Boolean
+        get() = expiredAt < LocalDate.now()
 
     companion object {
         private const val MAX_GUESSES = 6

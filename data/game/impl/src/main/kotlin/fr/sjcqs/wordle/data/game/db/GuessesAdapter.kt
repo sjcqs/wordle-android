@@ -30,7 +30,7 @@ class GuessesAdapter : ColumnAdapter<List<Guess>, String> {
 
     override fun encode(value: List<Guess>): String {
         return value.joinToString(";") { guess ->
-            "${guess.word}:${guess.tiles.joinToString(",") { "${it.databaseId}" }}"
+            "${guess.word}:${guess.tiles.joinToString(",") { it.name }}"
         }
     }
 }

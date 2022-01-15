@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import fr.sjcqs.wordle.annotations.ApplicationContext
 import fr.sjcqs.wordle.data.game.Database
 import fr.sjcqs.wordle.data.game.db.Game
+import fr.sjcqs.wordle.data.game.db.GameQueries
 import fr.sjcqs.wordle.data.game.db.GuessesAdapter
 import fr.sjcqs.wordle.data.game.db.LocalDateAdapter
 import javax.inject.Singleton
@@ -34,6 +35,9 @@ internal object DatabaseModule {
             GuessesAdapter()
         )
     )
+
+    @Provides
+    fun gameQueries(database: Database): GameQueries = database.gameQueries
 
     private const val DATABASE_FILE_NAME = "database.db"
 }

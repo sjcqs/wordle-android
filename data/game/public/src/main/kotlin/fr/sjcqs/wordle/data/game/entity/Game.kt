@@ -1,8 +1,11 @@
 package fr.sjcqs.wordle.data.game.entity
 
+import java.time.LocalDate
+
 data class Game(
     val word: String,
     val guessesCount: Int,
+    val expiredAt: LocalDate,
     val guesses: List<Guess>,
     val isFinished: Boolean = false,
 ) {
@@ -43,4 +46,5 @@ data class Game(
         guesses = guesses.plus(guess),
         isFinished = guesses.size + 1 == guessesCount || guess.word == word
     )
+
 }
