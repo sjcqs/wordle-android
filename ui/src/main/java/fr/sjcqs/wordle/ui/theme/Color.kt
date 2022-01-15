@@ -106,7 +106,7 @@ internal val DarkColorScheme = darkColorScheme(
     secondary = Colors.Oslogray,
     secondaryContainer = Colors.Cuttyshark,
     surface = Colors.Black800,
-    outline = Color(58, 58, 60)
+    outline = Color(135, 138, 140)
 )
 
 internal val LightTileColorScheme = TileColorScheme()
@@ -124,5 +124,5 @@ internal val LightColorScheme = lightColorScheme(
     secondary = Colors.Oslogray,
     secondaryContainer = Colors.Cuttyshark,
     surface = Colors.White,
-    outline = Color(135, 138, 140)
+    outline = Color(58, 58, 60)
 )
