@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,8 +65,8 @@ private fun Finished(
         Spacer(modifier = Modifier.height(4.dp))
         Word(word, tileSize)
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onReload) {
-            Text(text = "Recommencer")
+        OutlinedButton(onClick = onReload) {
+            Text(text = "Recommencer", color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }

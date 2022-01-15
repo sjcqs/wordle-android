@@ -24,8 +24,8 @@ data class Game(
                             letters.apply {
                                 compute(letter) { _, currentTileState ->
                                     when (currentTileState) {
-                                        TileState.Present -> currentTileState
-                                        TileState.Correct,
+                                        TileState.Present,
+                                        TileState.Correct -> currentTileState
                                         TileState.Absent,
                                         null,
                                         -> TileState.Absent
