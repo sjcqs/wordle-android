@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
@@ -12,6 +13,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -90,22 +92,21 @@ fun Game() {
             )
         },
         topBar = {
-            Surface(
-                shadowElevation = elevation,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .padding(vertical = 16.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.game_title),
-                        modifier = Modifier.align(Alignment.Center),
-                        style = MaterialTheme.typography.headlineLarge,
-                    )
+            MediumTopAppBar(
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .statusBarsPadding()
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.Center),
+                            text = stringResource(id = R.string.game_title)
+                        )
+                    }
                 }
-            }
+            )
         },
         content = { paddingValues ->
             val scrollState = rememberScrollState()
@@ -140,7 +141,14 @@ private fun Game(
             isFinished = false,
             scrollState = scrollState,
         )
-        GameUiState.Loading -> CircularProgressIndicator()
+        GameUiState.Loading -> Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         is GameUiState.Finished -> Finished(uiState = uiState)
     }
 }
