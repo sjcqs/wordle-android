@@ -7,4 +7,5 @@ interface GameRepository {
     val dailyGame: Flow<Game>
 
     suspend fun submit(word: String): Boolean
+    suspend fun refresh()
 }

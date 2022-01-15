@@ -32,7 +32,9 @@ import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.present
 
 @Composable
-internal fun Finished(uiState: GameUiState.Finished, ) {
+internal fun Finished(
+    uiState: GameUiState.Finished,
+) {
     Finished(
         word = uiState.word,
         guesses = uiState.guesses,
@@ -129,8 +131,9 @@ private fun FinishedPreview() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(vertical = 8.dp)
         ) {
-            Finished(uiState = GameUiState.Finished(
-                "MELEE",
+            val uiState = GameUiState.Finished(
+                word = "MELEE",
+                onReload = {},
                 isWon = false,
                 guesses = listOf(
                     GuessUiModel(tileState = mapOf(
@@ -155,8 +158,10 @@ private fun FinishedPreview() {
                         4 to TileUiState.values().random(),
                     )),
                 ),
-                length = 5
-            ))
+                length = 5,
+            )
+            Finished(
+                uiState = uiState)
         }
     }
 }

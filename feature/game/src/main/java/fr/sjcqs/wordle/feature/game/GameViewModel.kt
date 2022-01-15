@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
-import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,12 +28,24 @@ internal class GameViewModel @Inject constructor(
     val uiEventFlow = _uiEventFlow.asSharedFlow()
 
     init {
-        gameRepository.dailyGame.map(Game::toUiState)
+        gameRepository.dailyGame
+            .map { game ->
+                game.toUiState(
+                    onReload = ::onReload,
+                    onSubmit = ::onSubmit,
+                )
+            }
             .onEach(_uiStateFlow::emit)
             .launchIn(viewModelScope)
     }
 
-    fun onSubmit(word: String) {
+    private fun onReload() {
+        viewModelScope.launch {
+            gameRepository.refresh()
+        }
+    }
+
+    private fun onSubmit(word: String) {
         viewModelScope.launch {
             val wasSubmitted = gameRepository.submit(word)
             _uiEventFlow.emit(GameUiEvent.ClearInput)
@@ -59,6 +70,7 @@ internal sealed interface GameUiState {
         override val guesses: List<GuessUiModel>,
         override val length: Int,
         val tilesLetters: Map<Int, Map<Char, TileUiState>>,
+        val onSubmit: (word: String) -> Unit,
     ) : Playing
 
     @Immutable
@@ -67,6 +79,7 @@ internal sealed interface GameUiState {
         override val guesses: List<GuessUiModel>,
         val isWon: Boolean,
         override val length: Int,
+        val onReload: () -> Unit,
     ) : Playing
 }
 

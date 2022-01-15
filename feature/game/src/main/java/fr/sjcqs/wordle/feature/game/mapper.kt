@@ -11,7 +11,10 @@ internal fun TileState.toUiModel(isHint: Boolean = false): TileUiState = when (t
     TileState.Present -> TileUiState.Present
 }
 
-internal fun Game.toUiState(): GameUiState {
+internal fun Game.toUiState(
+    onReload: () -> Unit,
+    onSubmit: (String) -> Unit,
+): GameUiState {
     val length = word.length
     val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
@@ -27,7 +30,8 @@ internal fun Game.toUiState(): GameUiState {
             word = word,
             guesses = guessUiModels,
             length = length,
-            isWon = isWon
+            isWon = isWon,
+            onReload = onReload
         )
     } else {
         GameUiState.Guessing(
@@ -36,6 +40,7 @@ internal fun Game.toUiState(): GameUiState {
             tilesLetters = tileLetters.mapValues { (_, letters) ->
                 letters.mapValues { (_, tileState) -> tileState.toUiModel(isHint = true) }
             },
+            onSubmit = onSubmit
         )
     }
 }

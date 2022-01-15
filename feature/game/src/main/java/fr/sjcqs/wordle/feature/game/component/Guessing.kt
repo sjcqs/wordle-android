@@ -44,10 +44,9 @@ import fr.sjcqs.wordle.ui.components.Word
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun Guessing(
-    uiModel: GameUiState.Guessing,
+    uiState: GameUiState.Guessing,
     value: String,
     onValueChanged: (String) -> Unit,
-    onSubmit: (word: String) -> Unit,
     isFinished: Boolean,
     scrollState: ScrollState,
 ) {
@@ -60,12 +59,12 @@ internal fun Guessing(
     var currentValue by remember(value) { mutableStateOf(value) }
     val currentTiles: Map<Int, TileUiState> by derivedStateOf {
         currentValue.mapIndexedNotNull { index, letter ->
-            val tileState = uiModel.tilesLetters[index]?.get(letter)
+            val tileState = uiState.tilesLetters[index]?.get(letter)
             if (tileState != null) (index to tileState) else null
         }.toMap()
     }
     val imeAction by derivedStateOf {
-        if (currentValue.length == uiModel.length) ImeAction.Done else ImeAction.None
+        if (currentValue.length == uiState.length) ImeAction.Done else ImeAction.None
     }
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -77,17 +76,16 @@ internal fun Guessing(
     }
 
     Guessing(
-        guesses = uiModel.guesses,
+        guesses = uiState.guesses,
         value = currentValue,
         currentTiles = currentTiles,
         isImeVisible = ime.isVisible,
         openKeyboard = openKeyboard,
-        onSubmit = onSubmit,
         navigationWithImeBottom = navigationWithImeBottom,
         scrollState = scrollState
     )
     if (!isFinished) {
-        DisposableEffect(uiModel) {
+        DisposableEffect(uiState) {
             openKeyboard()
             onDispose {
                 /* no-op */
@@ -100,7 +98,7 @@ internal fun Guessing(
                 val filteredNewValue = newValue.filter {
                     it in 'A'..'Z'
                 }
-                if (filteredNewValue.length <= uiModel.length) {
+                if (filteredNewValue.length <= uiState.length) {
                     currentValue = filteredNewValue
                     onValueChanged(filteredNewValue)
                 }
@@ -115,7 +113,9 @@ internal fun Guessing(
                 autoCorrect = false,
                 imeAction = imeAction
             ),
-            keyboardActions = KeyboardActions(onDone = { onSubmit(currentValue) })
+            keyboardActions = KeyboardActions(
+                onDone = { uiState.onSubmit(currentValue) }
+            )
         )
     }
 }
@@ -127,7 +127,6 @@ private fun Guessing(
     currentTiles: Map<Int, TileUiState>,
     isImeVisible: Boolean,
     openKeyboard: () -> Unit,
-    onSubmit: (word: String) -> Unit,
     navigationWithImeBottom: Dp,
     scrollState: ScrollState,
 ) {
@@ -140,7 +139,7 @@ private fun Guessing(
         val density = LocalDensity.current
         var currentTileOffset: Dp by remember { mutableStateOf(0.dp) }
         val scrollBy: Dp by derivedStateOf { currentTileOffset + 16.dp }
-        LaunchedEffect(key1 = scrollBy, key2 = isImeVisible) {
+        LaunchedEffect(key1 = scrollBy) {
             if (isImeVisible) {
                 scrollState.scrollBy(scrollBy.value)
             }
@@ -162,7 +161,6 @@ private fun Guessing(
                     }
                 } else Modifier,
                 tiles = if (guess.isEditable) currentTiles else guess.tileState,
-                onSubmit = onSubmit,
                 onTileClicked = openKeyboard
             )
             if (index < guesses.lastIndex) {
@@ -179,13 +177,11 @@ private fun Guess(
     modifier: Modifier,
     onTileClicked: () -> Unit,
     tiles: Map<Int, TileUiState>,
-    onSubmit: (word: String) -> Unit,
 ) {
     Word(
         modifier = modifier,
         word = word,
         onTileClicked = onTileClicked,
-        onSubmit = onSubmit,
         tileStates = tiles
     )
 }

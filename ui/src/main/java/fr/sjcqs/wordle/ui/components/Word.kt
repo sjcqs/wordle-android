@@ -42,7 +42,6 @@ fun Word(
     tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
     onTileClicked: () -> Unit,
-    onSubmit: (word: String) -> Unit = {},
 ) {
     require(word.length <= length) {
         "$word is too long (max $length, current: ${word.length})"

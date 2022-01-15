@@ -56,6 +56,10 @@ class GameRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun refresh() {
+        gameFlow.value = initialGame()
+    }
+
     private fun computeGuess(expected: String, submitted: String): Guess {
         val letterVisits = mutableMapOf<Char, Int>()
         val tiles = buildMap {

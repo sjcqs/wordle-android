@@ -103,10 +103,6 @@ fun Game() {
                     uiState = uiState,
                     typingWord = typingWord,
                     onValueChanged = setTypingWord,
-                    onSubmit = { word ->
-                        snackbarState.currentSnackbarData?.dismiss()
-                        viewModel.onSubmit(word)
-                    },
                     scrollState = scrollState
                 )
             }
@@ -118,15 +114,13 @@ private fun Game(
     uiState: GameUiState,
     typingWord: String,
     onValueChanged: (String) -> Unit,
-    onSubmit: (word: String) -> Unit,
     scrollState: ScrollState,
 ) {
     when (uiState) {
         is GameUiState.Guessing -> Guessing(
-            uiModel = uiState,
+            uiState = uiState,
             value = typingWord,
             onValueChanged = onValueChanged,
-            onSubmit = onSubmit,
             isFinished = false,
             scrollState = scrollState,
         )
