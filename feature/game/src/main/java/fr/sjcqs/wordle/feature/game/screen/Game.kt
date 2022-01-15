@@ -53,7 +53,7 @@ fun Game() {
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
 
-    val (typingWord, setTypingWord) = remember(uiState) {
+    val (typingWord, setTypingWord) = remember(viewModel) {
         mutableStateOf("")
     }
 
@@ -101,7 +101,7 @@ fun Game() {
             ) {
                 Game(
                     uiState = uiState,
-                    value = typingWord,
+                    typingWord = typingWord,
                     onValueChanged = setTypingWord,
                     onSubmit = { word ->
                         snackbarState.currentSnackbarData?.dismiss()
@@ -116,7 +116,7 @@ fun Game() {
 @Composable
 private fun Game(
     uiState: GameUiState,
-    value: String,
+    typingWord: String,
     onValueChanged: (String) -> Unit,
     onSubmit: (word: String) -> Unit,
     scrollState: ScrollState,
@@ -124,7 +124,7 @@ private fun Game(
     when (uiState) {
         is GameUiState.Guessing -> Guessing(
             uiModel = uiState,
-            value = value,
+            value = typingWord,
             onValueChanged = onValueChanged,
             onSubmit = onSubmit,
             isFinished = false,
