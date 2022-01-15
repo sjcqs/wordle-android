@@ -38,6 +38,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.derivedWindowInsetsTypeOf
 import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GuessUiModel
+import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.ui.components.TileUiState
 import fr.sjcqs.wordle.ui.components.Word
 
@@ -169,7 +170,7 @@ private fun Guessing(
                 onTileClicked = openKeyboard
             )
             if (index < guesses.lastIndex) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
             }
         }
         Spacer(modifier = Modifier.height(navigationWithImeBottom))

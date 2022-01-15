@@ -22,7 +22,9 @@ internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<GameUiState>(GameUiState.Loading)
+    private val _uiState = MutableStateFlow<GameUiState>(
+        GameUiState.Loading(gameRepository.maxGuesses)
+    )
     val uiState = _uiState.asStateFlow()
 
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
@@ -78,7 +80,7 @@ internal class GameViewModel @Inject constructor(
 
 internal sealed interface GameUiState {
     @Immutable
-    object Loading : GameUiState
+    data class Loading(val maxGuesses: Int) : GameUiState
 
     sealed interface Playing : GameUiState {
         val guesses: List<GuessUiModel>

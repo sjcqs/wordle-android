@@ -33,6 +33,8 @@ class GameRepositoryImpl @Inject constructor(
     private lateinit var game: Game
     private val words: HashSet<String> = assertsWords("words.txt")
 
+    override val maxGuesses: Int = MAX_GUESSES
+
     private fun assertsWords(fileName: String): HashSet<String> {
         return context.assets.open(fileName)
             .bufferedReader()

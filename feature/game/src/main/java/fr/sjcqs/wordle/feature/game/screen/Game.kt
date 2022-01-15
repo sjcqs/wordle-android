@@ -2,17 +2,17 @@ package fr.sjcqs.wordle.feature.game.screen
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,8 +39,10 @@ import fr.sjcqs.wordle.feature.game.GameUiEvent
 import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GameViewModel
 import fr.sjcqs.wordle.feature.game.R
+import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.feature.game.component.Finished
 import fr.sjcqs.wordle.feature.game.component.Guessing
+import fr.sjcqs.wordle.ui.components.Word
 import kotlinx.coroutines.launch
 
 
@@ -117,7 +119,7 @@ fun Game() {
                     .verticalScroll(scrollState, enabled = ime.isVisible)
             ) {
                 Game(
-                    uiState = uiState,
+                    state = uiState,
                     typingWord = typingWord,
                     onValueChanged = setTypingWord,
                     scrollState = scrollState
@@ -128,28 +130,33 @@ fun Game() {
 
 @Composable
 private fun Game(
-    uiState: GameUiState,
+    state: GameUiState,
     typingWord: String,
     onValueChanged: (String) -> Unit,
     scrollState: ScrollState,
 ) {
-    when (uiState) {
+    when (state) {
         is GameUiState.Guessing -> Guessing(
-            uiState = uiState,
+            uiState = state,
             value = typingWord,
             onValueChanged = onValueChanged,
             isFinished = false,
             scrollState = scrollState,
         )
-        GameUiState.Loading -> Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.Center),
-                color = MaterialTheme.colorScheme.primary
-            )
+        is GameUiState.Loading -> Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            repeat(state.maxGuesses) { index ->
+                Word()
+                if (index != state.maxGuesses - 1) {
+                    Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
+                }
+            }
         }
-        is GameUiState.Finished -> Finished(uiState = uiState)
+        is GameUiState.Finished -> Finished(uiState = state)
     }
 }
 
