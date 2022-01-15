@@ -1,3 +1,5 @@
+import gradle.kotlin.dsl.accessors._c4fcb3ec03f9133cd9522b64213c2cea.implementation
+
 plugins {
     id("fr.sjcqs.android.lib")
     id("kotlin-kapt")
@@ -12,6 +14,7 @@ android.buildFeatures {
 dependencies {
     implementation(project(":ui"))
     //implementation(project(":tools:molecule-viewmodel"))
+    implementation(project(":tools:extensions:coroutines"))
 
     implementation(libs["androidx.lifecycle.viewmodel.ktx"])
 

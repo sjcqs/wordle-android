@@ -21,6 +21,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,8 +38,7 @@ import fr.sjcqs.wordle.feature.game.GameViewModel
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.component.Finished
 import fr.sjcqs.wordle.feature.game.component.Guessing
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -52,18 +52,26 @@ fun Game() {
     val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun snackbar(message: String) {
+        coroutineScope.launch {
+            snackbarState.showSnackbar(message)
+        }
+    }
 
     val (typingWord, setTypingWord) = remember(viewModel) {
         mutableStateOf("")
     }
 
     LaunchedEffect(key1 = viewModel) {
-        viewModel.uiEventFlow.onEach { event ->
+        viewModel.uiEventFlow.collect { event ->
             when (event) {
                 GameUiEvent.ClearInput -> setTypingWord("")
-                GameUiEvent.InvalidWord -> snackbarState.showSnackbar(invalidWord)
+                GameUiEvent.InvalidWord -> snackbar(invalidWord)
+                GameUiEvent.Dismiss -> snackbarState.currentSnackbarData?.dismiss()
             }
-        }.launchIn(this)
+        }
     }
     Scaffold(
         scaffoldState = scaffoldState,

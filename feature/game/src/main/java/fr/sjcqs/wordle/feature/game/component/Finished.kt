@@ -42,7 +42,7 @@ internal fun Finished(
         guesses = uiState.guesses,
         isWon = uiState.isWon,
         length = uiState.length,
-        onReload = uiState.onReload
+        onReload = uiState.onRetry
     )
 }
 
@@ -153,7 +153,7 @@ private fun FinishedPreview() {
         ) {
             val uiState = GameUiState.Finished(
                 word = "MELEE",
-                onReload = {},
+                onRetry = {},
                 isWon = false,
                 guesses = listOf(
                     GuessUiModel(tileState = mapOf(

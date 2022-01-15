@@ -5,20 +5,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
+import fr.sjcqs.wordle.extensions.emitIn
+import fr.sjcqs.wordle.logger.Logger
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _uiStateFlow = MutableStateFlow<GameUiState>(GameUiState.Loading)
@@ -27,32 +30,50 @@ internal class GameViewModel @Inject constructor(
     private val _uiEventFlow = MutableSharedFlow<GameUiEvent>()
     val uiEventFlow = _uiEventFlow.asSharedFlow()
 
+    private val events = MutableSharedFlow<Event>()
+
     init {
         gameRepository.dailyGame
             .map { game ->
                 game.toUiState(
-                    onReload = ::onReload,
-                    onSubmit = ::onSubmit,
+                    onRetry = { events.emitIn(viewModelScope, Event.Retry) },
+                    onTyping = { events.emitIn(viewModelScope, Event.Typing) },
+                    onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
                 )
-            }
-            .onEach(_uiStateFlow::emit)
+            }.onEach(_uiStateFlow::emit)
+            .launchIn(viewModelScope)
+
+        events
+            .distinctUntilChanged()
+            .onEach { logger.d("onEvent: $it") }
+            .onEach(::handleEvent)
             .launchIn(viewModelScope)
     }
 
-    private fun onReload() {
-        viewModelScope.launch {
-            gameRepository.refresh()
+    private suspend fun handleEvent(event: Event) {
+        when (event) {
+            is Event.Retry -> retry()
+            is Event.Submit -> submit(event.word)
+            is Event.Typing -> _uiEventFlow.emit(GameUiEvent.Dismiss)
         }
     }
 
-    private fun onSubmit(word: String) {
-        viewModelScope.launch {
-            val wasSubmitted = gameRepository.submit(word)
-            _uiEventFlow.emit(GameUiEvent.ClearInput)
-            if (!wasSubmitted) {
-                _uiEventFlow.emit(GameUiEvent.InvalidWord)
-            }
+    private suspend fun retry() {
+        gameRepository.refresh()
+    }
+
+    private suspend fun submit(word: String) {
+        val wasSubmitted = gameRepository.submit(word)
+        _uiEventFlow.emit(GameUiEvent.ClearInput)
+        if (!wasSubmitted) {
+            _uiEventFlow.emit(GameUiEvent.InvalidWord)
         }
+    }
+
+    private sealed interface Event {
+        data class Submit(val word: String) : Event
+        object Retry : Event
+        object Typing : Event
     }
 }
 
@@ -70,6 +91,7 @@ internal sealed interface GameUiState {
         override val guesses: List<GuessUiModel>,
         override val length: Int,
         val tilesLetters: Map<Int, Map<Char, TileUiState>>,
+        val onTyping: () -> Unit,
         val onSubmit: (word: String) -> Unit,
     ) : Playing
 
@@ -79,13 +101,16 @@ internal sealed interface GameUiState {
         override val guesses: List<GuessUiModel>,
         val isWon: Boolean,
         override val length: Int,
-        val onReload: () -> Unit,
+        val onRetry: () -> Unit,
     ) : Playing
 }
 
 internal sealed interface GameUiEvent {
-    object InvalidWord : GameUiEvent
     object ClearInput : GameUiEvent
+
+    sealed interface Notify : GameUiEvent
+    object InvalidWord : Notify
+    object Dismiss : Notify
 }
 
 @Immutable

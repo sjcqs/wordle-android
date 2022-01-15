@@ -95,6 +95,9 @@ internal fun Guessing(
             value = currentValue,
             singleLine = true,
             onValueChange = { newValue ->
+                if (newValue.isNotEmpty()) {
+                    uiState.onTyping()
+                }
                 val filteredNewValue = newValue.filter {
                     it in 'A'..'Z'
                 }

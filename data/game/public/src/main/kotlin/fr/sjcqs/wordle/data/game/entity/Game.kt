@@ -25,8 +25,3 @@ data class Game(
         isFinished = guesses.size + 1 == guessesCount || guess.word == word
     )
 }
-
-data class LetterState(
-    val letter: Char,
-    val state: TileState
-)

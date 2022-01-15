@@ -31,6 +31,7 @@ include(":feature:game")
 include(":navigation")
 
 include(":tools:annotations")
+include(":tools:extensions:coroutines")
 include(":tools:haptics:compose")
 include(":tools:haptics:public")
 include(":tools:haptics:impl")

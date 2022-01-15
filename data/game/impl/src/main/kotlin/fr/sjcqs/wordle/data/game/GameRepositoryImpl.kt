@@ -57,7 +57,9 @@ class GameRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refresh() {
-        gameFlow.value = initialGame()
+        withContext(defaultDispatcher) {
+            gameFlow.value = initialGame()
+        }
     }
 
     private fun computeGuess(expected: String, submitted: String): Guess {
