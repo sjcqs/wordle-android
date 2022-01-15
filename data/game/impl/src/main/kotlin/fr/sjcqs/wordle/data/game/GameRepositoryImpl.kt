@@ -20,10 +20,11 @@ class GameRepositoryImpl @Inject constructor(
     // db datasource
     // network datasource
 ) : GameRepository {
-    private val words: HashSet<String> = loadWordList()
+    private val words: HashSet<String> = assertsWords("words.txt")
 
-    private fun loadWordList(): HashSet<String> {
-        return context.assets.open("words.txt").bufferedReader()
+    private fun assertsWords(fileName: String): HashSet<String> {
+        return context.assets.open(fileName)
+            .bufferedReader()
             .readLines()
             .toHashSet()
     }
@@ -31,7 +32,7 @@ class GameRepositoryImpl @Inject constructor(
     private val gameFlow = MutableStateFlow(initialGame())
 
     private fun initialGame() = Game(
-        word = words.random(),
+        word = assertsWords("suggested_words.txt").random(),
         guesses = emptyList(),
         guessesCount = MAX_GUESSES,
     )
@@ -86,6 +87,6 @@ class GameRepositoryImpl @Inject constructor(
 
 
     companion object {
-        private const val MAX_GUESSES = 6
+        private const val MAX_GUESSES = 3
     }
 }

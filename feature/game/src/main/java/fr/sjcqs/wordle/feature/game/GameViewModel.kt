@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
+import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
@@ -27,13 +29,9 @@ internal class GameViewModel @Inject constructor(
     val uiEventFlow = _uiEventFlow.asSharedFlow()
 
     init {
-        gameRepository.dailyGame.onEach { game ->
-            val uiState = game.toUiModel()
-            if (uiState is GameUiState.Finished && !uiState.isWon) {
-                _uiEventFlow.emit(GameUiEvent.Lost(game.word))
-            }
-            _uiStateFlow.value = uiState
-        }.launchIn(viewModelScope)
+        gameRepository.dailyGame.map(Game::toUiState)
+            .onEach(_uiStateFlow::emit)
+            .launchIn(viewModelScope)
     }
 
     fun onSubmit(word: String) {
@@ -73,7 +71,6 @@ internal sealed interface GameUiState {
 }
 
 internal sealed interface GameUiEvent {
-    data class Lost(val word: String) : GameUiEvent
     object InvalidWord : GameUiEvent
     object ClearInput : GameUiEvent
 }

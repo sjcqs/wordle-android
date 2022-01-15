@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 import fr.sjcqs.wordle.ui.theme.absent
 import fr.sjcqs.wordle.ui.theme.contentColorFor
 import fr.sjcqs.wordle.ui.theme.correct
@@ -32,10 +32,6 @@ enum class TileUiState {
     HintCorrect,
     HintAbsent,
 }
-
-private val TileShape
-    @Composable
-    get() = RoundedCornerShape(2.dp)
 
 
 @OptIn(ExperimentalComposeUiApi::class)

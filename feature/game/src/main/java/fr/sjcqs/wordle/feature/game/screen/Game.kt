@@ -35,6 +35,7 @@ import fr.sjcqs.wordle.feature.game.GameUiEvent
 import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GameViewModel
 import fr.sjcqs.wordle.feature.game.R
+import fr.sjcqs.wordle.feature.game.component.Finished
 import fr.sjcqs.wordle.feature.game.component.Guessing
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -60,10 +61,7 @@ fun Game() {
         viewModel.uiEventFlow.onEach { event ->
             when (event) {
                 GameUiEvent.ClearInput -> setTypingWord("")
-                GameUiEvent.InvalidWord -> {
-                    snackbarState.showSnackbar(invalidWord)
-                }
-                is GameUiEvent.Lost -> snackbarState.showSnackbar(event.word)
+                GameUiEvent.InvalidWord -> snackbarState.showSnackbar(invalidWord)
             }
         }.launchIn(this)
     }
@@ -133,9 +131,7 @@ private fun Game(
             scrollState = scrollState,
         )
         GameUiState.Loading -> CircularProgressIndicator()
-        is GameUiState.Finished -> {
-            //todo
-        }
+        is GameUiState.Finished -> Finished(uiState = uiState)
     }
 }
 

@@ -11,15 +11,15 @@ internal fun TileState.toUiModel(isHint: Boolean = false): TileUiState = when (t
     TileState.Present -> TileUiState.Present
 }
 
-internal fun Game.toUiModel(): GameUiState {
+internal fun Game.toUiState(): GameUiState {
     val length = word.length
     val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
         if (!isFinished) {
             add(GuessUiModel(isEditable = true))
-        }
-        repeat(guessesCount - size) {
-            add(GuessUiModel())
+            repeat(guessesCount - size) {
+                add(GuessUiModel())
+            }
         }
     }
     return if (isFinished) {

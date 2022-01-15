@@ -3,10 +3,14 @@ package fr.sjcqs.wordle
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import fr.sjcqs.wordle.haptics.HapticsController
 import fr.sjcqs.wordle.haptics.LocalHapticController
@@ -27,7 +31,7 @@ internal class HostActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent { HostCompositionLocalProvider { AppContent() } }
+        setContent { HostCompositionLocalProvider { AppContent(isSystemInDarkTheme()) } }
     }
 
     @Composable
@@ -40,8 +44,15 @@ internal class HostActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AppContent() {
-        WordleTheme {
+    private fun AppContent(isSystemInDarkTheme: Boolean = isSystemInDarkTheme()) {
+        val systemUiController = rememberSystemUiController()
+        SideEffect {
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = !isSystemInDarkTheme
+            )
+        }
+        WordleTheme(isInDarkTheme = isSystemInDarkTheme) {
             ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
                 AppNavHost()
             }
