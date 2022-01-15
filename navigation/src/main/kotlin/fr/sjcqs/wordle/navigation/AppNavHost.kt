@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import fr.sjcqs.wordle.feature.guessing.Guessing
+import fr.sjcqs.wordle.feature.game.screen.Game
 
 private sealed interface Screen {
     val route: String
@@ -31,12 +31,12 @@ fun AppNavHost(
 }
 
 private fun NavGraphBuilder.guessingScreens(navController: NavHostController) {
-    guessingScreen(navController)
+    gameScreen(navController)
 }
 
-private fun NavGraphBuilder.guessingScreen(navController: NavHostController) {
+private fun NavGraphBuilder.gameScreen(navController: NavHostController) {
     composable(route = Screen.Guessing.route) {
-        Guessing()
+        Game()
     }
 }
 

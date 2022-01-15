@@ -1,4 +1,4 @@
-package fr.sjcqs.wordle.feature.guessing
+package fr.sjcqs.wordle.feature.game
 
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
@@ -11,8 +11,9 @@ internal fun TileState.toUiModel(isHint: Boolean = false): TileUiState = when (t
     TileState.Present -> TileUiState.Present
 }
 
-internal fun Game.toUiModel(): GuessingUiState = GuessingUiState.Guessing(
-    guesses = buildList {
+internal fun Game.toUiModel(): GameUiState {
+    val length = word.length
+    val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
         if (!isFinished) {
             add(GuessUiModel(isEditable = true))
@@ -20,13 +21,25 @@ internal fun Game.toUiModel(): GuessingUiState = GuessingUiState.Guessing(
         repeat(guessesCount - size) {
             add(GuessUiModel())
         }
-    },
-    length = word.length,
-    isFinished = isFinished,
-    tilesLetters = tileLetters.mapValues { (_, letters) ->
-        letters.mapValues { (_, tileState) -> tileState.toUiModel(isHint = true) }
     }
-)
+    return if (isFinished) {
+        GameUiState.Finished(
+            word = word,
+            guesses = guessUiModels,
+            length = length,
+            isWon = isWon
+        )
+    } else {
+        GameUiState.Guessing(
+            guesses = guessUiModels,
+            length = length,
+            tilesLetters = tileLetters.mapValues { (_, letters) ->
+                letters.mapValues { (_, tileState) -> tileState.toUiModel(isHint = true) }
+            },
+        )
+    }
+}
+
 
 internal fun Guess.toUiModel(): GuessUiModel = GuessUiModel(
     word = word,

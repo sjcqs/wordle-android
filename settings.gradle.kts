@@ -26,7 +26,7 @@ include(":data:game:public")
 include(":data:game:impl")
 include(":data:game:wiring")
 
-include(":feature:guessing")
+include(":feature:game")
 
 include(":navigation")
 

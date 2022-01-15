@@ -46,7 +46,7 @@ fun Word(
     tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
     onTileClicked: () -> Unit,
-    onSubmit: (word: String) -> Unit = {}
+    onSubmit: (word: String) -> Unit = {},
 ) {
     require(word.length <= length) {
         "$word is too long (max $length, current: ${word.length})"
@@ -83,17 +83,18 @@ fun Word(
                 TileUiState.HintCorrect -> OutlinedTile(
                     value = letter,
                     modifier = tileModifier,
+                    contentColor = MaterialTheme.colorScheme.correct,
                     outlineColor = MaterialTheme.colorScheme.correct
                 )
                 TileUiState.HintAbsent -> OutlinedTile(
                     value = letter,
                     modifier = tileModifier,
+                    contentColor = MaterialTheme.colorScheme.absent,
                     outlineColor = MaterialTheme.colorScheme.absent
                 )
                 null -> OutlinedTile(
                     value = letter,
                     modifier = tileModifier,
-                    outlineColor = MaterialTheme.colorScheme.outline
                 )
             }
             if (index + 1 < length) {
@@ -106,8 +107,8 @@ fun Word(
 @Composable
 private fun OutlinedTile(
     value: String,
-    outlineColor: Color,
     modifier: Modifier = Modifier,
+    outlineColor: Color = MaterialTheme.colorScheme.outline,
     contentColor: Color = LocalContentColor.current,
 ) {
     Tile(

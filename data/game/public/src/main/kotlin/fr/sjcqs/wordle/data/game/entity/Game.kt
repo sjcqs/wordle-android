@@ -6,6 +6,7 @@ data class Game(
     val guesses: List<Guess>,
     val isFinished: Boolean = false
 ) {
+    val isWon: Boolean = word == guesses.lastOrNull()?.word
     val tileLetters: Map<Int, Map<Char, TileState>> = guesses
         .fold(mutableMapOf()) { tilesState, guess ->
             guess.word.onEachIndexed { index, letter ->

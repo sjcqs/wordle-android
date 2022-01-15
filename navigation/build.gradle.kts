@@ -12,6 +12,6 @@ android {
 dependencies {
     api(libs.androidx.navigation.compose)
 
-    implementation(projects.feature.guessing)
+    implementation(projects.feature.game)
     implementation(projects.tools.logger.compose)
 }

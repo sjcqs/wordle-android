@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(projects.feature.guessing)
+    api(projects.feature.game)
 
     api(projects.data.game.wiring)
 
