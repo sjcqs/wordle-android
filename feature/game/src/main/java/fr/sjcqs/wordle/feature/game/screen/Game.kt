@@ -140,7 +140,6 @@ private fun Game(
             uiState = state,
             value = typingWord,
             onValueChanged = onValueChanged,
-            isFinished = false,
             scrollState = scrollState,
         )
         is GameUiState.Loading -> Column(

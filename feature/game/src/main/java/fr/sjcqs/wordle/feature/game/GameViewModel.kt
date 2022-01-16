@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
+import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
@@ -34,16 +35,9 @@ internal class GameViewModel @Inject constructor(
 
     init {
         gameRepository.dailyGame
-            .map { game ->
-                if (game.isFinished) {
-                    _uiEvent.emit(GameUiEvent.CloseKeyboard)
-                }
-                game.toUiState(
-                    onRetry = { events.emitIn(viewModelScope, Event.Retry) },
-                    onTyping = { events.emitIn(viewModelScope, Event.Typing) },
-                    onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
-                )
-            }.onEach(_uiState::emit)
+            .onEach(::onGameUpdated)
+            .map(::map)
+            .onEach(_uiState::emit)
             .launchIn(viewModelScope)
 
         events.distinctUntilChanged()
@@ -51,11 +45,23 @@ internal class GameViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    private fun onGameUpdated(game: Game) {
+        if (game.isFinished) {
+            _uiEvent.emitIn(viewModelScope, GameUiEvent.CloseKeyboard)
+        }
+    }
+
+    private fun map(game: Game) = game.toUiState(
+        onRetry = { events.emitIn(viewModelScope, Event.Retry) },
+        onTyping = { events.emitIn(viewModelScope, Event.Typing) },
+        onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
+    )
+
     private suspend fun handleEvent(event: Event) {
         when (event) {
             is Event.Retry -> retry()
             is Event.Submit -> submit(event.word)
-            is Event.Typing -> _uiEvent.emit(GameUiEvent.Dismiss)
+            is Event.Typing -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Dismiss)
         }
     }
 
@@ -65,9 +71,9 @@ internal class GameViewModel @Inject constructor(
 
     private suspend fun submit(word: String) {
         val wasSubmitted = gameRepository.submit(word)
-        _uiEvent.emit(GameUiEvent.ClearInput)
+        _uiEvent.emitIn(viewModelScope, GameUiEvent.ClearInput)
         if (!wasSubmitted) {
-            _uiEvent.emit(GameUiEvent.InvalidWord)
+            _uiEvent.emitIn(viewModelScope, GameUiEvent.InvalidWord)
         }
     }
 

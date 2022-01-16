@@ -30,8 +30,7 @@ data class Game(
                                         TileState.Present,
                                         TileState.Correct -> currentTileState
                                         TileState.Absent,
-                                        null,
-                                        -> TileState.Absent
+                                        null-> TileState.Absent
                                     }
                                 }
                             }

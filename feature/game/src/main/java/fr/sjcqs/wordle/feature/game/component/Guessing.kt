@@ -48,7 +48,6 @@ internal fun Guessing(
     uiState: GameUiState.Guessing,
     value: String,
     onValueChanged: (String) -> Unit,
-    isFinished: Boolean,
     scrollState: ScrollState,
 ) {
     val ime = LocalWindowInsets.current.ime
@@ -87,43 +86,41 @@ internal fun Guessing(
         navigationWithImeBottom = navigationWithImeBottom,
         scrollState = scrollState
     )
-    if (!isFinished) {
-        DisposableEffect(uiState) {
-            focusRequester.requestFocus()
-            onDispose {
-                /* no-op */
-            }
+    DisposableEffect(uiState) {
+        focusRequester.requestFocus()
+        onDispose {
+            /* no-op */
         }
-        TextField(
-            value = currentValue,
-            singleLine = true,
-            onValueChange = { newValue ->
-                if (newValue.isNotEmpty()) {
-                    uiState.onTyping()
-                }
-                val filteredNewValue = newValue.filter {
-                    it in 'A'..'Z'
-                }
-                if (filteredNewValue.length <= uiState.length) {
-                    currentValue = filteredNewValue
-                    onValueChanged(filteredNewValue)
-                }
-            },
-            modifier = Modifier
-                .size(0.dp)
-                .alpha(0f)
-                .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Ascii,
-                capitalization = KeyboardCapitalization.Characters,
-                autoCorrect = false,
-                imeAction = imeAction
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { uiState.onSubmit(currentValue) }
-            )
-        )
     }
+    TextField(
+        value = currentValue,
+        singleLine = true,
+        onValueChange = { newValue ->
+            if (newValue.isNotEmpty()) {
+                uiState.onTyping()
+            }
+            val filteredNewValue = newValue.filter {
+                it in 'A'..'Z'
+            }
+            if (filteredNewValue.length <= uiState.length) {
+                currentValue = filteredNewValue
+                onValueChanged(filteredNewValue)
+            }
+        },
+        modifier = Modifier
+            .size(0.dp)
+            .alpha(0f)
+            .focusRequester(focusRequester),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Ascii,
+            capitalization = KeyboardCapitalization.Characters,
+            autoCorrect = false,
+            imeAction = imeAction
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { uiState.onSubmit(currentValue) }
+        )
+    )
 }
 
 @Composable

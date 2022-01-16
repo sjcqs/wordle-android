@@ -1,5 +1,13 @@
 package fr.sjcqs.wordle.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,7 +43,7 @@ enum class TileUiState {
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun Word(
     modifier: Modifier = Modifier,
@@ -54,43 +63,55 @@ fun Word(
         val tileModifier = Modifier
             .weight(1f)
             .aspectRatio(1f)
+            .border(width = 1.dp, shape = TileShape, color = MaterialTheme.colorScheme.outline)
             .clickable {
                 onTileClicked()
             }
         repeat(length) { index ->
             val letter = word.getOrNull(index)?.toString().orEmpty()
-            when (tileStates[index]) {
-                TileUiState.Present -> BackgroundedTile(
-                    value = letter,
-                    modifier = tileModifier,
-                    backgroundColor = MaterialTheme.colorScheme.present,
-                )
-                TileUiState.Correct -> BackgroundedTile(
-                    value = letter,
-                    modifier = tileModifier,
-                    backgroundColor = MaterialTheme.colorScheme.correct,
-                )
-                TileUiState.Absent -> BackgroundedTile(
-                    value = letter,
-                    modifier = tileModifier,
-                    backgroundColor = MaterialTheme.colorScheme.absent,
-                )
-                TileUiState.HintCorrect -> OutlinedTile(
-                    value = letter,
-                    modifier = tileModifier,
-                    contentColor = MaterialTheme.colorScheme.correct,
-                    outlineColor = MaterialTheme.colorScheme.correct
-                )
-                TileUiState.HintAbsent -> OutlinedTile(
-                    value = letter,
-                    modifier = tileModifier,
-                    contentColor = MaterialTheme.colorScheme.absent,
-                    outlineColor = MaterialTheme.colorScheme.absent
-                )
-                null -> OutlinedTile(
-                    value = letter,
-                    modifier = tileModifier,
-                )
+            AnimatedContent(
+                modifier = tileModifier,
+                contentAlignment = Alignment.Center,
+                targetState = tileStates[index],
+                transitionSpec = {
+                    when (targetState) {
+                        TileUiState.Present,
+                        TileUiState.Correct,
+                        TileUiState.Absent-> slideIntoContainer(
+                            towards = AnimatedContentScope.SlideDirection.Up,
+                            animationSpec = tween(delayMillis = index * 100)
+                        ) with fadeOut(targetAlpha = 1f)
+                        TileUiState.HintCorrect,
+                        TileUiState.HintAbsent,
+                        null-> hold()
+                    }
+                }
+            ) { targetState ->
+                when (targetState) {
+                    TileUiState.Present -> BackgroundedTile(
+                        value = letter,
+                        backgroundColor = MaterialTheme.colorScheme.present,
+                    )
+                    TileUiState.Correct -> BackgroundedTile(
+                        value = letter,
+                        backgroundColor = MaterialTheme.colorScheme.correct,
+                    )
+                    TileUiState.Absent -> BackgroundedTile(
+                        value = letter,
+                        backgroundColor = MaterialTheme.colorScheme.absent,
+                    )
+                    TileUiState.HintCorrect -> OutlinedTile(
+                        value = letter,
+                        contentColor = MaterialTheme.colorScheme.correct,
+                        outlineColor = MaterialTheme.colorScheme.correct
+                    )
+                    TileUiState.HintAbsent -> OutlinedTile(
+                        value = letter,
+                        contentColor = MaterialTheme.colorScheme.absent,
+                        outlineColor = MaterialTheme.colorScheme.absent
+                    )
+                    null -> OutlinedTile(value = letter)
+                }
             }
             if (index + 1 < length) {
                 Spacer(modifier = Modifier.size(8.dp))
@@ -106,11 +127,12 @@ private fun OutlinedTile(
     outlineColor: Color = MaterialTheme.colorScheme.outline,
     contentColor: Color = LocalContentColor.current,
 ) {
-    Tile(
-        value = value,
-        contentColor = contentColor,
-        modifier = modifier.border(width = 1.5.dp, outlineColor, TileShape),
-    )
+    Box(modifier = modifier.border(width = 1.5.dp, outlineColor, TileShape)) {
+        Tile(
+            value = value,
+            contentColor = contentColor,
+        )
+    }
 }
 
 @Composable
@@ -133,13 +155,14 @@ private fun BackgroundedTile(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Tile(
     value: String,
-    modifier: Modifier = Modifier,
     contentColor: Color = LocalContentColor.current,
 ) {
-    Box(modifier = modifier) {
+
+    Box(modifier = Modifier.fillMaxSize()) {
         AutoSizeText(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -150,3 +173,6 @@ private fun Tile(
         )
     }
 }
+
+@OptIn(ExperimentalAnimationApi::class)
+private fun hold(): ContentTransform = fadeIn(initialAlpha = 1f) with fadeOut(targetAlpha = 1f)

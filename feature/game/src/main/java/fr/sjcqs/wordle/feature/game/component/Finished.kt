@@ -123,11 +123,9 @@ private fun Guess(
                 color = when (tile) {
                     TileUiState.Present -> MaterialTheme.colorScheme.present
                     TileUiState.HintCorrect,
-                    TileUiState.Correct,
-                    -> MaterialTheme.colorScheme.correct
+                    TileUiState.Correct-> MaterialTheme.colorScheme.correct
                     TileUiState.HintAbsent,
-                    TileUiState.Absent,
-                    -> MaterialTheme.colorScheme.absent
+                    TileUiState.Absent-> MaterialTheme.colorScheme.absent
                 },
                 shape = TileShape,
                 shadowElevation = 1.5.dp,
