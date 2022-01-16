@@ -63,10 +63,7 @@ fun Word(
         val tileModifier = Modifier
             .weight(1f)
             .aspectRatio(1f)
-            .border(width = 1.dp, shape = TileShape, color = MaterialTheme.colorScheme.outline)
-            .clickable {
-                onTileClicked()
-            }
+            .clickable { onTileClicked() }
         repeat(length) { index ->
             val letter = word.getOrNull(index)?.toString().orEmpty()
             AnimatedContent(

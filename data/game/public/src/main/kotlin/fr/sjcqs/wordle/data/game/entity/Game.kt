@@ -21,7 +21,7 @@ data class Game(
                         }
                     }
                     if (tileState == TileState.Absent &&
-                        tilesState.values.none { it[letter] == TileState.Present }
+                        guesses.none { guess -> guess.tiles.contains(TileState.Present) }
                     ) {
                         tilesState.replaceAll { _, letters ->
                             letters.apply {
@@ -30,7 +30,7 @@ data class Game(
                                         TileState.Present,
                                         TileState.Correct -> currentTileState
                                         TileState.Absent,
-                                        null-> TileState.Absent
+                                        null -> TileState.Absent
                                     }
                                 }
                             }
