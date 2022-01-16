@@ -4,11 +4,11 @@ import java.time.LocalDate
 
 data class Game(
     val word: String,
-    val guessesCount: Int,
+    val maxGuesses: Int,
     val expiredAt: LocalDate,
     val guesses: List<Guess>,
-    val isFinished: Boolean = false,
 ) {
+    val isFinished: Boolean = guesses.lastOrNull()?.word == word || guesses.size >= maxGuesses
     val isWon: Boolean = word == guesses.lastOrNull()?.word
     val tileLetters: Map<Int, Map<Char, TileState>> = guesses
         .fold(mutableMapOf<Int, MutableMap<Char, TileState>>()) { tilesState, guess ->
@@ -41,9 +41,6 @@ data class Game(
             tilesState
         }
 
-    fun add(guess: Guess) = copy(
-        guesses = guesses.plus(guess),
-        isFinished = guesses.size + 1 == guessesCount || guess.word == word
-    )
+    fun add(guess: Guess) = copy(guesses = guesses.plus(guess))
 
 }

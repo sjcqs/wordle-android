@@ -45,7 +45,7 @@ class GameRepositoryImpl @Inject constructor(
     private fun randomGame() = Game(
         word = assertsWords("suggested_words.txt").random(),
         guesses = emptyList(),
-        guessesCount = MAX_GUESSES,
+        maxGuesses = MAX_GUESSES,
         expiredAt = LocalDate.now().plusDays(1)
     )
 

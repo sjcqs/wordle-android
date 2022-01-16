@@ -21,7 +21,7 @@ internal fun Game.toUiState(
         addAll(guesses.map(Guess::toUiModel))
         if (!isFinished) {
             add(GuessUiModel(isEditable = true))
-            repeat(guessesCount - size) {
+            repeat(maxGuesses - size) {
                 add(GuessUiModel())
             }
         }

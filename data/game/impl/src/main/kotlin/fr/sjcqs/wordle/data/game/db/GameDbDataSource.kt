@@ -25,10 +25,9 @@ class GameDbDataSource @Inject constructor(
 
     suspend fun insertOrUpdate(game: Game) = withContext(ioDispatcher) {
         gameQueries.insertOrReplace(
-            game.word,
-            game.expiredAt,
-            game.guesses,
-            game.isFinished
+            word = game.word,
+            expiredAt = game.expiredAt,
+            guesses = game.guesses,
         )
     }
 }
