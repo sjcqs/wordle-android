@@ -71,9 +71,10 @@ internal class GameViewModel @Inject constructor(
 
     private suspend fun submit(word: String) {
         val wasSubmitted = gameRepository.submit(word)
-        _uiEvent.emitIn(viewModelScope, GameUiEvent.ClearInput)
         if (!wasSubmitted) {
             _uiEvent.emitIn(viewModelScope, GameUiEvent.InvalidWord)
+        } else {
+            _uiEvent.emitIn(viewModelScope, GameUiEvent.ClearInput)
         }
     }
 
@@ -100,6 +101,7 @@ internal sealed interface GameUiState {
         val tilesLetters: Map<Int, Map<Char, TileUiState>>,
         val onTyping: () -> Unit,
         val onSubmit: (word: String) -> Unit,
+        val isCurrentWordInvalid: Boolean = false,
     ) : Playing
 
     @Immutable
