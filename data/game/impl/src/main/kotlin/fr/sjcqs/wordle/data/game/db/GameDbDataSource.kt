@@ -19,6 +19,10 @@ class GameDbDataSource @Inject constructor(
             .executeAsOneOrNull()
     }
 
+    suspend fun getAll(): List<Game> = withContext(ioDispatcher) {
+        gameQueries.getAll().executeAsList()
+    }
+
     fun watchLatest(): Flow<Game> = gameQueries.lastGame()
         .asFlow()
         .mapToOne(ioDispatcher)

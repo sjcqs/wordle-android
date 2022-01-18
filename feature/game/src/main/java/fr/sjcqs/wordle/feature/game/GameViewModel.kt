@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.extensions.emitIn
+import fr.sjcqs.wordle.logger.Logger
 import fr.sjcqs.wordle.ui.components.TileUiState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,10 +18,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val logger: Logger
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GameUiState>(
@@ -43,6 +46,10 @@ internal class GameViewModel @Inject constructor(
         events.distinctUntilChanged()
             .onEach(::handleEvent)
             .launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            logger.d("Game: ${gameRepository.getStats()}")
+        }
     }
 
     private fun onGameUpdated(game: Game) {

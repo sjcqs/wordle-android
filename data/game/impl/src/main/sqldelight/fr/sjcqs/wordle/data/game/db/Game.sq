@@ -13,6 +13,10 @@ INSERT OR REPLACE
 INTO game(word, expiredAt, guesses)
 VALUES (?, ?, ?);
 
+getAll:
+SELECT * FROM game
+ORDER BY expiredAt DESC;
+
 lastGame:
 SELECT * FROM game
 ORDER BY expiredAt DESC

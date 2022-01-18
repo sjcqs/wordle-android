@@ -8,6 +8,7 @@ import fr.sjcqs.wordle.data.game.db.fromDb
 import fr.sjcqs.wordle.data.game.db.toDb
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
+import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.logger.Logger
 import java.time.LocalDate
@@ -59,6 +60,37 @@ class GameRepositoryImpl @Inject constructor(
         }.map { it.fromDb(MAX_GUESSES) }
         .onEach { game = it }
         .distinctUntilChanged()
+
+    override suspend fun getStats(): Stats {
+        val allGames = dbDataSource.getAll()
+            .filter { it.guesses.isNotEmpty() && it.isFinished }
+
+        val wonGames = allGames.filter { it.isWon }
+
+        val currentStreak = allGames.takeWhile { it.isWon }.size
+
+        var maxStreak = 0
+        var streak = 0
+        allGames.forEach { game ->
+            if (game.isWon) {
+                streak += 1
+            } else {
+                if (streak > maxStreak) {
+                    maxStreak = streak
+                }
+                streak = 0
+            }
+        }
+
+        return Stats(
+            played = allGames.size,
+            winRate = wonGames.size.toDouble() / allGames.size,
+            currentStreak = currentStreak,
+            maxStreak = maxStreak,
+            distributions = wonGames.groupBy { it.guesses.size }
+                .mapValues { (_, games) -> games.size }
+        )
+    }
 
     override suspend fun submit(word: String): Boolean {
         return withContext(defaultDispatcher) {
@@ -115,6 +147,12 @@ class GameRepositoryImpl @Inject constructor(
 
     private val DbGame.isExpired: Boolean
         get() = expiredAt < LocalDate.now()
+
+    private val DbGame.isWon: Boolean
+        get() = word == guesses.lastOrNull()?.word
+
+    private val DbGame.isFinished: Boolean
+        get() = word == guesses.lastOrNull()?.word || guesses.size == MAX_GUESSES
 
     companion object {
         private const val MAX_GUESSES = 6
