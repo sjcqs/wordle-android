@@ -16,7 +16,6 @@ internal fun Game.toUiState(
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
 ): GameUiState {
-    val length = word.length
     val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
         if (!isFinished) {
@@ -26,25 +25,21 @@ internal fun Game.toUiState(
             }
         }
     }
-    return if (isFinished) {
-        GameUiState.Finished(
-            word = word,
-            guesses = guessUiModels,
-            length = length,
-            isWon = isWon,
-            onRetry = onRetry
-        )
-    } else {
-        GameUiState.Guessing(
-            guesses = guessUiModels,
-            length = length,
-            tilesLetters = tileLetters.mapValues { (_, letters) ->
-                letters.mapValues { (_, tileState) -> tileState.toUiModel(isHint = true) }
-            },
-            onTyping = onTyping,
-            onSubmit = onSubmit
-        )
+    val tilesLetters = tileLetters.mapValues { (_, letters) ->
+        letters.mapValues { (_, tileState) -> tileState.toUiModel(isHint = true) }
     }
+
+    return GameUiState.Guessing(
+        guesses = guessUiModels,
+        tilesLetters = tilesLetters,
+        onTyping = onTyping,
+        onSubmit = onSubmit,
+        word = word,
+        isFinished = isFinished,
+        isWon = isWon,
+        onRetry = onRetry,
+        canRetry = true
+    )
 }
 
 

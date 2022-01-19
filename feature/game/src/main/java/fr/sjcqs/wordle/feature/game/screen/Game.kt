@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.LocalWindowInsets
@@ -40,7 +39,6 @@ import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GameViewModel
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
-import fr.sjcqs.wordle.feature.game.component.Finished
 import fr.sjcqs.wordle.feature.game.component.Guessing
 import fr.sjcqs.wordle.ui.components.Word
 import kotlinx.coroutines.launch
@@ -54,7 +52,7 @@ fun Game() {
     val viewModel: GameViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val ime = LocalWindowInsets.current.ime
-    val elevation: Dp by remember { derivedStateOf { if (ime.isVisible) 4.dp else 0.dp } }
+
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
     val coroutineScope = rememberCoroutineScope()
@@ -155,7 +153,6 @@ private fun Game(
                 }
             }
         }
-        is GameUiState.Finished -> Finished(uiState = state)
     }
 }
 

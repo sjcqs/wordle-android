@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +45,7 @@ import fr.sjcqs.wordle.feature.game.GuessUiModel
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.ui.components.TileUiState
 import fr.sjcqs.wordle.ui.components.Word
+import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
@@ -55,14 +60,9 @@ internal fun Guessing(
     val insets = remember(ime, navBars) { derivedWindowInsetsTypeOf(ime, navBars) }
     val navigationWithImeBottom = with(LocalDensity.current) { insets.bottom.toDp() }
 
-    val keyboard = LocalSoftwareKeyboardController.current
-    val openKeyboard = {
-        if (!ime.isVisible) {
-            keyboard?.show()
-        }
-    }
-
     val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
     var currentValue by remember(value) { mutableStateOf(value) }
     val currentTiles: Map<Int, TileUiState> by derivedStateOf {
         currentValue.mapIndexedNotNull { index, letter ->
@@ -70,57 +70,64 @@ internal fun Guessing(
             if (tileState != null) (index to tileState) else null
         }.toMap()
     }
-    val imeAction by derivedStateOf {
-        if (currentValue.length == uiState.length) ImeAction.Done else ImeAction.None
-    }
 
     Guessing(
+        word = uiState.word,
+        isFinished = uiState.isFinished,
         guesses = uiState.guesses,
         value = currentValue,
         currentTiles = currentTiles,
         isImeVisible = ime.isVisible,
         openKeyboard = {
-            focusRequester.requestFocus()
-            openKeyboard()
+            if (!uiState.isFinished) {
+                focusRequester.requestFocus()
+                keyboard?.show()
+            }
         },
+        onRetry = uiState.onRetry,
+        canRetry = uiState.canRetry,
         navigationWithImeBottom = navigationWithImeBottom,
         scrollState = scrollState
     )
-    DisposableEffect(uiState) {
-        focusRequester.requestFocus()
-        onDispose {
-            /* no-op */
+    if (!uiState.isFinished) {
+        DisposableEffect(uiState) {
+            focusRequester.requestFocus()
+            onDispose {
+                /* no-op */
+            }
         }
-    }
-    TextField(
-        value = currentValue,
-        singleLine = true,
-        onValueChange = { newValue ->
-            if (newValue.isNotEmpty()) {
-                uiState.onTyping()
-            }
-            val filteredNewValue = newValue.filter {
-                it in 'A'..'Z'
-            }
-            if (filteredNewValue.length <= uiState.length) {
-                currentValue = filteredNewValue
-                onValueChanged(filteredNewValue)
-            }
-        },
-        modifier = Modifier
-            .size(0.dp)
-            .alpha(0f)
-            .focusRequester(focusRequester),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Ascii,
-            capitalization = KeyboardCapitalization.Characters,
-            autoCorrect = false,
-            imeAction = imeAction
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { uiState.onSubmit(currentValue) }
+        TextField(
+            value = currentValue,
+            singleLine = true,
+            onValueChange = { newValue ->
+                if (newValue.isNotEmpty()) {
+                    uiState.onTyping()
+                }
+                val filteredNewValue = newValue.filter { it in 'A'..'Z' }
+                if (filteredNewValue.length <= uiState.word.length) {
+                    currentValue = filteredNewValue
+                    onValueChanged(filteredNewValue)
+                }
+            },
+            modifier = Modifier
+                .size(0.dp)
+                .alpha(0f)
+                .focusRequester(focusRequester),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Ascii,
+                capitalization = KeyboardCapitalization.Characters,
+                autoCorrect = false,
+                imeAction = if (currentValue.length == uiState.word.length) {
+                    ImeAction.Done
+                } else {
+                    ImeAction.None
+                }
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                uiState.onSubmit(currentValue)
+            })
         )
-    )
+    }
 }
 
 @Composable
@@ -132,6 +139,10 @@ private fun Guessing(
     openKeyboard: () -> Unit,
     navigationWithImeBottom: Dp,
     scrollState: ScrollState,
+    word: String,
+    isFinished: Boolean,
+    canRetry: Boolean,
+    onRetry: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -146,6 +157,19 @@ private fun Guessing(
             if (isImeVisible) {
                 scrollState.scrollBy(scrollBy.value)
             }
+        }
+        if (isFinished) {
+            Surface(
+                color = MaterialTheme.colorScheme.inverseSurface,
+                shape = TileShape
+            ) {
+                Text(
+                    text = word,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
         guesses.forEachIndexed { index, guess ->
             Guess(
@@ -168,6 +192,12 @@ private fun Guessing(
             )
             if (index < guesses.lastIndex) {
                 Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
+            }
+        }
+        if (isFinished && canRetry) {
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedButton(onClick = onRetry) {
+                Text(text = "Recommencer", color = MaterialTheme.colorScheme.onBackground)
             }
         }
         Spacer(modifier = Modifier.height(navigationWithImeBottom))

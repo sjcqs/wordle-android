@@ -96,29 +96,18 @@ internal sealed interface GameUiState {
     @Immutable
     data class Loading(val maxGuesses: Int) : GameUiState
 
-    sealed interface Playing : GameUiState {
-        val guesses: List<GuessUiModel>
-        val length: Int
-    }
-
     @Immutable
     data class Guessing(
-        override val guesses: List<GuessUiModel>,
-        override val length: Int,
+        val guesses: List<GuessUiModel>,
+        val word: String,
         val tilesLetters: Map<Int, Map<Char, TileUiState>>,
         val onTyping: () -> Unit,
         val onSubmit: (word: String) -> Unit,
-        val isCurrentWordInvalid: Boolean = false,
-    ) : Playing
-
-    @Immutable
-    data class Finished(
-        val word: String,
-        override val guesses: List<GuessUiModel>,
-        val isWon: Boolean,
-        override val length: Int,
+        val isFinished: Boolean = false,
+        val isWon: Boolean = false,
+        val canRetry: Boolean = true,
         val onRetry: () -> Unit,
-    ) : Playing
+    ) : GameUiState
 }
 
 internal sealed interface GameUiEvent {
