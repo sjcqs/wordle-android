@@ -1,7 +1,6 @@
 package fr.sjcqs.wordle.feature.game.screen
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsWithImePadding
-import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import fr.sjcqs.wordle.feature.game.GameUiEvent
 import fr.sjcqs.wordle.feature.game.GameUiState
@@ -40,7 +39,9 @@ import fr.sjcqs.wordle.feature.game.GameViewModel
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.feature.game.component.Guessing
+import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.Word
+import fr.sjcqs.wordle.ui.icons.Icons
 import kotlinx.coroutines.launch
 
 
@@ -92,18 +93,14 @@ fun Game() {
             )
         },
         topBar = {
-            MediumTopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .statusBarsPadding()
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .align(Alignment.Center),
-                            text = stringResource(id = R.string.game_title)
-                        )
+            CenterAlignedTopAppBar(
+                contentPadding = rememberInsetsPaddingValues(
+                    insets = LocalWindowInsets.current.statusBars
+                ),
+                title = { Text(text = stringResource(id = R.string.game_title)) },
+                actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icons.Stats()
                     }
                 }
             )
