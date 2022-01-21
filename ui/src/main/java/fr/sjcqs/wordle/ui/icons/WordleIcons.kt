@@ -22,4 +22,30 @@ object Icons {
             tint = tint,
         )
     }
+
+    @Composable
+    fun Close(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_close),
+            contentDescription = stringResource(id = R.string.content_description_close),
+            tint = tint,
+        )
+    }
+
+    @Composable
+    fun Share(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_share),
+            contentDescription = stringResource(id = R.string.content_description_share),
+            tint = tint,
+        )
+    }
 }

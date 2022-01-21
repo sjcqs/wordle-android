@@ -50,7 +50,7 @@ class GameRepositoryImpl @Inject constructor(
         expiredAt = LocalDate.now().plusDays(1)
     )
 
-    override val dailyGame: Flow<Game> = dbDataSource.watchLatest()
+    override val dailyGameFlow: Flow<Game> = dbDataSource.watchLatest()
         .onStart {
             val latest = dbDataSource.getLatest()
             if (latest == null || latest.isExpired) {
@@ -61,10 +61,7 @@ class GameRepositoryImpl @Inject constructor(
         .onEach { game = it }
         .distinctUntilChanged()
 
-    override suspend fun getStats(): Stats {
-        val allGames = dbDataSource.getAll()
-            .filter { it.guesses.isNotEmpty() && it.isFinished }
-
+    override val statsFlow: Flow<Stats> = dbDataSource.watchAll().map { allGames ->
         val wonGames = allGames.filter { it.isWon }
 
         val currentStreak = allGames.takeWhile { it.isWon }.size
@@ -81,14 +78,18 @@ class GameRepositoryImpl @Inject constructor(
                 streak = 0
             }
         }
-
-        return Stats(
+        val distributions = wonGames
+            .groupBy { it.guesses.size }
+            .mapValues { (_, games) -> games.size }
+        Stats(
             played = allGames.size,
             winRate = wonGames.size.toDouble() / allGames.size,
             currentStreak = currentStreak,
             maxStreak = maxStreak,
-            distributions = wonGames.groupBy { it.guesses.size }
-                .mapValues { (_, games) -> games.size }
+            distributions = (1..MAX_GUESSES).associateWith { distributions[it] ?: 0 },
+            dailyFinishedGame = dbDataSource.getLatest()
+                ?.fromDb(MAX_GUESSES)
+                ?.takeIf { it.isFinished && !it.isExpired }
         )
     }
 
@@ -148,11 +149,11 @@ class GameRepositoryImpl @Inject constructor(
     private val DbGame.isExpired: Boolean
         get() = expiredAt < LocalDate.now()
 
+    private val Game.isExpired: Boolean
+        get() = expiredAt < LocalDate.now()
+
     private val DbGame.isWon: Boolean
         get() = word == guesses.lastOrNull()?.word
-
-    private val DbGame.isFinished: Boolean
-        get() = word == guesses.lastOrNull()?.word || guesses.size == MAX_GUESSES
 
     companion object {
         private const val MAX_GUESSES = 6

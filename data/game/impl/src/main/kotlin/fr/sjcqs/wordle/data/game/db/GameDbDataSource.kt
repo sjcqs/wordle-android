@@ -1,6 +1,7 @@
 package fr.sjcqs.wordle.data.game.db
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.sjcqs.wordle.annotations.IoDispatcher
 import javax.inject.Inject
@@ -22,6 +23,10 @@ class GameDbDataSource @Inject constructor(
     suspend fun getAll(): List<Game> = withContext(ioDispatcher) {
         gameQueries.getAll().executeAsList()
     }
+
+    fun watchAll() = gameQueries.getAll()
+        .asFlow()
+        .mapToList(ioDispatcher)
 
     fun watchLatest(): Flow<Game> = gameQueries.lastGame()
         .asFlow()

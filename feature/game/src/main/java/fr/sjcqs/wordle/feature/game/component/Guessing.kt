@@ -1,6 +1,7 @@
 package fr.sjcqs.wordle.feature.game.component
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -158,8 +158,17 @@ private fun Guessing(
                 scrollState.scrollBy(scrollBy.value)
             }
         }
+        var retryClicked by remember { mutableStateOf(0) }
+        LaunchedEffect(key1 = retryClicked) {
+            if (!canRetry) retryClicked = 0
+            if (retryClicked >= 4) {
+                onRetry()
+                retryClicked = 0
+            }
+        }
         if (isFinished) {
             Surface(
+                modifier = Modifier.clickable { retryClicked++ },
                 color = MaterialTheme.colorScheme.inverseSurface,
                 shape = TileShape
             ) {
@@ -192,12 +201,6 @@ private fun Guessing(
             )
             if (index < guesses.lastIndex) {
                 Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
-            }
-        }
-        if (isFinished && canRetry) {
-            Spacer(modifier = Modifier.height(24.dp))
-            OutlinedButton(onClick = onRetry) {
-                Text(text = "Recommencer", color = MaterialTheme.colorScheme.onBackground)
             }
         }
         Spacer(modifier = Modifier.height(navigationWithImeBottom))

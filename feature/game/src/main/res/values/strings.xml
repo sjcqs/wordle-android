@@ -2,4 +2,12 @@
 <resources>
     <string name="guessing_invalid_word">"Ce mot n’existe pas. "</string>
     <string name="game_title">Le Mot</string>
+    <string name="game_statistics">Statistiques</string>
+    <string name="game_ok">OK</string>
+    <string name="game_performances">Performances</string>
+    <string name="game_stats_played">Parties</string>
+    <string name="game_stats_win_rate">Victoires (%)</string>
+    <string name="game_stats_current_streak">Série\nactuelle</string>
+    <string name="game_stats_max_streak">Meilleure\nsérie</string>
+    <string name="game_stats_share">Partager</string>
 </resources>

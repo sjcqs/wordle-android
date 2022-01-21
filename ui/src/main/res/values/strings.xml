@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="content_description_stats">Stats</string>
+    <string name="content_description_close">Fermer</string>
+    <string name="content_description_share">Partager</string>
 </resources>

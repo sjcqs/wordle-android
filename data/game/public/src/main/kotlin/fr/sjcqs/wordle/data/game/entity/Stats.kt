@@ -5,5 +5,6 @@ data class Stats(
     val winRate: Double,
     val currentStreak: Int,
     val maxStreak: Int,
-    val distributions: Map<Int, Int>
+    val distributions: Map<Int, Int>,
+    val dailyFinishedGame: Game?,
 )

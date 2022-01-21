@@ -9,16 +9,25 @@ import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.logger.Logger
 import fr.sjcqs.wordle.ui.components.TileUiState
+import java.time.Duration
+import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
@@ -31,13 +40,36 @@ internal class GameViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    val stats: StateFlow<StatsUiModel> = gameRepository.statsFlow
+        .flatMapLatest {
+            flow {
+                while (currentCoroutineContext().isActive) {
+                    val dailyFinishedGame = it.dailyFinishedGame
+                    emit(
+                        StatsUiModel(
+                            played = it.played,
+                            winRate = it.winRate * 100,
+                            currentStreak = it.currentStreak,
+                            maxStreak = it.maxStreak,
+                            distributions = it.distributions,
+                            dailyWord = dailyFinishedGame?.word,
+                            expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
+                                Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
+                            }
+                        )
+                    )
+                    delay(1000)
+                }
+            }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, StatsUiModel())
+
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     private val events = MutableSharedFlow<Event>()
 
     init {
-        gameRepository.dailyGame
+        gameRepository.dailyGameFlow
             .onEach(::onGameUpdated)
             .map(::map)
             .onEach(_uiState::emit)
@@ -46,10 +78,6 @@ internal class GameViewModel @Inject constructor(
         events.distinctUntilChanged()
             .onEach(::handleEvent)
             .launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            logger.d("Game: ${gameRepository.getStats()}")
-        }
     }
 
     private fun onGameUpdated(game: Game) {
@@ -124,4 +152,14 @@ internal data class GuessUiModel(
     val word: String = "",
     val tileState: Map<Int, TileUiState> = emptyMap(),
     val isEditable: Boolean = false,
+)
+
+data class StatsUiModel(
+    val played: Int = 0,
+    val winRate: Double = 0.0,
+    val currentStreak: Int = 0,
+    val maxStreak: Int = 0,
+    val distributions: Map<Int, Int> = emptyMap(),
+    val dailyWord: String? = null,
+    val expiredIn: Duration? = null
 )
