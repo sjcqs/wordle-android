@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.data.game.remote
 
+import androidx.annotation.Keep
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -14,27 +15,26 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class GameRemoteDataSource @Inject constructor(
-    private val firebaseDatabase: FirebaseDatabase,
+    firebaseDatabase: FirebaseDatabase,
 ) {
 
+    private val dailyWordRef = firebaseDatabase.getReference(REF_DAILY_WORD)
+
     init {
-        firebaseDatabase.getReference(REF_DAILY_WORD)
-            .keepSynced(true)
+        dailyWordRef.keepSynced(true)
     }
 
     private suspend fun dailyWord(): DailyWord {
-        val snapshot = firebaseDatabase.getReference(REF_DAILY_WORD).get()
+        val snapshot = dailyWordRef.get()
             .await()
         return snapshot.getValue<DailyWord>() ?: error("Missing daily word")
     }
 
     fun watchDailyWord(): Flow<DailyWord> = callbackFlow {
-        val dailyWordReference = firebaseDatabase.getReference(REF_DAILY_WORD)
+        val dailyWordReference = dailyWordRef
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.getValue<DailyWord>()?.let {
-                    trySendBlocking(it)
-                }
+                snapshot.getValue<DailyWord>()?.let { trySendBlocking(it) }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -55,6 +55,7 @@ class GameRemoteDataSource @Inject constructor(
 }
 
 @IgnoreExtraProperties
+@Keep
 data class DailyWord(
     var word: String = "",
     var expired_at: String = ""

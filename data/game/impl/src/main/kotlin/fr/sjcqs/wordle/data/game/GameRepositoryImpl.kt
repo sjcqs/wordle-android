@@ -12,7 +12,6 @@ import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.data.game.remote.DailyWord
 import fr.sjcqs.wordle.data.game.remote.GameRemoteDataSource
-import fr.sjcqs.wordle.logger.Logger
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -34,8 +33,7 @@ class GameRepositoryImpl @Inject constructor(
     @ApplicationContext
     private val context: Context,
     private val dbDataSource: GameDbDataSource,
-    private val remoteDataSource: GameRemoteDataSource,
-    private val logger: Logger
+    private val remoteDataSource: GameRemoteDataSource
 ) : GameRepository {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
     private lateinit var game: Game
@@ -151,9 +149,6 @@ class GameRepositoryImpl @Inject constructor(
             word = submitted,
             tiles = submitted.indices.map { tiles.getOrDefault(it, TileState.Absent) })
     }
-
-    private val DbGame.isExpired: Boolean
-        get() = expiredAt < LocalDate.now()
 
     private val Game.isExpired: Boolean
         get() = expiredAt < LocalDate.now()
