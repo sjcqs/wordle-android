@@ -10,6 +10,7 @@ buildscript {
         classpath(libs.kotlin.gradle)
         classpath(libs.sqldelight.gradle)
         classpath(libs.google.services)
+        classpath(libs.firebase.crashlytics.gradle)
     }
 }
 

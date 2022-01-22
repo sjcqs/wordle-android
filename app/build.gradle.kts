@@ -4,6 +4,7 @@ plugins {
     id("fr.sjcqs.android.app")
     id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -22,13 +23,18 @@ android {
 
     buildTypes {
         debug {
+            manifestPlaceholders.put("crashlyticsCollectionEnabled", false)
             signingConfig = signingConfigs.getByName("debug")
+        }
+        release {
+            manifestPlaceholders.put("crashlyticsCollectionEnabled", true)
         }
     }
 }
 
 dependencies {
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.appcheck)
 
     implementation(projects.navigation)

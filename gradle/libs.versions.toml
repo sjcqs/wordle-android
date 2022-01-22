@@ -65,6 +65,8 @@ dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 desugarJdk = "com.android.tools:desugar_jdk_libs:1.1.5"
 
 firebase-bom = "com.google.firebase:firebase-bom:29.0.4"
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+firebase-crashlytics-gradle = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
 firebase-appcheck = "com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta04"
 
 google-material = "com.google.android.material:material:1.5.0-rc01"
