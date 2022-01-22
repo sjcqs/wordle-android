@@ -1,7 +1,6 @@
 package fr.sjcqs.wordle.feature.game.component
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -159,16 +158,7 @@ private fun Guessing(
             }
         }
         if (isFinished) {
-            Surface(
-                color = MaterialTheme.colorScheme.inverseSurface,
-                shape = TileShape
-            ) {
-                Text(
-                    text = word,
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
+            DailyWord(word)
             Spacer(modifier = Modifier.height(24.dp))
         }
         guesses.forEachIndexed { index, guess ->
@@ -195,6 +185,20 @@ private fun Guessing(
             }
         }
         Spacer(modifier = Modifier.height(navigationWithImeBottom))
+    }
+}
+
+@Composable
+private fun DailyWord(word: String) {
+    Surface(
+        color = MaterialTheme.colorScheme.inverseSurface,
+        shape = TileShape
+    ) {
+        Text(
+            text = word,
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 
