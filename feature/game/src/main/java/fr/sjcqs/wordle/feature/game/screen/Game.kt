@@ -237,8 +237,8 @@ private fun Duration.format(): String {
     return String.format(
         "%d:%02d:%02d",
         toHours(),
-        toMinutesPart(),
-        toSecondsPart()
+        (seconds % (60 * 60)) / 60,
+        seconds % 60
     );
 }
 
