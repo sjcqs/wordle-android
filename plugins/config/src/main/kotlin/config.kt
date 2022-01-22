@@ -11,16 +11,11 @@ val config = Config(
         javaVersion = JavaVersion.VERSION_1_8,
         kotlinJvm = "1.8"
     ),
-    version = VersionConfig(
-        code = 1,
-        name = "1.0"
-    )
 )
 
 data class Config(
     val android: AndroidConfig,
     val jvm: JvmConfig,
-    val version: VersionConfig
 )
 
 data class AndroidConfig(
@@ -30,10 +25,6 @@ data class AndroidConfig(
     val applicationId: String,
 )
 
-data class VersionConfig(
-    val name: String,
-    val code: Int
-)
 
 data class JvmConfig(
     val javaVersion: JavaVersion,

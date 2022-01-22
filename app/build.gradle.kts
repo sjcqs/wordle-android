@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.createNativeBuildSystemVariantConfig
-
 plugins {
     id("fr.sjcqs.android.app")
     id("dagger.hilt.android.plugin")
@@ -12,6 +10,11 @@ android {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 
+    defaultConfig {
+        versionCode = 2
+        versionName = "0.1"
+    }
+
     signingConfigs {
         getByName("debug") {
             storeFile = file("debug.keystore")
@@ -19,12 +22,20 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+
+        register("release") {
+            storeFile = file("upload.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = "upload"
+            keyPassword = System.getenv("KEYSTORE_PASSWORD")
+        }
     }
 
     buildTypes {
         debug {
             manifestPlaceholders.put("crashlyticsCollectionEnabled", false)
             signingConfig = signingConfigs.getByName("debug")
+            versionNameSuffix = "-dev"
         }
         release {
             manifestPlaceholders.put("crashlyticsCollectionEnabled", true)
