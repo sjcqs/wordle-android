@@ -93,7 +93,7 @@ class GameRepositoryImpl @Inject constructor(
             .mapValues { (_, games) -> games.size }
         Stats(
             played = allGames.count { it.isFinished },
-            winRate = wonGames.size.toDouble() / allGames.size,
+            winRate = (wonGames.size.toDouble() / allGames.size).coerceIn(0.0, 1.0),
             currentStreak = currentStreak,
             maxStreak = maxStreak,
             distributions = (1..MAX_GUESSES).associateWith { distributions[it] ?: 0 },
