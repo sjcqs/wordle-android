@@ -13,7 +13,7 @@ jobs:
       CI: true
     defaults:
       run:
-        working-directory: functions
+        working-directory: functions/functions
     steps:
       - name: Setup node
         uses: actions/setup-node@v1

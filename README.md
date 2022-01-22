@@ -1,0 +1,1 @@
+# Le Mot (Wordle FR)
