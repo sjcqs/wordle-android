@@ -158,17 +158,8 @@ private fun Guessing(
                 scrollState.scrollBy(scrollBy.value)
             }
         }
-        var retryClicked by remember { mutableStateOf(0) }
-        LaunchedEffect(key1 = retryClicked) {
-            if (!canRetry) retryClicked = 0
-            if (retryClicked >= 4) {
-                onRetry()
-                retryClicked = 0
-            }
-        }
         if (isFinished) {
             Surface(
-                modifier = Modifier.clickable { retryClicked++ },
                 color = MaterialTheme.colorScheme.inverseSurface,
                 shape = TileShape
             ) {
