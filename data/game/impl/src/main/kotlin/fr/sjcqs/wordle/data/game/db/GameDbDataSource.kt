@@ -2,7 +2,7 @@ package fr.sjcqs.wordle.data.game.db
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import com.squareup.sqldelight.runtime.coroutines.mapToOneNotNull
 import fr.sjcqs.wordle.annotations.IoDispatcher
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,14 +14,9 @@ class GameDbDataSource @Inject constructor(
     @IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
 ) {
-
     suspend fun getLatest(): Game? = withContext(ioDispatcher) {
         gameQueries.lastGame()
             .executeAsOneOrNull()
-    }
-
-    suspend fun getAll(): List<Game> = withContext(ioDispatcher) {
-        gameQueries.getAll().executeAsList()
     }
 
     fun watchAll() = gameQueries.getAll()
@@ -30,7 +25,7 @@ class GameDbDataSource @Inject constructor(
 
     fun watchLatest(): Flow<Game> = gameQueries.lastGame()
         .asFlow()
-        .mapToOne(ioDispatcher)
+        .mapToOneNotNull(ioDispatcher)
 
     suspend fun insertOrUpdate(game: Game) = withContext(ioDispatcher) {
         gameQueries.insertOrReplace(

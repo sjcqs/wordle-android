@@ -47,6 +47,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.appcheck)
+    implementation(libs.firebase.database)
 
     implementation(projects.navigation)
     implementation(projects.ui)
