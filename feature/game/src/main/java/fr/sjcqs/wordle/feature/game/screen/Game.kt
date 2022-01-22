@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.feature.game.screen
 
+import android.widget.Space
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -186,6 +187,7 @@ private fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
                     Stat(labelId = R.string.game_stats_current_streak, value = stats.currentStreak)
                     Stat(labelId = R.string.game_stats_max_streak, value = stats.maxStreak)
                 }
+                Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
                         .padding(PaddingValues(bottom = 16.dp))

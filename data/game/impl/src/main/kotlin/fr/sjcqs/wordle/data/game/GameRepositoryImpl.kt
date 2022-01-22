@@ -82,7 +82,7 @@ class GameRepositoryImpl @Inject constructor(
             .groupBy { it.guesses.size }
             .mapValues { (_, games) -> games.size }
         Stats(
-            played = allGames.size,
+            played = allGames.count { it.isFinished },
             winRate = wonGames.size.toDouble() / allGames.size,
             currentStreak = currentStreak,
             maxStreak = maxStreak,
@@ -154,6 +154,9 @@ class GameRepositoryImpl @Inject constructor(
 
     private val DbGame.isWon: Boolean
         get() = word == guesses.lastOrNull()?.word
+
+    private val DbGame.isFinished: Boolean
+        get() = word == guesses.lastOrNull()?.word || guesses.size == MAX_GUESSES
 
     companion object {
         private const val MAX_GUESSES = 6
