@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import fr.sjcqs.wordle.data.game.db.Game as DbGame
@@ -60,7 +61,8 @@ class GameRepositoryImpl @Inject constructor(
                         )
                         dbDataSource.insertOrUpdate(dailyGame.toDb())
                     }
-                }.launchIn(scope)
+                }.retry()
+                .launchIn(scope)
         }
     }
 

@@ -8,11 +8,12 @@ import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import javax.inject.Inject
+import kotlin.coroutines.resume
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 class GameRemoteDataSource @Inject constructor(
     firebaseDatabase: FirebaseDatabase,
@@ -24,10 +25,17 @@ class GameRemoteDataSource @Inject constructor(
         dailyWordRef.keepSynced(true)
     }
 
-    private suspend fun dailyWord(): DailyWord {
-        val snapshot = dailyWordRef.get()
-            .await()
-        return snapshot.getValue<DailyWord>() ?: error("Missing daily word")
+    private suspend fun dailyWord(): DailyWord = suspendCancellableCoroutine { continuation ->
+        dailyWordRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.getValue<DailyWord>()?.let(continuation::resume)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                continuation.cancel(error.toException())
+            }
+
+        })
     }
 
     fun watchDailyWord(): Flow<DailyWord> = callbackFlow {
