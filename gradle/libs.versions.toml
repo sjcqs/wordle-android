@@ -64,7 +64,11 @@ dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 
 desugarJdk = "com.android.tools:desugar_jdk_libs:1.1.5"
 
+firebase-bom = "com.google.firebase:firebase-bom:29.0.4"
+firebase-appcheck = "com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta04"
+
 google-material = "com.google.android.material:material:1.5.0-rc01"
+google-services = "com.google.gms:google-services:4.3.10"
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "dagger" }
