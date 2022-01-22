@@ -40,13 +40,7 @@ function expiredAt(): Date {
   return date;
 }
 
-exports.importWords = functionBuilder.https.onCall(async (_: undefined, context) => {
-  if (!(context.auth && context.auth.token && context.auth.token.admin)) {
-    throw new functions.https.HttpsError(
-        "permission-denied",
-        "Must be an administrative user to import words."
-    );
-  }
+exports.importWords = functionBuilder.https.onRequest(async (_, resp) => {
   const ref = admin.database().ref(REF_ALL_WORDS).orderByKey();
   const wordsRef = admin.database().ref(REF_WORDS);
 
@@ -57,21 +51,7 @@ exports.importWords = functionBuilder.https.onCall(async (_: undefined, context)
       wordsRef.push(word);
     });
   });
-});
-
-exports.updateDailyWord = functionBuilder.https.onCall(async (_: undefined, context) => {
-  if (!(context.auth && context.auth.token && context.auth.token.admin)) {
-    throw new functions.https.HttpsError(
-        "permission-denied",
-        "Must be an administrative user to update daily word."
-    );
-  }
-  await updateDailyWord();
-  return admin.database()
-      .ref(REF_DAILY_WORD)
-      .once("value", (snapshot) => {
-        return snapshot.val();
-      });
+  resp.status(200).send("OK");
 });
 
 exports.scheduleUpdateDailyWord = functionBuilder.pubsub
