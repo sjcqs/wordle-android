@@ -35,7 +35,7 @@ async function updateDailyWord() {
 
 function expiredAt(): Date {
   const date = new Date();
-  date.setHours(23, 59, 59);
+  date.setUTCHours(23, 59, 59);
   return date;
 }
 
