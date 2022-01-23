@@ -7,7 +7,7 @@ const REF_ALL_WORDS = "/all_words";
 const REF_WORDS = "/words";
 const REF_DAILY_WORD = "/daily_word";
 
-const functionBuilder = functions.region("europe-west1");
+const functionBuilder = functions.region("europe-west3");
 
 async function updateDailyWord() {
   const wordsRef = admin.database()

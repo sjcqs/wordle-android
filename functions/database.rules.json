@@ -1,6 +1,8 @@
 {
   "rules": {
-    ".read": false,
-    ".write": false
+      "daily_word": {
+        ".read": true,
+    		".write": false
+      }
   }
 }
