@@ -57,6 +57,4 @@ exports.importWords = functionBuilder.https.onRequest(async (_, resp) => {
 exports.scheduleUpdateDailyWord = functionBuilder.pubsub
     .schedule("every day 00:00")
     .timeZone("Europe/Paris")
-    .onRun(async () => {
-      return updateDailyWord();
-    });
+    .onRun(updateDailyWord);
