@@ -16,7 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -75,63 +74,62 @@ internal fun Guessing(
         }.toMap()
     }
 
-    Guessing(
-        word = uiState.word,
-        isFinished = uiState.isFinished,
-        guesses = uiState.guesses,
-        value = currentValue,
-        currentTiles = currentTiles,
-        isImeVisible = ime.isVisible,
-        openKeyboard = {
-            if (!uiState.isFinished) {
+    Column {
+        Guessing(
+            word = uiState.word,
+            isFinished = uiState.isFinished,
+            guesses = uiState.guesses,
+            value = currentValue,
+            currentTiles = currentTiles,
+            isImeVisible = ime.isVisible,
+            openKeyboard = {
+                if (!uiState.isFinished) {
+                    focusRequester.requestFocus()
+                    keyboard?.show()
+                }
+            },
+            onRetry = uiState.onRetry,
+            canRetry = uiState.canRetry,
+            navigationWithImeBottom = navigationWithImeBottom,
+            scrollState = scrollState
+        )
+        if (!uiState.isFinished) {
+            LaunchedEffect(key1 = Unit) {
                 focusRequester.requestFocus()
-                keyboard?.show()
             }
-        },
-        onRetry = uiState.onRetry,
-        canRetry = uiState.canRetry,
-        navigationWithImeBottom = navigationWithImeBottom,
-        scrollState = scrollState
-    )
-    if (!uiState.isFinished) {
-        DisposableEffect(uiState) {
-            focusRequester.requestFocus()
-            onDispose {
-                /* no-op */
+            CompositionLocalProvider(LocalTextToolbar provides NoOpTextToolbar) {
+                TextField(
+                    value = currentValue,
+                    singleLine = true,
+                    onValueChange = { newValue ->
+                        if (newValue.isNotEmpty()) {
+                            uiState.onTyping()
+                        }
+                        val filteredNewValue =
+                            newValue.uppercase(Locale.FRANCE).filter { it in 'A'..'Z' }
+                        if (filteredNewValue.length <= uiState.word.length) {
+                            currentValue = filteredNewValue
+                            onValueChanged(filteredNewValue)
+                        }
+                    },
+                    modifier = Modifier
+                        .size(0.dp)
+                        .alpha(0f)
+                        .focusRequester(focusRequester),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        capitalization = KeyboardCapitalization.Characters,
+                        autoCorrect = false,
+                        imeAction = if (currentValue.length == uiState.word.length) {
+                            ImeAction.Done
+                        } else {
+                            ImeAction.None
+                        }
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        uiState.onSubmit(currentValue)
+                    })
+                )
             }
-        }
-        CompositionLocalProvider(LocalTextToolbar provides NoOpTextToolbar) {
-            TextField(
-                value = currentValue,
-                singleLine = true,
-                onValueChange = { newValue ->
-                    if (newValue.isNotEmpty()) {
-                        uiState.onTyping()
-                    }
-                    val filteredNewValue =
-                        newValue.uppercase(Locale.FRANCE).filter { it in 'A'..'Z' }
-                    if (filteredNewValue.length <= uiState.word.length) {
-                        currentValue = filteredNewValue
-                        onValueChanged(filteredNewValue)
-                    }
-                },
-                modifier = Modifier
-                    .size(0.dp)
-                    .alpha(0f)
-                    .focusRequester(focusRequester),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    capitalization = KeyboardCapitalization.Characters,
-                    autoCorrect = false,
-                    imeAction = if (currentValue.length == uiState.word.length) {
-                        ImeAction.Done
-                    } else {
-                        ImeAction.None
-                    }
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    uiState.onSubmit(currentValue)
-                })
-            )
         }
     }
 }
@@ -204,7 +202,8 @@ private fun Guessing(
                     }
                 } else Modifier,
                 tiles = if (guess.isEditable) currentTiles else guess.tileState,
-                onTileClicked = openKeyboard
+                onTileClicked = openKeyboard,
+                number = index + 1
             )
             if (index < guesses.lastIndex) {
                 Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
@@ -231,6 +230,7 @@ private fun DailyWord(word: String) {
 @Composable
 private fun Guess(
     word: String,
+    number: Int,
     modifier: Modifier,
     onTileClicked: () -> Unit,
     tiles: Map<Int, TileUiState>,
@@ -238,6 +238,7 @@ private fun Guess(
     Word(
         modifier = modifier,
         word = word,
+        number = number,
         onTileClicked = onTileClicked,
         tileStates = tiles
     )

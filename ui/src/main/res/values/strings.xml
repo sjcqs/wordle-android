@@ -3,4 +3,12 @@
     <string name="content_description_stats">Stats</string>
     <string name="content_description_close">Fermer</string>
     <string name="content_description_share">Partager</string>
+    <string name="content_description_present">Essai numéro %1$d, lettre %2$d, cette lettre est présente</string>
+    <string name="content_description_correct">Essai numéro %1$d, lettre %2$d, cette lettre est correctement placée</string>
+    <string name="content_description_absent">Essai numéro %1$d, lettre %2$d, cette lettre est absente du mot</string>
+    <string name="content_description_hint_correct">Essai numéro %1$d, lettre %2$d, cette lettre est correctement placée</string>
+    <string name="content_description_hint_absent">Essai numéro %1$d, lettre %2$d, cette lettre est absente du mot</string>
+    <string name="content_description_unknown">""</string>
+    <string name="content_description_tile_click_label">Ouvrir le clavier</string>
+    <string name="content_description_empty">pas de lettre</string>
 </resources>

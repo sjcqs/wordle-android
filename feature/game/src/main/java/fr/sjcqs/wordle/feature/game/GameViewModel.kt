@@ -7,7 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.extensions.emitIn
-import fr.sjcqs.wordle.logger.Logger
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
 import java.time.LocalDate
@@ -32,7 +31,6 @@ import kotlinx.coroutines.isActive
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val logger: Logger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GameUiState>(
@@ -50,7 +48,6 @@ internal class GameViewModel @Inject constructor(
                 onStatsOpened = { events.emitIn(viewModelScope, Event.OnStatsOpened) },
                 onStatsDismissed = { events.emitIn(viewModelScope, Event.OnStatsDismissed) }
             )
-            logger.d("Stats: $statsUiModel")
             if (areStatsOpen) {
                 while (currentCoroutineContext().isActive) {
                     emit(statsUiModel.updateExpiredIn(dailyFinishedGame?.expiredAt))
@@ -157,10 +154,10 @@ internal data class GuessUiModel(
 )
 
 data class StatsUiModel(
-    val played: Int = 0,
-    val winRate: Double = 0.0,
-    val currentStreak: Int = 0,
-    val maxStreak: Int = 0,
+    val played: String = "",
+    val winRate: String = "",
+    val currentStreak: String = "",
+    val maxStreak: String = "",
     val sharedText: String? = null,
     val distributions: Map<Int, Int> = emptyMap(),
     val dailyWord: String? = null,

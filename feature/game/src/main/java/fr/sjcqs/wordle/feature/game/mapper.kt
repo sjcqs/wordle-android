@@ -5,6 +5,7 @@ import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.ui.components.TileUiState
+import java.text.NumberFormat
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -58,20 +59,23 @@ internal fun Stats.toUiModel(
     dailyFinishedGame: Game?,
     onStatsDismissed: () -> Unit,
     onStatsOpened: () -> Unit
-) = StatsUiModel(
-    played = played,
-    winRate = winRate * 100,
-    currentStreak = currentStreak,
-    maxStreak = maxStreak,
-    distributions = distributions,
-    dailyWord = dailyFinishedGame?.word,
-    expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
-        Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
-    },
-    sharedText = sharedText(dailyFinishedGame),
-    onStatsDismissed = onStatsDismissed,
-    onStatsOpened = onStatsOpened
-)
+): StatsUiModel {
+    val numberFormat = NumberFormat.getNumberInstance()
+    return StatsUiModel(
+        played = numberFormat.format(played),
+        winRate = NumberFormat.getPercentInstance().format(winRate),
+        currentStreak = numberFormat.format(currentStreak),
+        maxStreak = numberFormat.format(maxStreak),
+        distributions = distributions,
+        dailyWord = dailyFinishedGame?.word,
+        expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
+            Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
+        },
+        sharedText = sharedText(dailyFinishedGame),
+        onStatsDismissed = onStatsDismissed,
+        onStatsOpened = onStatsOpened
+    )
+}
 
 fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.run {
     buildString {

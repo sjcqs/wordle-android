@@ -76,7 +76,7 @@ class GameRepositoryImpl @Inject constructor(
 
         val currentStreak = allGames.takeWhile { it.isWon }.size
 
-        var maxStreak = 0
+        var maxStreak = currentStreak
         var streak = 0
         allGames.forEach { game ->
             if (game.isWon) {

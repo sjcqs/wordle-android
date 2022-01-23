@@ -23,7 +23,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,6 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,6 +58,7 @@ import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.feature.game.StatsUiModel
 import fr.sjcqs.wordle.feature.game.component.Guessing
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
+import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.absent
@@ -109,6 +112,13 @@ fun Game() {
     }
 
     var showStatsDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = showStatsDialog) {
+        if (showStatsDialog) {
+            stats.onStatsOpened()
+        } else {
+            stats.onStatsDismissed()
+        }
+    }
     if (showStatsDialog) {
         StatsDialog(
             stats = stats,
@@ -131,7 +141,8 @@ fun Game() {
                 ),
                 title = { Text(text = stringResource(id = R.string.game_title)) },
                 actions = {
-                    IconButton(onClick = { showStatsDialog = true }) {
+                    val onClickLabel = stringResource(id = R.string.game_stats_label_open)
+                    IconButton(onClick = { showStatsDialog = true }, onClickLabel = onClickLabel) {
                         Icons.Stats()
                     }
                 }
@@ -174,11 +185,14 @@ private fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
         onDismissRequest = onDismissRequest,
         confirmButton = {},
         title = {
+            val closeOnClickLabel = stringResource(id = R.string.game_stats_label_close)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onDismissRequest) { Icons.Close() }
+                IconButton(onClick = onDismissRequest, onClickLabel = closeOnClickLabel) {
+                    Icons.Close()
+                }
                 Text(
                     text = stringResource(R.string.game_statistics),
                     textAlign = TextAlign.Center,
@@ -216,8 +230,11 @@ private fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
                 if (stats.expiredIn != null) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.SpaceAround) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "Prochain mot dans:")
+                        Column(
+                            modifier = Modifier.semantics(mergeDescendants = true) { },
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = stringResource(R.string.game_stats_next_word_in))
                             Text(
                                 text = stats.expiredIn.format(),
                                 style = MaterialTheme.typography.headlineMedium
@@ -226,14 +243,16 @@ private fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
                         Spacer(modifier = Modifier.weight(1f))
                         if (stats.sharedText != null) {
                             Button(
-                                modifier = Modifier.align(Alignment.CenterVertically),
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .semantics(mergeDescendants = true) { },
                                 onClick = { share() },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.correct,
                                     contentColor = MaterialTheme.colorScheme.onCorrect,
                                 )
                             ) {
-                                Icons.Share()
+                                Icons.Share(modifier = Modifier.clearAndSetSemantics {  })
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(text = stringResource(R.string.game_stats_share))
                             }
@@ -257,8 +276,26 @@ private fun Duration.format(): String {
 @Composable
 private fun StatsPerformances(distributions: Map<Int, Int>, wonGames: Float) {
     distributions.forEach { (guessCount, count) ->
-        Row(modifier = Modifier.padding(vertical = 2.dp)) {
-            Text(text = "$guessCount")
+
+        val stateDescription = if (count == 0) {
+            stringResource(id = R.string.game_stats_performance_description_none, guessCount)
+        } else {
+            LocalContext.current.resources.getQuantityString(
+                R.plurals.game_stats_performance_description,
+                count,
+                guessCount,
+                count
+            )
+        }
+        Row(modifier = Modifier
+            .padding(vertical = 2.dp)
+            .semantics {
+                this.stateDescription = stateDescription
+            }) {
+            Text(
+                modifier = Modifier.clearAndSetSemantics { },
+                text = "$guessCount"
+            )
             Spacer(modifier = Modifier.width(8.dp))
             val fraction = (count / wonGames).coerceAtLeast(.1f)
             Box(
@@ -269,9 +306,11 @@ private fun StatsPerformances(distributions: Map<Int, Int>, wonGames: Float) {
             ) {
                 Text(
                     color = MaterialTheme.colorScheme.onAbsent,
-                    modifier = Modifier.align(
-                        if (count > 0) Alignment.CenterEnd else Alignment.Center
-                    ),
+                    modifier = Modifier
+                        .align(
+                            if (count > 0) Alignment.CenterEnd else Alignment.Center
+                        )
+                        .clearAndSetSemantics { },
                     text = "$count"
                 )
             }
@@ -280,12 +319,23 @@ private fun StatsPerformances(distributions: Map<Int, Int>, wonGames: Float) {
 }
 
 @Composable
-private fun <T : Any> Stat(@StringRes labelId: Int, value: T) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "$value", style = MaterialTheme.typography.titleLarge)
+private fun Stat(@StringRes labelId: Int, value: String) {
+    val label = stringResource(labelId)
+    Column(
+        modifier = Modifier.semantics(mergeDescendants = true) {
+            stateDescription = "$label: $value"
+        },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
+            modifier = Modifier.clearAndSetSemantics { },
+            text = value,
+            style = MaterialTheme.typography.titleLarge
+        )
+        Text(
+            modifier = Modifier.clearAndSetSemantics { },
             textAlign = TextAlign.Center,
-            text = stringResource(labelId),
+            text = label,
             style = MaterialTheme.typography.labelMedium
         )
     }
@@ -312,7 +362,7 @@ private fun Game(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             repeat(state.maxGuesses) { index ->
-                Word()
+                Word(number = index + 1)
                 if (index != state.maxGuesses - 1) {
                     Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
                 }

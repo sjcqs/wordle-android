@@ -27,7 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import fr.sjcqs.wordle.ui.R
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 import fr.sjcqs.wordle.ui.theme.absent
 import fr.sjcqs.wordle.ui.theme.contentColorFor
@@ -48,6 +53,7 @@ enum class TileUiState {
 fun Word(
     modifier: Modifier = Modifier,
     word: String = "",
+    number: Int,
     tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
     onTileClicked: () -> Unit = {},
@@ -60,27 +66,52 @@ fun Word(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        val tileModifier = Modifier
-            .weight(1f)
-            .aspectRatio(1f)
-            .clickable { onTileClicked() }
         repeat(length) { index ->
             val letter = word.getOrNull(index)?.toString().orEmpty()
+            val tileState = tileStates[index]
+            val letterStateDescription = if (letter.isEmpty()) {
+                stringResource(R.string.content_description_empty)
+            } else {
+                stringResource(
+                    id = when (tileState) {
+                        TileUiState.Present -> R.string.content_description_present
+                        TileUiState.Correct -> R.string.content_description_correct
+                        TileUiState.Absent -> R.string.content_description_absent
+                        TileUiState.HintCorrect -> R.string.content_description_hint_correct
+                        TileUiState.HintAbsent -> R.string.content_description_hint_absent
+                        null -> R.string.content_description_unknown
+                    },
+                    number,
+                    index + 1
+                )
+            }
+            val clickLabel = stringResource(id = R.string.content_description_tile_click_label)
+            val ime = LocalWindowInsets.current.ime
+            val tileModifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f)
+                .run {
+                    if (!ime.isVisible) {
+                        clickable(onClickLabel = clickLabel) { onTileClicked() }
+                    } else this
+                }
             AnimatedContent(
-                modifier = tileModifier,
+                modifier = tileModifier.semantics(mergeDescendants = true) {
+                    stateDescription = letterStateDescription
+                },
                 contentAlignment = Alignment.Center,
-                targetState = tileStates[index],
+                targetState = tileState,
                 transitionSpec = {
                     when (targetState) {
                         TileUiState.Present,
                         TileUiState.Correct,
-                        TileUiState.Absent-> slideIntoContainer(
+                        TileUiState.Absent -> slideIntoContainer(
                             towards = AnimatedContentScope.SlideDirection.Up,
                             animationSpec = tween(delayMillis = index * 100)
                         ) with fadeOut(targetAlpha = 1f)
                         TileUiState.HintCorrect,
                         TileUiState.HintAbsent,
-                        null-> hold()
+                        null -> hold()
                     }
                 }
             ) { targetState ->
