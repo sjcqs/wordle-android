@@ -7,6 +7,9 @@
       "**/node_modules/**"
     ],
     "appAssociation": "AUTO",
-    "rewrites": [ { "source": "wordle/**", "dynamicLinks": true } ]
+    "rewrites": [ 
+      { "source": "wordle/**", "dynamicLinks": true },
+      { "source": "!wordle/**", "destination": "/index.html" } 
+    ]
   }
 }
