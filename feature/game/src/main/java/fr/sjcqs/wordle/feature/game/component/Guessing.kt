@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
@@ -45,6 +44,7 @@ import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.ui.components.TileUiState
 import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
+import java.util.Locale
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
@@ -102,7 +102,7 @@ internal fun Guessing(
                 if (newValue.isNotEmpty()) {
                     uiState.onTyping()
                 }
-                val filteredNewValue = newValue.filter { it in 'A'..'Z' }
+                val filteredNewValue = newValue.uppercase(Locale.FRANCE).filter { it in 'A'..'Z' }
                 if (filteredNewValue.length <= uiState.word.length) {
                     currentValue = filteredNewValue
                     onValueChanged(filteredNewValue)
@@ -113,7 +113,6 @@ internal fun Guessing(
                 .alpha(0f)
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Ascii,
                 capitalization = KeyboardCapitalization.Characters,
                 autoCorrect = false,
                 imeAction = if (currentValue.length == uiState.word.length) {

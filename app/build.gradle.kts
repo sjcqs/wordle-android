@@ -11,8 +11,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 4
-        versionName = "0.2b"
+        versionCode = 5
+        versionName = "0.3"
     }
 
     signingConfigs {
@@ -33,12 +33,12 @@ android {
 
     buildTypes {
         debug {
-            manifestPlaceholders.put("crashlyticsCollectionEnabled", false)
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             signingConfig = signingConfigs.getByName("debug")
             versionNameSuffix = "-dev"
         }
         release {
-            manifestPlaceholders.put("crashlyticsCollectionEnabled", true)
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
         }
     }
 }
