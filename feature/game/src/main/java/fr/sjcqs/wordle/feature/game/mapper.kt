@@ -98,6 +98,6 @@ fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.let {
             appendLine()
         }
         appendLine()
-        appendLine("https://wordlefr.page.link/app (Android)")
+        appendLine("wordlefr.page.link/app (Android)")
     }
 }
