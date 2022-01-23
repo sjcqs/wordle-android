@@ -4,6 +4,7 @@ import android.app.Application
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import dagger.hilt.android.HiltAndroidApp
+import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.lifecycle_logging.ActivityLifecycleLoggerFactory
 import javax.inject.Inject
 
@@ -11,6 +12,9 @@ import javax.inject.Inject
 class WordleApp : Application() {
     @Inject
     lateinit var lifecycleLoggerFactory: ActivityLifecycleLoggerFactory
+
+    @Inject
+    lateinit var gameRepository: GameRepository
 
     override fun onCreate() {
         super.onCreate()
