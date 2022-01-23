@@ -73,21 +73,16 @@ internal fun Stats.toUiModel(
     onStatsOpened = onStatsOpened
 )
 
-fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.let {
+fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.run {
     buildString {
-        val date = dailyFinishedGame.expiredAt.minusDays(1)
+        val date = expiredAt.minusDays(1)
             .format(DateTimeFormatter.ofPattern("DD MMM"))
-        val guesses = "${
-            if (dailyFinishedGame.isWon) {
-                dailyFinishedGame.guesses.size
-            } else {
-                "\uD83D\uDC80"
-            }
-        }/${dailyFinishedGame.maxGuesses}"
+        val guesses = guesses
+        val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
         appendLine("Le Mot (Wordle FR)")
-        appendLine("le $date - $guesses")
+        appendLine("le $date - $performance")
         appendLine()
-        dailyFinishedGame.guesses.forEach { guess ->
+        guesses.forEach { guess ->
             guess.tiles.forEach { tile ->
                 when (tile) {
                     TileState.Correct -> append("\uD83D\uDFE9")

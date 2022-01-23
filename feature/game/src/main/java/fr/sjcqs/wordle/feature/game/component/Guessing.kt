@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -28,10 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.Dp
@@ -95,37 +100,59 @@ internal fun Guessing(
                 /* no-op */
             }
         }
-        TextField(
-            value = currentValue,
-            singleLine = true,
-            onValueChange = { newValue ->
-                if (newValue.isNotEmpty()) {
-                    uiState.onTyping()
-                }
-                val filteredNewValue = newValue.uppercase(Locale.FRANCE).filter { it in 'A'..'Z' }
-                if (filteredNewValue.length <= uiState.word.length) {
-                    currentValue = filteredNewValue
-                    onValueChanged(filteredNewValue)
-                }
-            },
-            modifier = Modifier
-                .size(0.dp)
-                .alpha(0f)
-                .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                capitalization = KeyboardCapitalization.Characters,
-                autoCorrect = false,
-                imeAction = if (currentValue.length == uiState.word.length) {
-                    ImeAction.Done
-                } else {
-                    ImeAction.None
-                }
-            ),
-            keyboardActions = KeyboardActions(onDone = {
-                uiState.onSubmit(currentValue)
-            })
-        )
+        CompositionLocalProvider(LocalTextToolbar provides NoOpTextToolbar) {
+            TextField(
+                value = currentValue,
+                singleLine = true,
+                onValueChange = { newValue ->
+                    if (newValue.isNotEmpty()) {
+                        uiState.onTyping()
+                    }
+                    val filteredNewValue =
+                        newValue.uppercase(Locale.FRANCE).filter { it in 'A'..'Z' }
+                    if (filteredNewValue.length <= uiState.word.length) {
+                        currentValue = filteredNewValue
+                        onValueChanged(filteredNewValue)
+                    }
+                },
+                modifier = Modifier
+                    .size(0.dp)
+                    .alpha(0f)
+                    .focusRequester(focusRequester),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Characters,
+                    autoCorrect = false,
+                    imeAction = if (currentValue.length == uiState.word.length) {
+                        ImeAction.Done
+                    } else {
+                        ImeAction.None
+                    }
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    uiState.onSubmit(currentValue)
+                })
+            )
+        }
     }
+}
+
+object NoOpTextToolbar : TextToolbar {
+    override val status: TextToolbarStatus = TextToolbarStatus.Hidden
+
+    override fun hide() {
+        /* no-op */
+    }
+
+    override fun showMenu(
+        rect: Rect,
+        onCopyRequested: (() -> Unit)?,
+        onPasteRequested: (() -> Unit)?,
+        onCutRequested: (() -> Unit)?,
+        onSelectAllRequested: (() -> Unit)?
+    ) {
+        /* no-op */
+    }
+
 }
 
 @Composable
