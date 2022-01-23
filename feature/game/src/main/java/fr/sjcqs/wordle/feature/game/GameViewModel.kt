@@ -10,6 +10,7 @@ import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.logger.Logger
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.currentCoroutineContext
@@ -20,9 +21,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -32,7 +32,7 @@ import kotlinx.coroutines.isActive
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val logger: Logger
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GameUiState>(
@@ -40,26 +40,24 @@ internal class GameViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    private val areStatsOpenFlow = MutableStateFlow(false)
+
     val stats: StateFlow<StatsUiModel> = gameRepository.statsFlow
-        .flatMapLatest {
-            flow {
+        .combineTransform(areStatsOpenFlow) { it, areStatsOpen ->
+            val dailyFinishedGame = it.dailyFinishedGame
+            val statsUiModel = it.toUiModel(
+                dailyFinishedGame,
+                onStatsOpened = { events.emitIn(viewModelScope, Event.OnStatsOpened) },
+                onStatsDismissed = { events.emitIn(viewModelScope, Event.OnStatsDismissed) }
+            )
+            logger.d("Stats: $statsUiModel")
+            if (areStatsOpen) {
                 while (currentCoroutineContext().isActive) {
-                    val dailyFinishedGame = it.dailyFinishedGame
-                    emit(
-                        StatsUiModel(
-                            played = it.played,
-                            winRate = it.winRate * 100,
-                            currentStreak = it.currentStreak,
-                            maxStreak = it.maxStreak,
-                            distributions = it.distributions,
-                            dailyWord = dailyFinishedGame?.word,
-                            expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
-                                Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
-                            }
-                        )
-                    )
+                    emit(statsUiModel.updateExpiredIn(dailyFinishedGame?.expiredAt))
                     delay(1000)
                 }
+            } else {
+                emit(statsUiModel)
             }
         }.stateIn(viewModelScope, SharingStarted.Eagerly, StatsUiModel())
 
@@ -97,6 +95,8 @@ internal class GameViewModel @Inject constructor(
             is Event.Retry -> retry()
             is Event.Submit -> submit(event.word)
             is Event.Typing -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Dismiss)
+            Event.OnStatsDismissed -> areStatsOpenFlow.emit(false)
+            Event.OnStatsOpened -> areStatsOpenFlow.emit(true)
         }
     }
 
@@ -117,6 +117,8 @@ internal class GameViewModel @Inject constructor(
         data class Submit(val word: String) : Event
         object Retry : Event
         object Typing : Event
+        object OnStatsOpened : Event
+        object OnStatsDismissed : Event
     }
 }
 
@@ -159,7 +161,16 @@ data class StatsUiModel(
     val winRate: Double = 0.0,
     val currentStreak: Int = 0,
     val maxStreak: Int = 0,
+    val sharedText: String? = null,
     val distributions: Map<Int, Int> = emptyMap(),
     val dailyWord: String? = null,
-    val expiredIn: Duration? = null
-)
+    val expiredIn: Duration? = null,
+    val onStatsOpened: () -> Unit = {},
+    val onStatsDismissed: () -> Unit = {}
+) {
+    fun updateExpiredIn(expiredAt: LocalDate?) = copy(
+        expiredIn = expiredAt?.let {
+            Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
+        }
+    )
+}

@@ -2,8 +2,12 @@ package fr.sjcqs.wordle.feature.game
 
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
+import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.ui.components.TileUiState
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 internal fun TileState.toUiModel(isHint: Boolean = false): TileUiState = when (this) {
     TileState.Correct -> if (isHint) TileUiState.HintCorrect else TileUiState.Correct
@@ -49,3 +53,51 @@ internal fun Guess.toUiModel(): GuessUiModel = GuessUiModel(
         index to state.toUiModel()
     }.toMap()
 )
+
+internal fun Stats.toUiModel(
+    dailyFinishedGame: Game?,
+    onStatsDismissed: () -> Unit,
+    onStatsOpened: () -> Unit
+) = StatsUiModel(
+    played = played,
+    winRate = winRate * 100,
+    currentStreak = currentStreak,
+    maxStreak = maxStreak,
+    distributions = distributions,
+    dailyWord = dailyFinishedGame?.word,
+    expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
+        Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
+    },
+    sharedText = sharedText(dailyFinishedGame),
+    onStatsDismissed = onStatsDismissed,
+    onStatsOpened = onStatsOpened
+)
+
+fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.let {
+    buildString {
+        val date = dailyFinishedGame.expiredAt.minusDays(1)
+            .format(DateTimeFormatter.ofPattern("DD MMM"))
+        val guesses = "${
+            if (dailyFinishedGame.isWon) {
+                dailyFinishedGame.guesses.size
+            } else {
+                "\uD83D\uDC80"
+            }
+        }/${dailyFinishedGame.maxGuesses}"
+        appendLine("Le Mot (Wordle FR)")
+        appendLine("le $date - $guesses")
+        appendLine()
+        dailyFinishedGame.guesses.forEach { guess ->
+            guess.tiles.forEach { tile ->
+                when (tile) {
+                    TileState.Correct -> append("\uD83D\uDFE9")
+                    TileState.Absent -> append("⬛")
+                    TileState.Present -> append("\uD83D\uDFE8")
+                }
+            }
+            appendLine()
+        }
+        appendLine()
+        appendLine("https://wordlefr.page.link/app (Android)")
+    }
+}

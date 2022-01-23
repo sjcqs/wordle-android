@@ -69,6 +69,7 @@ firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-
 firebase-crashlytics-gradle = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
 firebase-appcheck = "com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta04"
 firebase-database = { module = "com.google.firebase:firebase-database-ktx" }
+firebase-links = { module = "com.google.firebase:firebase-dynamic-links-ktx" }
 
 google-material = "com.google.android.material:material:1.5.0-rc01"
 google-services = "com.google.gms:google-services:4.3.10"

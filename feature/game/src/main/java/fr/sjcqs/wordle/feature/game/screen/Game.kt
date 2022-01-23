@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.feature.game.screen
 
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -20,6 +21,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +59,9 @@ import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.absent
+import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.onAbsent
+import fr.sjcqs.wordle.ui.theme.onCorrect
 import java.time.Duration
 import kotlinx.coroutines.launch
 
@@ -151,6 +157,19 @@ fun Game() {
 
 @Composable
 private fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    fun share() {
+        stats.sharedText?.let {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, stats.sharedText)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            context.startActivity(shareIntent)
+        }
+
+    }
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {},
@@ -205,18 +224,20 @@ private fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        /*Button(
-                            modifier = Modifier.align(Alignment.CenterVertically),
-                            onClick = { *//*TODO*//* },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.correct,
-                                contentColor = MaterialTheme.colorScheme.onCorrect,
-                            )
-                        ) {
-                            Icons.Share()
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = stringResource(R.string.game_stats_share))
-                        }*/
+                        if (stats.sharedText != null) {
+                            Button(
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                                onClick = { share() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.correct,
+                                    contentColor = MaterialTheme.colorScheme.onCorrect,
+                                )
+                            ) {
+                                Icons.Share()
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = stringResource(R.string.game_stats_share))
+                            }
+                        }
                     }
                 }
             }
