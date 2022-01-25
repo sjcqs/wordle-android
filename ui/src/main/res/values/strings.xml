@@ -11,4 +11,6 @@
     <string name="content_description_unknown">""</string>
     <string name="content_description_tile_click_label">Ouvrir le clavier</string>
     <string name="content_description_empty">pas de lettre</string>
+    <string name="content_description_return">Entrée</string>
+    <string name="content_description_backspace">Retour arrière</string>
 </resources>

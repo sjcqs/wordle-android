@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -18,6 +19,7 @@ fun CenterAlignedTopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    shadowElevation: Dp = 0.dp,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
@@ -26,7 +28,8 @@ fun CenterAlignedTopAppBar(
     val color by colors.containerColor(scrollFraction = scrollBehavior?.scrollFraction ?: 0f)
     Surface(
         color = color,
-        modifier = modifier
+        modifier = modifier,
+        shadowElevation = shadowElevation
     ) {
         CenterAlignedTopAppBar(
             title = title,

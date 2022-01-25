@@ -10,35 +10,22 @@ data class Game(
 ) {
     val isFinished: Boolean = guesses.lastOrNull()?.word == word || guesses.size >= maxGuesses
     val isWon: Boolean = word == guesses.lastOrNull()?.word
-    val tileLetters: Map<Int, Map<Char, TileState>> = guesses
-        .fold(mutableMapOf<Int, MutableMap<Char, TileState>>()) { tilesState, guess ->
+    val letterStates: Map<Char, TileState> = guesses
+        .fold(mutableMapOf()) { letterStates, guess ->
             guess.word.onEachIndexed { index, letter ->
-                val tileState = guess.tiles[index]
-                if (tileState != TileState.Present) {
-                    tilesState.compute(index) { _, letters ->
-                        (letters ?: mutableMapOf()).apply {
-                            put(letter, tileState)
+                val guessState = guess.tiles[index]
+                letterStates.compute(letter) { _, currentState ->
+                    when (currentState) {
+                        TileState.Correct -> {
+                            if (guessState == TileState.Present) guessState else currentState
                         }
-                    }
-                    if (tileState == TileState.Absent &&
-                        guesses.none { guess -> guess.tiles.contains(TileState.Present) }
-                    ) {
-                        tilesState.replaceAll { _, letters ->
-                            letters.apply {
-                                compute(letter) { _, currentTileState ->
-                                    when (currentTileState) {
-                                        TileState.Present,
-                                        TileState.Correct -> currentTileState
-                                        TileState.Absent,
-                                        null -> TileState.Absent
-                                    }
-                                }
-                            }
-                        }
+                        TileState.Absent -> guessState
+                        TileState.Present -> TileState.Present
+                        null -> guessState
                     }
                 }
             }
-            tilesState
+            letterStates
         }
 
     fun add(guess: Guess) = copy(guesses = guesses.plus(guess))

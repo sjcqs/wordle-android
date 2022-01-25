@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -31,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
 import fr.sjcqs.wordle.ui.R
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 import fr.sjcqs.wordle.ui.theme.absent
@@ -43,8 +41,6 @@ enum class TileUiState {
     Present,
     Correct,
     Absent,
-    HintCorrect,
-    HintAbsent,
 }
 
 
@@ -56,7 +52,6 @@ fun Word(
     number: Int,
     tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
-    onTileClicked: () -> Unit = {},
 ) {
     require(word.length <= length) {
         "$word is too long (max $length, current: ${word.length})"
@@ -77,24 +72,15 @@ fun Word(
                         TileUiState.Present -> R.string.content_description_present
                         TileUiState.Correct -> R.string.content_description_correct
                         TileUiState.Absent -> R.string.content_description_absent
-                        TileUiState.HintCorrect -> R.string.content_description_hint_correct
-                        TileUiState.HintAbsent -> R.string.content_description_hint_absent
                         null -> R.string.content_description_unknown
                     },
                     number,
                     index + 1
                 )
             }
-            val clickLabel = stringResource(id = R.string.content_description_tile_click_label)
-            val ime = LocalWindowInsets.current.ime
             val tileModifier = Modifier
                 .weight(1f)
                 .aspectRatio(1f)
-                .run {
-                    if (!ime.isVisible) {
-                        clickable(onClickLabel = clickLabel) { onTileClicked() }
-                    } else this
-                }
             AnimatedContent(
                 modifier = tileModifier.semantics(mergeDescendants = true) {
                     stateDescription = letterStateDescription
@@ -109,8 +95,6 @@ fun Word(
                             towards = AnimatedContentScope.SlideDirection.Up,
                             animationSpec = tween(delayMillis = index * 100)
                         ) with fadeOut(targetAlpha = 1f)
-                        TileUiState.HintCorrect,
-                        TileUiState.HintAbsent,
                         null -> hold()
                     }
                 }
@@ -127,16 +111,6 @@ fun Word(
                     TileUiState.Absent -> BackgroundedTile(
                         value = letter,
                         backgroundColor = MaterialTheme.colorScheme.absent,
-                    )
-                    TileUiState.HintCorrect -> OutlinedTile(
-                        value = letter,
-                        contentColor = MaterialTheme.colorScheme.correct,
-                        outlineColor = MaterialTheme.colorScheme.correct
-                    )
-                    TileUiState.HintAbsent -> OutlinedTile(
-                        value = letter,
-                        contentColor = MaterialTheme.colorScheme.absent,
-                        outlineColor = MaterialTheme.colorScheme.absent
                     )
                     null -> OutlinedTile(value = letter)
                 }
@@ -155,7 +129,11 @@ private fun OutlinedTile(
     outlineColor: Color = MaterialTheme.colorScheme.outline,
     contentColor: Color = LocalContentColor.current,
 ) {
-    Box(modifier = modifier.border(width = 1.5.dp, outlineColor, TileShape)) {
+    Box(modifier = modifier.border(
+        width = 1.5.dp,
+        outlineColor.copy(alpha = if (value.isEmpty()) 0.38f else 1f),
+        TileShape
+    )) {
         Tile(
             value = value,
             contentColor = contentColor,

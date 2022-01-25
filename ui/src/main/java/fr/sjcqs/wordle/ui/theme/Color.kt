@@ -19,11 +19,11 @@ import androidx.compose.material3.contentColorFor as materialContentColorFor
 
 internal object Colors {
     val Black = Color(0xFF000000)
-    val Black800 = Color(0xFF1C1C1C)
+    val Black800 = Color(0xFF1b1b1b)
     val Breakerbay = Color(0xFF4F9892)
     val Cuttyshark = Color(0xFF546E7A)
     val Montecarlo = Color(0xFF80CBC4)
-    val Offwhite = Color(0xFFFCFCFC)
+    val Offwhite = Color(0xFFFBFCFA)
     val Oslogray = Color(0xFF808E95)
     val Persiangray = Color(0xFF007167)
     val Red200 = Color(0xFFCF6679)

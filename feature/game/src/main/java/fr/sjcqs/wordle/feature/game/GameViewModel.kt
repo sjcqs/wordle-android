@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -65,20 +64,12 @@ internal class GameViewModel @Inject constructor(
 
     init {
         gameRepository.dailyGameFlow
-            .onEach(::onGameUpdated)
             .map(::map)
             .onEach(_uiState::emit)
             .launchIn(viewModelScope)
 
-        events.distinctUntilChanged()
-            .onEach(::handleEvent)
+        events.onEach(::handleEvent)
             .launchIn(viewModelScope)
-    }
-
-    private fun onGameUpdated(game: Game) {
-        if (game.isFinished) {
-            _uiEvent.emitIn(viewModelScope, GameUiEvent.CloseKeyboard)
-        }
     }
 
     private fun map(game: Game) = game.toUiState(
@@ -127,7 +118,7 @@ internal sealed interface GameUiState {
     data class Guessing(
         val guesses: List<GuessUiModel>,
         val word: String,
-        val tilesLetters: Map<Int, Map<Char, TileUiState>>,
+        val keyStates: Map<String, TileUiState>,
         val onTyping: () -> Unit,
         val onSubmit: (word: String) -> Unit,
         val isFinished: Boolean = false,
@@ -139,7 +130,6 @@ internal sealed interface GameUiState {
 
 internal sealed interface GameUiEvent {
     object ClearInput : GameUiEvent
-    object CloseKeyboard : GameUiEvent
 
     sealed interface Notify : GameUiEvent
     object InvalidWord : Notify

@@ -10,9 +10,9 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-internal fun TileState.toUiModel(isHint: Boolean = false): TileUiState = when (this) {
-    TileState.Correct -> if (isHint) TileUiState.HintCorrect else TileUiState.Correct
-    TileState.Absent -> if (isHint) TileUiState.HintAbsent else TileUiState.Absent
+internal fun TileState.toUiModel(): TileUiState = when (this) {
+    TileState.Correct -> TileUiState.Correct
+    TileState.Absent -> TileUiState.Absent
     TileState.Present -> TileUiState.Present
 }
 
@@ -30,13 +30,13 @@ internal fun Game.toUiState(
             }
         }
     }
-    val tilesLetters = tileLetters.mapValues { (_, letters) ->
-        letters.mapValues { (_, tileState) -> tileState.toUiModel(isHint = true) }
-    }
+    val keyStates = letterStates
+        .mapKeys { it.key.toString() }
+        .mapValues { (_, tileState) -> tileState.toUiModel() }
 
     return GameUiState.Guessing(
         guesses = guessUiModels,
-        tilesLetters = tilesLetters,
+        keyStates = keyStates,
         onTyping = onTyping,
         onSubmit = onSubmit,
         word = word,
@@ -69,7 +69,7 @@ internal fun Stats.toUiModel(
         distributions = distributions,
         dailyWord = dailyFinishedGame?.word,
         expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
-            Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
+            Duration.between(LocalDateTime.now(), expiredAt)
         },
         sharedText = sharedText(dailyFinishedGame),
         onStatsDismissed = onStatsDismissed,

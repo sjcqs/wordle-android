@@ -37,5 +37,5 @@ val Project.fullName: String
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = "7.3.3"
+    gradleVersion = libs.versions.gradle.get()
 }

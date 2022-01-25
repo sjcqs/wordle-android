@@ -37,6 +37,32 @@ object Icons {
     }
 
     @Composable
+    fun Enter(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_return),
+            contentDescription = stringResource(id = R.string.content_description_return),
+            tint = tint,
+        )
+    }
+
+    @Composable
+    fun Backspace(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_backspace),
+            contentDescription = stringResource(id = R.string.content_description_backspace),
+            tint = tint,
+        )
+    }
+
+    @Composable
     fun Share(
         modifier: Modifier = Modifier,
         tint: Color = LocalContentColor.current
