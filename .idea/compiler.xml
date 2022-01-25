@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="Focus.app" target="11" />
+      <module name="Focus.data.countdown-timer.impl" target="11" />
+      <module name="Focus.data.countdown-timer.wiring" target="11" />
+      <module name="Focus.data.session.impl" target="11" />
+      <module name="Focus.data.session.wiring" target="11" />
+      <module name="Focus.feature.session-configuration" target="11" />
+      <module name="Focus.feature.session-timer" target="11" />
+      <module name="Focus.navigation" target="11" />
+      <module name="Focus.tools.haptics.compose" target="11" />
+      <module name="Focus.tools.haptics.impl" target="11" />
+      <module name="Focus.tools.haptics.wiring" target="11" />
+      <module name="Focus.tools.lifecycle-logging.public" target="11" />
+      <module name="Focus.tools.lifecycle-logging.wiring" target="11" />
+      <module name="Focus.tools.logger.compose" target="11" />
+      <module name="Focus.tools.logger.impl" target="11" />
+      <module name="Focus.tools.logger.wiring" target="11" />
+      <module name="Focus.tools.molecule-viewmodel" target="11" />
+      <module name="Focus.ui" target="11" />
+      <module name="Focus.wiring" target="11" />
+      <module name="plugins.config" target="11" />
+      <module name="plugins.conventions" target="11" />
+      <module name="Wordle.app" target="11" />
+      <module name="Wordle.data.countdown-timer.impl" target="11" />
+      <module name="Wordle.data.countdown-timer.wiring" target="11" />
+      <module name="Wordle.data.game.impl" target="11" />
+      <module name="Wordle.data.game.wiring" target="11" />
+      <module name="Wordle.data.session.impl" target="11" />
+      <module name="Wordle.data.session.wiring" target="11" />
+      <module name="Wordle.data.word.impl" target="11" />
+      <module name="Wordle.data.word.wiring" target="11" />
+      <module name="Wordle.feature.game" target="11" />
+      <module name="Wordle.feature.session-timer" target="11" />
+      <module name="Wordle.navigation" target="11" />
+      <module name="Wordle.tools.haptics.compose" target="11" />
+      <module name="Wordle.tools.haptics.impl" target="11" />
+      <module name="Wordle.tools.haptics.wiring" target="11" />
+      <module name="Wordle.tools.lifecycle-logging.public" target="11" />
+      <module name="Wordle.tools.lifecycle-logging.wiring" target="11" />
+      <module name="Wordle.tools.logger.compose" target="11" />
+      <module name="Wordle.tools.logger.impl" target="11" />
+      <module name="Wordle.tools.logger.wiring" target="11" />
+      <module name="Wordle.tools.molecule-viewmodel" target="11" />
+      <module name="Wordle.ui" target="11" />
+      <module name="Wordle.wiring" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

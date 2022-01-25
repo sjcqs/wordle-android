@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/compose-model-1632982616698.xml" value="0.20491109229466553" />
+        <entry key="../../../../layout/compose-model-1632982967314.xml" value="1.0" />
+        <entry key="../../../../layout/compose-model-1633020463253.xml" value="0.34419983065198984" />
+        <entry key="../../../../layout/compose-model-1633283169912.xml" value="0.5" />
+        <entry key="../../../../layout/compose-model-1633414081910.xml" value="0.649074074074074" />
+        <entry key="../../../../layout/compose-model-1634714627208.xml" value="0.4935185185185185" />
+        <entry key="../../../../layout/compose-model-1635701329169.xml" value="0.45" />
+        <entry key="../../../../layout/compose-model-1635702941249.xml" value="0.5046296296296297" />
+        <entry key="../../../../layout/compose-model-1635703836673.xml" value="0.5046296296296297" />
+        <entry key="../../../../layout/compose-model-1642261380171.xml" value="0.5" />
+        <entry key="../../../../layout/compose-model-1642265580717.xml" value="0.34290540540540543" />
+        <entry key="../../../../layout/compose-model-1642282242529.xml" value="0.3420608108108108" />
+        <entry key="../../../../layout/compose-model-1642289400072.xml" value="0.1" />
+        <entry key="../../../../layout/compose-model-1642536684960.xml" value="0.34290540540540543" />
+        <entry key="../../../../layout/compose-model-1642624889704.xml" value="0.34290540540540543" />
+        <entry key="../../../../layout/compose-model-1643049284531.xml" value="0.34290540540540543" />
+        <entry key="../../../../layout/compose-model-1643098716077.xml" value="0.8219844357976653" />
+        <entry key="app/src/main/res/xml/backup_descriptor.xml" value="0.22552083333333334" />
+        <entry key="ui/src/main/res/drawable/ic_close.xml" value="0.19114583333333332" />
+        <entry key="ui/src/main/res/drawable/ic_play.xml" value="0.3315" />
+        <entry key="ui/src/main/res/font/poppins.xml" value="0.2111111111111111" />
+        <entry key="ui/src/main/res/font/poppins_bold.xml" value="0.2111111111111111" />
+        <entry key="ui/src/main/res/font/poppins_light.xml" value="0.2111111111111111" />
+        <entry key="ui/src/main/res/font/poppins_medium.xml" value="0.2111111111111111" />
+        <entry key="ui/src/main/res/font/poppins_semibold.xml" value="0.2111111111111111" />
+        <entry key="ui/src/main/res/font/questrial.xml" value="0.2111111111111111" />
+        <entry key="ui/src/main/res/font/questrial_regular.xml" value="0.4270833333333333" />
+      </map>
+    </option>
+  </component>
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="androidx.compose.runtime.Composable" />
+    </list>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+  <component name="SuppressKotlinCodeStyleNotification">
+    <option name="disableForAll" value="true" />
+  </component>
+</project>

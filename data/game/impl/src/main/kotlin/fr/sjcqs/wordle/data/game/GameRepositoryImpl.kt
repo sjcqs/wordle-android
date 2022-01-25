@@ -19,7 +19,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -67,41 +69,42 @@ class GameRepositoryImpl @Inject constructor(
     }
 
     override val dailyGameFlow: Flow<Game> = dbDataSource.watchLatest()
+        .filterNotNull()
         .map { it.fromDb(MAX_GUESSES) }
         .onEach { game = it }
         .distinctUntilChanged()
 
-    override val statsFlow: Flow<Stats> = dbDataSource.watchAll().map { allGames ->
-        val wonGames = allGames.filter { it.isWon }
+    override val statsFlow: Flow<Stats> = dbDataSource.watchAll()
+        .combine(dbDataSource.watchLatest()) { allGames, latestGame ->
+            val wonGames = allGames.filter { it.isWon }
 
-        val currentStreak = allGames.takeWhile { it.isWon }.size
+            val currentStreak = allGames.takeWhile { it.isWon }.size
 
-        var maxStreak = currentStreak
-        var streak = 0
-        allGames.forEach { game ->
-            if (game.isWon) {
-                streak += 1
-            } else {
-                if (streak > maxStreak) {
-                    maxStreak = streak
+            var maxStreak = currentStreak
+            var streak = 0
+            allGames.forEach { game ->
+                if (game.isWon) {
+                    streak += 1
+                } else {
+                    if (streak > maxStreak) {
+                        maxStreak = streak
+                    }
+                    streak = 0
                 }
-                streak = 0
             }
+            val distributions = wonGames
+                .groupBy { it.guesses.size }
+                .mapValues { (_, games) -> games.size }
+            Stats(
+                played = allGames.count { it.isFinished },
+                winRate = (wonGames.size.toDouble() / allGames.size).coerceIn(0.0, 1.0),
+                currentStreak = currentStreak,
+                maxStreak = maxStreak,
+                distributions = (1..MAX_GUESSES).associateWith { distributions[it] ?: 0 },
+                dailyFinishedGame = latestGame?.fromDb(MAX_GUESSES)
+                    ?.takeIf { it.isFinished && !it.isExpired }
+            )
         }
-        val distributions = wonGames
-            .groupBy { it.guesses.size }
-            .mapValues { (_, games) -> games.size }
-        Stats(
-            played = allGames.count { it.isFinished },
-            winRate = (wonGames.size.toDouble() / allGames.size).coerceIn(0.0, 1.0),
-            currentStreak = currentStreak,
-            maxStreak = maxStreak,
-            distributions = (1..MAX_GUESSES).associateWith { distributions[it] ?: 0 },
-            dailyFinishedGame = dbDataSource.getLatest()
-                ?.fromDb(MAX_GUESSES)
-                ?.takeIf { it.isFinished && !it.isExpired }
-        )
-    }
 
     override suspend fun submit(word: String): Boolean {
         return withContext(defaultDispatcher) {

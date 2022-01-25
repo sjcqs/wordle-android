@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.extensions.emitIn
+import fr.sjcqs.wordle.logger.Logger
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
 import java.time.LocalDateTime
@@ -29,6 +30,7 @@ import kotlinx.coroutines.isActive
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GameUiState>(
@@ -39,9 +41,9 @@ internal class GameViewModel @Inject constructor(
     private val areStatsOpenFlow = MutableStateFlow(false)
 
     val stats: StateFlow<StatsUiModel> = gameRepository.statsFlow
-        .combineTransform(areStatsOpenFlow) { it, areStatsOpen ->
-            val dailyFinishedGame = it.dailyFinishedGame
-            val statsUiModel = it.toUiModel(
+        .combineTransform(areStatsOpenFlow) { stats, areStatsOpen ->
+            val dailyFinishedGame = stats.dailyFinishedGame
+            val statsUiModel = stats.toUiModel(
                 dailyFinishedGame,
                 onStatsOpened = { events.emitIn(viewModelScope, Event.OnStatsOpened) },
                 onStatsDismissed = { events.emitIn(viewModelScope, Event.OnStatsDismissed) }

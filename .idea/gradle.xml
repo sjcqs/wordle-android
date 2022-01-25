@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/plugins" name="plugins">
+                <projects>
+                  <project path="$PROJECT_DIR$/plugins" />
+                  <project path="$PROJECT_DIR$/plugins/config" />
+                  <project path="$PROJECT_DIR$/plugins/conventions" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="testRunner" value="GRADLE" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/data" />
+            <option value="$PROJECT_DIR$/data/game" />
+            <option value="$PROJECT_DIR$/data/game/impl" />
+            <option value="$PROJECT_DIR$/data/game/public" />
+            <option value="$PROJECT_DIR$/data/game/wiring" />
+            <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/game" />
+            <option value="$PROJECT_DIR$/navigation" />
+            <option value="$PROJECT_DIR$/plugins" />
+            <option value="$PROJECT_DIR$/plugins/config" />
+            <option value="$PROJECT_DIR$/plugins/conventions" />
+            <option value="$PROJECT_DIR$/tools" />
+            <option value="$PROJECT_DIR$/tools/annotations" />
+            <option value="$PROJECT_DIR$/tools/extensions" />
+            <option value="$PROJECT_DIR$/tools/extensions/coroutines" />
+            <option value="$PROJECT_DIR$/tools/haptics" />
+            <option value="$PROJECT_DIR$/tools/haptics/compose" />
+            <option value="$PROJECT_DIR$/tools/haptics/impl" />
+            <option value="$PROJECT_DIR$/tools/haptics/public" />
+            <option value="$PROJECT_DIR$/tools/haptics/wiring" />
+            <option value="$PROJECT_DIR$/tools/lifecycle-logging" />
+            <option value="$PROJECT_DIR$/tools/lifecycle-logging/public" />
+            <option value="$PROJECT_DIR$/tools/lifecycle-logging/wiring" />
+            <option value="$PROJECT_DIR$/tools/logger" />
+            <option value="$PROJECT_DIR$/tools/logger/compose" />
+            <option value="$PROJECT_DIR$/tools/logger/impl" />
+            <option value="$PROJECT_DIR$/tools/logger/public" />
+            <option value="$PROJECT_DIR$/tools/logger/wiring" />
+            <option value="$PROJECT_DIR$/ui" />
+            <option value="$PROJECT_DIR$/wiring" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
