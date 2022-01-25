@@ -35,7 +35,21 @@ val Project.fullName: String
         }
     }.joinToString("-")
 
+/*
+  we can't use copy with the wrapper task as it cannot be serialized into conf. cache
+  cf https://docs.gradle.org/7.3.3/userguide/configuration_cache.html#config_cache:requirements:disallowed_types
+*/
+interface Injected {
+    @get:Inject val fs: FileSystemOperations
+}
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = libs.versions.gradle.get()
+    gradleVersion = "7.3.3"
+    val injected = project.objects.newInstance<Injected>()
+    doLast {
+        injected.fs.copy {
+            from("gradle/wrapper/gradle-wrapper.properties")
+            into("plugins/gradle/wrapper")
+        }
+    }
 }
