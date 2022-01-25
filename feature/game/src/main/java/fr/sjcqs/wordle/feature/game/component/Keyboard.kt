@@ -45,7 +45,11 @@ internal fun Keyboard(
     onKeyPressed: (key: Keycode) -> Unit
 ) {
     val hapticsController = LocalHapticController.current
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Row(modifier = Modifier.width(IntrinsicSize.Min)) {
             listOf(
                 Keycode.Character("A"),
@@ -142,34 +146,38 @@ private fun Key(
         null -> MaterialTheme.colorScheme.surface
     }
     val contentColor = contentColorFor(backgroundColor = color)
-    Surface(
-        modifier = modifier.padding(horizontal = 2.dp, vertical = 4.dp),
-        onClick = onPressed,
-        color = color,
-        contentColor = contentColor,
-        shape = RoundedCornerShape(4.dp),
-        shadowElevation = 4.dp,
-        role = Role.Button
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            when (keycode) {
-                Keycode.Backspace -> {
-                    Icons.Backspace(modifier = Modifier.align(Alignment.Center))
-                }
-                is Keycode.Character -> {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = keycode.char,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                }
-                Keycode.Enter -> {
-                    Icons.Enter(modifier = Modifier.align(Alignment.Center))
-                }
-            }
+        Surface(
+            modifier = modifier.padding(horizontal = 2.dp, vertical = 4.dp),
+            onClick = onPressed,
+            color = color,
+            contentColor = contentColor,
+            shape = RoundedCornerShape(4.dp),
+            shadowElevation = 4.dp,
+            role = Role.Button
+        ) {
+            Content(modifier = Modifier.fillMaxSize(), keycode = keycode)
+    }
+}
 
+@Composable
+private fun Content(modifier: Modifier, keycode: Keycode) {
+    Box(modifier = modifier) {
+        when (keycode) {
+            Keycode.Backspace -> {
+                Icons.Backspace(modifier = Modifier.align(Alignment.Center))
+            }
+            is Keycode.Character -> {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = keycode.char,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+            Keycode.Enter -> {
+                Icons.Enter(modifier = Modifier.align(Alignment.Center))
+            }
         }
     }
 }
