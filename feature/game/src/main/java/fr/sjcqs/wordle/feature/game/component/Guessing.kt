@@ -61,17 +61,14 @@ internal fun Guessing(
                         Keycode.Backspace -> {
                             currentValue = currentValue.dropLast(1)
                             onValueChanged(currentValue)
-                            logger.d("Backspace: $currentValue")
                         }
                         is Keycode.Character -> {
                             if (currentValue.length < uiState.word.length) {
                                 currentValue += keycode.char
                                 onValueChanged(currentValue)
-                                logger.d("Character: ${keycode.char} -> $currentValue")
                             }
                         }
                         Keycode.Enter -> {
-                            logger.d("Enter: $currentValue")
                             if (currentValue.length == uiState.word.length) {
                                 uiState.onSubmit(currentValue)
                             }
