@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.feature.game.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -44,7 +45,7 @@ internal fun Keyboard(
     onKeyPressed: (key: Keycode) -> Unit
 ) {
     val hapticsController = LocalHapticController.current
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         Row(modifier = Modifier.width(IntrinsicSize.Min)) {
             listOf(
                 Keycode.Character("A"),
@@ -160,7 +161,8 @@ private fun Key(
                         modifier = Modifier.align(Alignment.Center),
                         text = keycode.char,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.headlineMedium
                     )
                 }
                 Keycode.Enter -> {

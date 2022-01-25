@@ -3,6 +3,7 @@ package fr.sjcqs.wordle.feature.game.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.navigationBarsHeight
 import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GuessUiModel
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
@@ -34,12 +36,12 @@ internal fun Guessing(
 ) {
     var currentValue by remember(value) { mutableStateOf(value) }
 
-    Column(modifier = modifier, verticalArrangement = Arrangement.Top) {
+    Column(modifier = modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
         Spacer(modifier = Modifier.height(24.dp))
         Guessing(
             modifier = Modifier
                 .align(CenterHorizontally)
-                .fillMaxWidth(0.8f),
+                .fillMaxWidth(0.9f),
             word = uiState.word,
             isFinished = uiState.isFinished,
             guesses = uiState.guesses,
@@ -48,10 +50,11 @@ internal fun Guessing(
             canRetry = uiState.canRetry,
         )
         if (!uiState.isFinished) {
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
             Keyboard(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 12.dp),
                 keyStates = uiState.keyStates,
                 onKeyPressed = { keycode ->
@@ -73,8 +76,8 @@ internal fun Guessing(
                         }
                     }
                 })
-            Spacer(modifier = Modifier.weight(1f))
         }
+        Spacer(modifier = Modifier.navigationBarsHeight())
     }
 }
 
