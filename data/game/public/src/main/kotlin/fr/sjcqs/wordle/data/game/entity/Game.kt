@@ -1,11 +1,11 @@
 package fr.sjcqs.wordle.data.game.entity
 
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class Game(
     val word: String,
     val maxGuesses: Int,
-    val expiredAt: LocalDate,
+    val expiredAt: LocalDateTime,
     val guesses: List<Guess> = emptyList(),
 ) {
     val isFinished: Boolean = guesses.lastOrNull()?.word == word || guesses.size >= maxGuesses

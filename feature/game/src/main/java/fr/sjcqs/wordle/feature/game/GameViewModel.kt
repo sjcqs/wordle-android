@@ -9,7 +9,6 @@ import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.currentCoroutineContext
@@ -155,9 +154,9 @@ data class StatsUiModel(
     val onStatsOpened: () -> Unit = {},
     val onStatsDismissed: () -> Unit = {}
 ) {
-    fun updateExpiredIn(expiredAt: LocalDate?) = copy(
+    fun updateExpiredIn(expiredAt: LocalDateTime?) = copy(
         expiredIn = expiredAt?.let {
-            Duration.between(LocalDateTime.now(), expiredAt.atStartOfDay())
+            Duration.between(LocalDateTime.now(), expiredAt)
         }
     )
 }

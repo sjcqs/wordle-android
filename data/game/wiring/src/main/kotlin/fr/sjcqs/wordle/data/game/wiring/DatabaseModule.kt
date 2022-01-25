@@ -12,7 +12,7 @@ import fr.sjcqs.wordle.data.game.Database
 import fr.sjcqs.wordle.data.game.db.Game
 import fr.sjcqs.wordle.data.game.db.GameQueries
 import fr.sjcqs.wordle.data.game.db.GuessesAdapter
-import fr.sjcqs.wordle.data.game.db.LocalDateAdapter
+import fr.sjcqs.wordle.data.game.db.LocalDateTimeAdapter
 import javax.inject.Singleton
 
 @Module
@@ -23,7 +23,7 @@ internal object DatabaseModule {
     fun driver(@ApplicationContext context: Context): SqlDriver = AndroidSqliteDriver(
         Database.Schema,
         context,
-        DATABASE_FILE_NAME
+        DATABASE_FILE_NAME,
     )
 
     @Provides
@@ -31,7 +31,7 @@ internal object DatabaseModule {
     fun database(driver: SqlDriver) = Database(
         driver = driver,
         gameAdapter = Game.Adapter(
-            LocalDateAdapter(),
+            LocalDateTimeAdapter(),
             GuessesAdapter()
         )
     )

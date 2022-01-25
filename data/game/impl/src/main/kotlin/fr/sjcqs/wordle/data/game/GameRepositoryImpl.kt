@@ -12,7 +12,7 @@ import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.data.game.remote.DailyWord
 import fr.sjcqs.wordle.data.game.remote.GameRemoteDataSource
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -153,7 +153,7 @@ class GameRepositoryImpl @Inject constructor(
     }
 
     private val Game.isExpired: Boolean
-        get() = expiredAt < LocalDate.now()
+        get() = expiredAt < LocalDateTime.now()
 
     private val DbGame.isWon: Boolean
         get() = word == guesses.lastOrNull()?.word
@@ -161,8 +161,8 @@ class GameRepositoryImpl @Inject constructor(
     private val DbGame.isFinished: Boolean
         get() = word == guesses.lastOrNull()?.word || guesses.size == MAX_GUESSES
 
-    private val DailyWord.expiredAt: LocalDate
-        get() = LocalDate.parse(expired_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    private val DailyWord.expiredAt: LocalDateTime
+        get() = LocalDateTime.parse(expired_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
     companion object {
         private const val MAX_GUESSES = 6
