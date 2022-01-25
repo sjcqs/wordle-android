@@ -26,7 +26,7 @@ dependencies {
     api(libs.accompanist.systemuicontroller)
     api(libs.accompanist.pager)
 
-    debugApi(libs.compose.ui.preview)
+    api(libs.compose.ui.preview)
     debugApi(libs.compose.ui.tooling)
 
     api(projects.tools.logger.compose)

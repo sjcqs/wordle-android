@@ -174,7 +174,7 @@ private fun Key(
 
 @Preview
 @Composable
-fun KeyboardPreview() {
+internal fun KeyboardPreview() {
     WordleTheme {
         Keyboard(
             modifier = Modifier.fillMaxWidth(),
@@ -192,7 +192,7 @@ fun KeyboardPreview() {
 
 @Preview
 @Composable
-fun KeyboardPreviewDark() {
+internal fun KeyboardPreviewDark() {
     WordleTheme(true) {
         Keyboard(
             modifier = Modifier.fillMaxWidth(),

@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GuessUiModel
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
-import fr.sjcqs.wordle.logger.LocalLogger
 import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 
@@ -49,7 +48,6 @@ internal fun Guessing(
             canRetry = uiState.canRetry,
         )
         if (!uiState.isFinished) {
-            val logger = LocalLogger.current
             Spacer(modifier = Modifier.weight(1f))
             Keyboard(
                 modifier = Modifier
