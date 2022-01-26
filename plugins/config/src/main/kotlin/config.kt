@@ -8,8 +8,8 @@ val config = Config(
         applicationId = "fr.sjcqs.wordle",
     ),
     jvm = JvmConfig(
-        javaVersion = JavaVersion.VERSION_1_8,
-        kotlinJvm = "1.8"
+        javaVersion = JavaVersion.VERSION_11,
+        kotlinJvm = "11"
     ),
 )
 

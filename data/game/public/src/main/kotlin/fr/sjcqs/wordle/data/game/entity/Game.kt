@@ -15,13 +15,15 @@ data class Game(
             guess.word.onEachIndexed { index, letter ->
                 val guessState = guess.tiles[index]
                 letterStates.compute(letter) { _, currentState ->
-                    when (currentState) {
-                        TileState.Correct -> {
-                            if (guessState == TileState.Present) guessState else currentState
+                    if (guessState == TileState.Correct) {
+                        TileState.Correct
+                    } else {
+                        when (currentState) {
+                            TileState.Correct,
+                            TileState.Present -> currentState
+                            TileState.Absent,
+                            null -> guessState
                         }
-                        TileState.Absent -> guessState
-                        TileState.Present -> TileState.Present
-                        null -> guessState
                     }
                 }
             }
