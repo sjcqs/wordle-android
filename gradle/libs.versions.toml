@@ -21,6 +21,7 @@ accompanist-insetsui = { module = "com.google.accompanist:accompanist-insets-ui"
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanist" }
+accompanist-navigation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanist" }
 
 android-gradle = { module = "com.android.tools.build:gradle", version = "7.0.4" }
 
@@ -36,10 +37,9 @@ androidx-hilt-compose = "androidx.hilt:hilt-navigation-compose:1.0.0-rc01"
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "androidxhilt" }
 
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidxlifecycle" }
-androidx-lifecycle-viewmodel-compose = "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxlifecycle" }
 
-androidx-navigation-compose = "androidx.navigation:navigation-compose:2.4.0-rc01"
+androidx-navigation-compose = "androidx.navigation:navigation-compose:2.4.0"
 
 androidx-palette = "androidx.palette:palette:1.0.0"
 

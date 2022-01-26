@@ -1,6 +1,5 @@
 package fr.sjcqs.wordle.feature.game.screen
 
-import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -17,9 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,12 +24,11 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
-import fr.sjcqs.wordle.feature.game.GameUiEvent
-import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GameViewModel
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.component.Guessing
-import fr.sjcqs.wordle.feature.game.component.StatsDialog
+import fr.sjcqs.wordle.feature.game.model.GameUiEvent
+import fr.sjcqs.wordle.feature.game.model.GameUiState
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
@@ -41,13 +37,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
-fun Game() {
+fun Game(showStats: () -> Unit) {
     val invalidWord = stringResource(id = R.string.guessing_invalid_word)
 
     val viewModel: GameViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-
-    val stats by viewModel.statsFlow.collectAsState()
 
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
@@ -59,36 +53,15 @@ fun Game() {
         }
     }
 
-    val (typingWord, setTypingWord) = remember(viewModel) {
-        mutableStateOf("")
-    }
-
-    val context = LocalContext.current
+    val (typingWord, setTypingWord) = remember(viewModel) { mutableStateOf("") }
     LaunchedEffect(key1 = viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 GameUiEvent.ClearInput -> setTypingWord("")
                 GameUiEvent.InvalidWord -> snackbar(invalidWord)
                 GameUiEvent.Dismiss -> snackbarState.currentSnackbarData?.dismiss()
-                is GameUiEvent.Share -> {
-                    val sendIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, event.text)
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-                    context.startActivity(shareIntent)
-                }
             }
         }
-    }
-
-    var showStatsDialog by remember { mutableStateOf(false) }
-    if (showStatsDialog) {
-        StatsDialog(
-            stats = stats,
-            onDismissRequest = { showStatsDialog = false }
-        )
     }
 
     Scaffold(
@@ -107,8 +80,8 @@ fun Game() {
                 shadowElevation = 4.dp,
                 title = { Text(text = stringResource(id = R.string.game_title)) },
                 actions = {
-                    val onClickLabel = stringResource(id = R.string.game_stats_label_open)
-                    IconButton(onClick = { showStatsDialog = true }, onClickLabel = onClickLabel) {
+                    val onClickLabel = stringResource(id = R.string.game_open_stats_label)
+                    IconButton(onClick = showStats, onClickLabel = onClickLabel) {
                         Icons.Stats()
                     }
                 }
@@ -128,7 +101,8 @@ fun Game() {
                     onValueChanged = setTypingWord,
                 )
             }
-        })
+        }
+    )
 }
 
 @Composable

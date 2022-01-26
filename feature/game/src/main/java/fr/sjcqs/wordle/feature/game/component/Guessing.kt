@@ -27,11 +27,11 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
-import fr.sjcqs.wordle.feature.game.GameUiState
-import fr.sjcqs.wordle.feature.game.GuessUiModel
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.feature.game.format
+import fr.sjcqs.wordle.feature.game.model.GameUiState
+import fr.sjcqs.wordle.feature.game.model.GuessUiModel
 import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
@@ -92,7 +92,6 @@ internal fun Guessing(
                 })
         } else {
             Footer(
-                sharedText = uiState.sharedText,
                 expiredIn = uiState.expiredIn,
                 modifier = Modifier
                     .padding(horizontal = 12.dp),
@@ -106,7 +105,6 @@ internal fun Guessing(
 
 @Composable
 private fun Footer(
-    sharedText: String,
     expiredIn: Duration,
     modifier: Modifier,
     onExpiredInVisible: () -> Unit,
@@ -139,7 +137,7 @@ private fun Footer(
         ) {
             Icons.Share(modifier = Modifier.clearAndSetSemantics { })
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = stringResource(R.string.game_stats_share))
+            Text(text = stringResource(R.string.game_share_action))
         }
     }
 }

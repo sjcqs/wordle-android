@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stats_title">Statistiques</string>
+    <string name="stats_performances_header">Performances</string>
+    <string name="stats_played">Parties</string>
+    <string name="stats_win_rate">Victoires</string>
+    <string name="stats_current_streak">Série\nactuelle</string>
+    <string name="stats_max_streak">Meilleure\nsérie</string>
+    <string name="stats_share_action">Partager</string>
+    <string name="stats_label_close">Fermer les statistiques</string>
+    <string name="game_stats_performance_description_none">aucune partie gagnée en %1$d coups</string>
+    <plurals name="game_stats_performance_description">
+        <item quantity="other">%2$d parties gagnées en %1$d coups</item>
+        <item quantity="one">une partie gagnée en %1$d coups</item>
+    </plurals>
+
+</resources>

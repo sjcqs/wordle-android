@@ -2,10 +2,10 @@ package fr.sjcqs.wordle.feature.game
 
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
-import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
+import fr.sjcqs.wordle.feature.game.model.GameUiState
+import fr.sjcqs.wordle.feature.game.model.GuessUiModel
 import fr.sjcqs.wordle.ui.components.TileUiState
-import java.text.NumberFormat
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -62,17 +62,6 @@ internal fun Guess.toUiModel(): GuessUiModel = GuessUiModel(
         index to state.toUiModel()
     }.toMap()
 )
-
-internal fun Stats.toUiModel(): StatsUiModel {
-    val numberFormat = NumberFormat.getNumberInstance()
-    return StatsUiModel(
-        played = numberFormat.format(played),
-        winRate = NumberFormat.getPercentInstance().format(winRate),
-        currentStreak = numberFormat.format(currentStreak),
-        maxStreak = numberFormat.format(maxStreak),
-        distributions = distributions,
-    )
-}
 
 val Game.sharedText: String
     get() {

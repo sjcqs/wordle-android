@@ -13,5 +13,8 @@ dependencies {
     api(libs.androidx.navigation.compose)
 
     implementation(projects.feature.game)
+    implementation(projects.feature.stats)
     implementation(projects.tools.logger.compose)
+
+    implementation(libs.accompanist.navigation)
 }

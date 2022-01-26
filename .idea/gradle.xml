@@ -32,6 +32,7 @@
             <option value="$PROJECT_DIR$/data/game/wiring" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/game" />
+            <option value="$PROJECT_DIR$/feature/stats" />
             <option value="$PROJECT_DIR$/navigation" />
             <option value="$PROJECT_DIR$/plugins" />
             <option value="$PROJECT_DIR$/plugins/config" />

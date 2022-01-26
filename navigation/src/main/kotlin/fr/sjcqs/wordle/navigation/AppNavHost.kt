@@ -1,42 +1,63 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package fr.sjcqs.wordle.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import fr.sjcqs.wordle.feature.game.screen.Game
+import fr.sjcqs.wordle.feature.stats.screen.Stats
 
 private sealed interface Screen {
     val route: String
 
-    object Guessing : Screen {
-        override val route = "guessing"
+    object Game : Screen {
+        override val route = "game"
+    }
+
+    object Stats : Screen {
+        override val route = "stats"
     }
 
     companion object {
-        val startDestination = Guessing.route
+        val startDestination = Game.route
     }
 }
 
 @Composable
 fun AppNavHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberAnimatedNavController()
 ) {
-    NavHost(navController = navController, startDestination = Screen.startDestination) {
-        guessingScreens(navController)
+    AnimatedNavHost(navController = navController, startDestination = Screen.startDestination) {
+        gameScreen(navController)
+        statsScreen(navController)
     }
 }
 
-private fun NavGraphBuilder.guessingScreens(navController: NavHostController) {
-    gameScreen(navController)
+private fun NavGraphBuilder.gameScreen(navController: NavHostController) {
+    composable(route = Screen.Game.route) {
+        Game(showStats = { navController.navigate(Screen.Stats.route) })
+    }
 }
 
-private fun NavGraphBuilder.gameScreen(navController: NavHostController) {
-    composable(route = Screen.Guessing.route) {
-        Game()
+private fun NavGraphBuilder.statsScreen(navController: NavHostController) {
+    composable(
+        route = Screen.Stats.route,
+        enterTransition = { slideInVertically(initialOffsetY = { it }) },
+        exitTransition = { slideOutVertically(targetOffsetY = { it }) },
+        popEnterTransition = { fadeIn(initialAlpha = 1f) },
+        popExitTransition = { fadeOut(targetAlpha = 1f) }
+    ) {
+        Stats(onClose = { navController.navigateUp() })
     }
 }
 

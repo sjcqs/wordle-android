@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api(projects.feature.game)
+    api(projects.feature.stats)
 
     api(projects.data.game.wiring)
 

@@ -2,20 +2,7 @@
 <resources>
     <string name="guessing_invalid_word">"Ce mot n’existe pas. "</string>
     <string name="game_title">Le Mot</string>
-    <string name="game_statistics">Statistiques</string>
-    <string name="game_ok">OK</string>
-    <string name="game_performances">Performances</string>
-    <string name="game_stats_played">Parties</string>
-    <string name="game_stats_win_rate">Victoires</string>
-    <string name="game_stats_current_streak">Série\nactuelle</string>
-    <string name="game_stats_max_streak">Meilleure\nsérie</string>
-    <string name="game_stats_share">Partager</string>
-    <string name="game_stats_label_close">Fermer les statistiques</string>
-    <string name="game_stats_label_open">Ouvrir les statistiques</string>
-    <string name="game_stats_performance_description_none">aucune partie gagnée en %1$d coups</string>
-    <plurals name="game_stats_performance_description">
-        <item quantity="other">%2$d parties gagnées en %1$d coups</item>
-        <item quantity="one">une partie gagnée en %1$d coups</item>
-    </plurals>
+    <string name="game_open_stats_label">Ouvrir les statistiques</string>
+    <string name="game_share_action">Partager</string>
     <string name="game_stats_next_word_in">Prochain mot dans:</string>
 </resources>
