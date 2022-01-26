@@ -16,12 +16,14 @@ internal fun TileState.toUiModel(): TileUiState = when (this) {
     TileState.Present -> TileUiState.Present
 }
 
-internal fun Game.toUiState(
-    stats: StatsUiModel,
+internal fun Game.toUiModel(
     onRetry: () -> Unit,
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
-): GameUiState {
+    onStatsDismissed: () -> Unit,
+    onStatsOpened: () -> Unit,
+    onShare: (text: String) -> Unit
+): GameUiState.Guessing {
     val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
         if (!isFinished) {
@@ -41,11 +43,15 @@ internal fun Game.toUiState(
         onTyping = onTyping,
         onSubmit = onSubmit,
         word = word,
-        stats = stats,
         isFinished = isFinished,
         isWon = isWon,
         onRetry = onRetry,
-        canRetry = true
+        canRetry = true,
+        expiredIn = Duration.between(LocalDateTime.now(), expiredAt),
+        share = onShare,
+        sharedText = sharedText,
+        onCountdownHidden = onStatsDismissed,
+        onCountdownVisible = onStatsOpened
     )
 }
 
@@ -57,12 +63,7 @@ internal fun Guess.toUiModel(): GuessUiModel = GuessUiModel(
     }.toMap()
 )
 
-internal fun Stats.toUiModel(
-    dailyFinishedGame: Game?,
-    onStatsDismissed: () -> Unit,
-    onStatsOpened: () -> Unit,
-    onShare: (text: String) -> Unit
-): StatsUiModel {
+internal fun Stats.toUiModel(): StatsUiModel {
     val numberFormat = NumberFormat.getNumberInstance()
     return StatsUiModel(
         played = numberFormat.format(played),
@@ -70,40 +71,33 @@ internal fun Stats.toUiModel(
         currentStreak = numberFormat.format(currentStreak),
         maxStreak = numberFormat.format(maxStreak),
         distributions = distributions,
-        dailyWord = dailyFinishedGame?.word,
-        expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
-            Duration.between(LocalDateTime.now(), expiredAt)
-        },
-        share = onShare,
-        sharedText = sharedText(dailyFinishedGame),
-        onStatsDismissed = onStatsDismissed,
-        onStatsOpened = onStatsOpened
     )
 }
 
-fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.run {
-    buildString {
-        val date = expiredAt.minusDays(1)
-            .format(DateTimeFormatter.ofPattern("DD MMM"))
-        val guesses = guesses
-        val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
-        appendLine("Le Mot (Wordle FR)")
-        appendLine("le $date - $performance")
-        appendLine()
-        guesses.forEach { guess ->
-            guess.tiles.forEach { tile ->
-                when (tile) {
-                    TileState.Correct -> append("\uD83D\uDFE9")
-                    TileState.Absent -> append("⬛")
-                    TileState.Present -> append("\uD83D\uDFE8")
+val Game.sharedText: String
+    get() {
+        return buildString {
+            val date = expiredAt.minusDays(1)
+                .format(DateTimeFormatter.ofPattern("DD MMM"))
+            val guesses = guesses
+            val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
+            appendLine("Le Mot (Wordle FR)")
+            appendLine("le $date - $performance")
+            appendLine()
+            guesses.forEach { guess ->
+                guess.tiles.forEach { tile ->
+                    when (tile) {
+                        TileState.Correct -> append("\uD83D\uDFE9")
+                        TileState.Absent -> append("⬛")
+                        TileState.Present -> append("\uD83D\uDFE8")
+                    }
                 }
+                appendLine()
             }
             appendLine()
+            appendLine("wordlefr.page.link/app (Android)")
         }
-        appendLine()
-        appendLine("wordlefr.page.link/app (Android)")
     }
-}
 
 internal fun Duration.format(): String {
     return String.format(

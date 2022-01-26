@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
@@ -38,26 +38,11 @@ internal class GameViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    private val areStatsOpenFlow = MutableStateFlow(false)
+    private val isCountdownVisibleFlow = MutableStateFlow(false)
 
     val statsFlow: StateFlow<StatsUiModel> = gameRepository.statsFlow
-        .combineTransform(areStatsOpenFlow) { stats, areStatsOpen ->
-            val dailyFinishedGame = stats.dailyFinishedGame
-            val statsUiModel = stats.toUiModel(
-                dailyFinishedGame,
-                onStatsOpened = { events.emitIn(viewModelScope, Event.OnStatsOpened) },
-                onStatsDismissed = { events.emitIn(viewModelScope, Event.OnStatsDismissed) },
-                onShare = { events.emitIn(viewModelScope, Event.OnShare(it)) }
-            )
-            if (areStatsOpen) {
-                while (currentCoroutineContext().isActive) {
-                    emit(statsUiModel.updateExpiredIn(dailyFinishedGame?.expiredAt))
-                    delay(1000)
-                }
-            } else {
-                emit(statsUiModel)
-            }
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, StatsUiModel())
+        .map { stats -> stats.toUiModel() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, StatsUiModel())
 
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -66,19 +51,29 @@ internal class GameViewModel @Inject constructor(
 
     init {
         gameRepository.dailyGameFlow
-            .combine(statsFlow,::map)
-            .onEach(_uiState::emit)
+            .combineTransform(isCountdownVisibleFlow) { game, isCountdownVisible ->
+                val uiModel = map(game)
+                emit(uiModel)
+                if (isCountdownVisible) {
+                    while (currentCoroutineContext().isActive) {
+                        emit(uiModel.updateExpiredIn(game.expiredAt))
+                        delay(1000)
+                    }
+                }
+            }.onEach(_uiState::emit)
             .launchIn(viewModelScope)
 
         events.onEach(::handleEvent)
             .launchIn(viewModelScope)
     }
 
-    private fun map(game: Game, stats: StatsUiModel) = game.toUiState(
-        stats = stats,
+    private fun map(game: Game) = game.toUiModel(
         onRetry = { events.emitIn(viewModelScope, Event.Retry) },
         onTyping = { events.emitIn(viewModelScope, Event.Typing) },
         onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
+        onStatsOpened = { events.emitIn(viewModelScope, Event.OnCountdownVisible) },
+        onStatsDismissed = { events.emitIn(viewModelScope, Event.OnCountdownVisible) },
+        onShare = { events.emitIn(viewModelScope, Event.OnShare(it)) }
     )
 
     private suspend fun handleEvent(event: Event) {
@@ -87,8 +82,8 @@ internal class GameViewModel @Inject constructor(
             is Event.Submit -> submit(event.word)
             is Event.OnShare -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Share(event.text))
             is Event.Typing -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Dismiss)
-            Event.OnStatsDismissed -> areStatsOpenFlow.emit(false)
-            Event.OnStatsOpened -> areStatsOpenFlow.emit(true)
+            Event.OnCountdownHidden -> isCountdownVisibleFlow.emit(false)
+            Event.OnCountdownVisible -> isCountdownVisibleFlow.emit(true)
         }
     }
 
@@ -110,8 +105,8 @@ internal class GameViewModel @Inject constructor(
         data class OnShare(val text: String) : Event
         object Retry : Event
         object Typing : Event
-        object OnStatsOpened : Event
-        object OnStatsDismissed : Event
+        object OnCountdownVisible : Event
+        object OnCountdownHidden : Event
     }
 }
 
@@ -124,14 +119,25 @@ internal sealed interface GameUiState {
         val guesses: List<GuessUiModel>,
         val word: String,
         val keyStates: Map<String, TileUiState>,
-        val onTyping: () -> Unit,
-        val onSubmit: (word: String) -> Unit,
         val isFinished: Boolean = false,
         val isWon: Boolean = false,
         val stats: StatsUiModel = StatsUiModel(),
         val canRetry: Boolean = true,
+        val sharedText: String = "",
+        val expiredIn: Duration = Duration.ZERO,
+        val onTyping: () -> Unit,
+        val onSubmit: (word: String) -> Unit,
         val onRetry: () -> Unit,
-    ) : GameUiState
+        val onCountdownVisible: () -> Unit = {},
+        val onCountdownHidden: () -> Unit = {},
+        val share: (text: String) -> Unit = {}
+    ) : GameUiState {
+        fun updateExpiredIn(expiredAt: LocalDateTime) = copy(
+            expiredIn = expiredAt.let {
+                Duration.between(LocalDateTime.now(), expiredAt)
+            }
+        )
+    }
 }
 
 internal sealed interface GameUiEvent {
@@ -156,17 +162,5 @@ data class StatsUiModel(
     val winRate: String = "",
     val currentStreak: String = "",
     val maxStreak: String = "",
-    val sharedText: String? = null,
     val distributions: Map<Int, Int> = emptyMap(),
-    val dailyWord: String? = null,
-    val expiredIn: Duration? = null,
-    val onStatsOpened: () -> Unit = {},
-    val onStatsDismissed: () -> Unit = {},
-    val share: (text: String) -> Unit = {}
-) {
-    fun updateExpiredIn(expiredAt: LocalDateTime?) = copy(
-        expiredIn = expiredAt?.let {
-            Duration.between(LocalDateTime.now(), expiredAt)
-        }
-    )
-}
+)

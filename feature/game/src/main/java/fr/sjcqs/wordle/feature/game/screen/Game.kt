@@ -84,13 +84,6 @@ fun Game() {
     }
 
     var showStatsDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = showStatsDialog) {
-        if (showStatsDialog) {
-            stats.onStatsOpened()
-        } else {
-            stats.onStatsDismissed()
-        }
-    }
     if (showStatsDialog) {
         StatsDialog(
             stats = stats,

@@ -2,7 +2,6 @@ package fr.sjcqs.wordle.feature.game.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -33,13 +31,13 @@ import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GuessUiModel
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
-import fr.sjcqs.wordle.feature.game.StatsUiModel
 import fr.sjcqs.wordle.feature.game.format
 import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.onCorrect
+import java.time.Duration
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
@@ -65,6 +63,7 @@ internal fun Guessing(
             canRetry = uiState.canRetry,
         )
         if (!uiState.isFinished) {
+            SideEffect { uiState.onCountdownHidden() }
             Spacer(modifier = Modifier.height(16.dp))
             Keyboard(
                 modifier = Modifier
@@ -92,10 +91,13 @@ internal fun Guessing(
                     }
                 })
         } else {
-            Stats(
+            Footer(
+                sharedText = uiState.sharedText,
+                expiredIn = uiState.expiredIn,
                 modifier = Modifier
                     .padding(horizontal = 12.dp),
-                stats = uiState.stats
+                onExpiredInVisible = { uiState.onCountdownVisible() },
+                onShare = { uiState.share(uiState.sharedText) }
             )
         }
         Spacer(modifier = Modifier.navigationBarsHeight())
@@ -103,39 +105,41 @@ internal fun Guessing(
 }
 
 @Composable
-private fun Stats(modifier: Modifier, stats: StatsUiModel) {
-    SideEffect {
-        stats.onStatsOpened()
-    }
-    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        if (stats.expiredIn != null) {
-            Column(
-                modifier = Modifier.semantics(mergeDescendants = true) { },
-                horizontalAlignment = CenterHorizontally
-            ) {
-                Text(text = stringResource(R.string.game_stats_next_word_in))
-                Text(
-                    text = stats.expiredIn.format(),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
+private fun Footer(
+    sharedText: String,
+    expiredIn: Duration,
+    modifier: Modifier,
+    onExpiredInVisible: () -> Unit,
+    onShare: () -> Unit
+) {
+    SideEffect(onExpiredInVisible)
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = CenterHorizontally
+    ) {
+        Column(
+            modifier = Modifier.semantics(mergeDescendants = true) { },
+            horizontalAlignment = CenterHorizontally
+        ) {
+            Text(text = stringResource(R.string.game_stats_next_word_in))
+            Text(
+                text = expiredIn.format(),
+                style = MaterialTheme.typography.headlineMedium
+            )
         }
-        Spacer(modifier = Modifier.width(16.dp))
-        if (stats.sharedText != null) {
-            Button(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .semantics(mergeDescendants = true) { },
-                onClick = { stats.share(stats.sharedText) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.correct,
-                    contentColor = MaterialTheme.colorScheme.onCorrect,
-                )
-            ) {
-                Icons.Share(modifier = Modifier.clearAndSetSemantics { })
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = stringResource(R.string.game_stats_share))
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            modifier = Modifier.semantics(mergeDescendants = true) { },
+            onClick = onShare,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.correct,
+                contentColor = MaterialTheme.colorScheme.onCorrect,
+            )
+        ) {
+            Icons.Share(modifier = Modifier.clearAndSetSemantics { })
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = stringResource(R.string.game_stats_share))
         }
     }
 }
