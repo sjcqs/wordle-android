@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.feature.game.screen
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,7 +47,7 @@ fun Game() {
     val viewModel: GameViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    val stats by viewModel.stats.collectAsState()
+    val stats by viewModel.statsFlow.collectAsState()
 
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
@@ -61,12 +63,22 @@ fun Game() {
         mutableStateOf("")
     }
 
+    val context = LocalContext.current
     LaunchedEffect(key1 = viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 GameUiEvent.ClearInput -> setTypingWord("")
                 GameUiEvent.InvalidWord -> snackbar(invalidWord)
                 GameUiEvent.Dismiss -> snackbarState.currentSnackbarData?.dismiss()
+                is GameUiEvent.Share -> {
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, event.text)
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    context.startActivity(shareIntent)
+                }
             }
         }
     }

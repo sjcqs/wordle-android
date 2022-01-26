@@ -17,6 +17,7 @@ internal fun TileState.toUiModel(): TileUiState = when (this) {
 }
 
 internal fun Game.toUiState(
+    stats: StatsUiModel,
     onRetry: () -> Unit,
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
@@ -40,6 +41,7 @@ internal fun Game.toUiState(
         onTyping = onTyping,
         onSubmit = onSubmit,
         word = word,
+        stats = stats,
         isFinished = isFinished,
         isWon = isWon,
         onRetry = onRetry,
@@ -58,7 +60,8 @@ internal fun Guess.toUiModel(): GuessUiModel = GuessUiModel(
 internal fun Stats.toUiModel(
     dailyFinishedGame: Game?,
     onStatsDismissed: () -> Unit,
-    onStatsOpened: () -> Unit
+    onStatsOpened: () -> Unit,
+    onShare: (text: String) -> Unit
 ): StatsUiModel {
     val numberFormat = NumberFormat.getNumberInstance()
     return StatsUiModel(
@@ -71,6 +74,7 @@ internal fun Stats.toUiModel(
         expiredIn = dailyFinishedGame?.expiredAt?.let { expiredAt ->
             Duration.between(LocalDateTime.now(), expiredAt)
         },
+        share = onShare,
         sharedText = sharedText(dailyFinishedGame),
         onStatsDismissed = onStatsDismissed,
         onStatsOpened = onStatsOpened
@@ -99,4 +103,13 @@ fun sharedText(dailyFinishedGame: Game?): String? = dailyFinishedGame?.run {
         appendLine()
         appendLine("wordlefr.page.link/app (Android)")
     }
+}
+
+internal fun Duration.format(): String {
+    return String.format(
+        "%d:%02d:%02d",
+        toHours(),
+        (seconds % (60 * 60)) / 60,
+        seconds % 60
+    );
 }

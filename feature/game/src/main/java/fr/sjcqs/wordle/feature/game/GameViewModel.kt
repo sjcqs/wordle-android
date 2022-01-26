@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
@@ -40,13 +40,14 @@ internal class GameViewModel @Inject constructor(
 
     private val areStatsOpenFlow = MutableStateFlow(false)
 
-    val stats: StateFlow<StatsUiModel> = gameRepository.statsFlow
+    val statsFlow: StateFlow<StatsUiModel> = gameRepository.statsFlow
         .combineTransform(areStatsOpenFlow) { stats, areStatsOpen ->
             val dailyFinishedGame = stats.dailyFinishedGame
             val statsUiModel = stats.toUiModel(
                 dailyFinishedGame,
                 onStatsOpened = { events.emitIn(viewModelScope, Event.OnStatsOpened) },
-                onStatsDismissed = { events.emitIn(viewModelScope, Event.OnStatsDismissed) }
+                onStatsDismissed = { events.emitIn(viewModelScope, Event.OnStatsDismissed) },
+                onShare = { events.emitIn(viewModelScope, Event.OnShare(it)) }
             )
             if (areStatsOpen) {
                 while (currentCoroutineContext().isActive) {
@@ -65,7 +66,7 @@ internal class GameViewModel @Inject constructor(
 
     init {
         gameRepository.dailyGameFlow
-            .map(::map)
+            .combine(statsFlow,::map)
             .onEach(_uiState::emit)
             .launchIn(viewModelScope)
 
@@ -73,7 +74,8 @@ internal class GameViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun map(game: Game) = game.toUiState(
+    private fun map(game: Game, stats: StatsUiModel) = game.toUiState(
+        stats = stats,
         onRetry = { events.emitIn(viewModelScope, Event.Retry) },
         onTyping = { events.emitIn(viewModelScope, Event.Typing) },
         onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
@@ -83,6 +85,7 @@ internal class GameViewModel @Inject constructor(
         when (event) {
             is Event.Retry -> retry()
             is Event.Submit -> submit(event.word)
+            is Event.OnShare -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Share(event.text))
             is Event.Typing -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Dismiss)
             Event.OnStatsDismissed -> areStatsOpenFlow.emit(false)
             Event.OnStatsOpened -> areStatsOpenFlow.emit(true)
@@ -104,6 +107,7 @@ internal class GameViewModel @Inject constructor(
 
     private sealed interface Event {
         data class Submit(val word: String) : Event
+        data class OnShare(val text: String) : Event
         object Retry : Event
         object Typing : Event
         object OnStatsOpened : Event
@@ -124,6 +128,7 @@ internal sealed interface GameUiState {
         val onSubmit: (word: String) -> Unit,
         val isFinished: Boolean = false,
         val isWon: Boolean = false,
+        val stats: StatsUiModel = StatsUiModel(),
         val canRetry: Boolean = true,
         val onRetry: () -> Unit,
     ) : GameUiState
@@ -131,6 +136,8 @@ internal sealed interface GameUiState {
 
 internal sealed interface GameUiEvent {
     object ClearInput : GameUiEvent
+
+    data class Share(val text: String) : GameUiEvent
 
     sealed interface Notify : GameUiEvent
     object InvalidWord : Notify
@@ -154,7 +161,8 @@ data class StatsUiModel(
     val dailyWord: String? = null,
     val expiredIn: Duration? = null,
     val onStatsOpened: () -> Unit = {},
-    val onStatsDismissed: () -> Unit = {}
+    val onStatsDismissed: () -> Unit = {},
+    val share: (text: String) -> Unit = {}
 ) {
     fun updateExpiredIn(expiredAt: LocalDateTime?) = copy(
         expiredIn = expiredAt?.let {

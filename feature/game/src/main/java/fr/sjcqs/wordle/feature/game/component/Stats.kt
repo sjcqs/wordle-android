@@ -1,6 +1,5 @@
 package fr.sjcqs.wordle.feature.game.component
 
-import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,29 +29,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.StatsUiModel
+import fr.sjcqs.wordle.feature.game.format
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.absent
 import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.onAbsent
 import fr.sjcqs.wordle.ui.theme.onCorrect
-import java.time.Duration
 
 @Composable
-internal fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
-    fun share() {
-        stats.sharedText?.let {
-            val sendIntent: Intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, stats.sharedText)
-                type = "text/plain"
-            }
-            val shareIntent = Intent.createChooser(sendIntent, null)
-            context.startActivity(shareIntent)
-        }
-
-    }
+internal fun StatsDialog(
+    stats: StatsUiModel,
+    onDismissRequest: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {},
@@ -118,7 +107,7 @@ internal fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
                                 modifier = Modifier
                                     .align(Alignment.CenterVertically)
                                     .semantics(mergeDescendants = true) { },
-                                onClick = { share() },
+                                onClick = { stats.share(stats.sharedText) },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.correct,
                                     contentColor = MaterialTheme.colorScheme.onCorrect,
@@ -134,15 +123,6 @@ internal fun StatsDialog(stats: StatsUiModel, onDismissRequest: () -> Unit) {
             }
         }
     )
-}
-
-private fun Duration.format(): String {
-    return String.format(
-        "%d:%02d:%02d",
-        toHours(),
-        (seconds % (60 * 60)) / 60,
-        seconds % 60
-    );
 }
 
 @Composable

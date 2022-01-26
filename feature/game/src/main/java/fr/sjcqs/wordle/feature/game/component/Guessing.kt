@@ -2,29 +2,44 @@ package fr.sjcqs.wordle.feature.game.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import fr.sjcqs.wordle.feature.game.GameUiState
 import fr.sjcqs.wordle.feature.game.GuessUiModel
+import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
+import fr.sjcqs.wordle.feature.game.StatsUiModel
+import fr.sjcqs.wordle.feature.game.format
 import fr.sjcqs.wordle.ui.components.Word
+import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
+import fr.sjcqs.wordle.ui.theme.correct
+import fr.sjcqs.wordle.ui.theme.onCorrect
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
@@ -76,8 +91,52 @@ internal fun Guessing(
                         }
                     }
                 })
+        } else {
+            Stats(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp),
+                stats = uiState.stats
+            )
         }
         Spacer(modifier = Modifier.navigationBarsHeight())
+    }
+}
+
+@Composable
+private fun Stats(modifier: Modifier, stats: StatsUiModel) {
+    SideEffect {
+        stats.onStatsOpened()
+    }
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        if (stats.expiredIn != null) {
+            Column(
+                modifier = Modifier.semantics(mergeDescendants = true) { },
+                horizontalAlignment = CenterHorizontally
+            ) {
+                Text(text = stringResource(R.string.game_stats_next_word_in))
+                Text(
+                    text = stats.expiredIn.format(),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        if (stats.sharedText != null) {
+            Button(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .semantics(mergeDescendants = true) { },
+                onClick = { stats.share(stats.sharedText) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.correct,
+                    contentColor = MaterialTheme.colorScheme.onCorrect,
+                )
+            ) {
+                Icons.Share(modifier = Modifier.clearAndSetSemantics { })
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = stringResource(R.string.game_stats_share))
+            }
+        }
     }
 }
 
