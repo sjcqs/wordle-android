@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import fr.sjcqs.wordle.data.game.db.Game as DbGame
 
 class GameRepositoryImpl @Inject constructor(
     @DefaultDispatcher
@@ -56,11 +55,7 @@ class GameRepositoryImpl @Inject constructor(
                 .onEach { dailyWord ->
                     val latest = dbDataSource.getLatest()
                     if (latest?.word != dailyWord.word) {
-                        val dailyGame = Game(
-                            word = dailyWord.word,
-                            expiredAt = dailyWord.expiredAt,
-                            maxGuesses = MAX_GUESSES
-                        )
+                        val dailyGame = dailyWord.toGame()
                         dbDataSource.insertOrUpdate(dailyGame.toDb())
                     }
                 }.retry()
@@ -71,11 +66,16 @@ class GameRepositoryImpl @Inject constructor(
     override val dailyGameFlow: Flow<Game> = dbDataSource.watchLatest()
         .filterNotNull()
         .map { it.fromDb(MAX_GUESSES) }
-        .onEach { game = it }
+        .map {
+            if (it.isExpired) remoteDataSource.getDailyWord().toGame() else it
+        }.onEach { game = it }
         .distinctUntilChanged()
 
     override val statsFlow: Flow<Stats> = dbDataSource.watchAll()
-        .combine(dbDataSource.watchLatest()) { allGames, latestGame ->
+        .map { games -> games.map { it.fromDb(MAX_GUESSES) } }
+        .combine(
+            dbDataSource.watchLatest()
+                .map { it?.fromDb(MAX_GUESSES) }) { allGames, latestGame ->
             val wonGames = allGames.filter { it.isWon }
 
             val currentStreak = allGames.takeWhile { it.isWon }.size
@@ -95,13 +95,14 @@ class GameRepositoryImpl @Inject constructor(
             val distributions = wonGames
                 .groupBy { it.guesses.size }
                 .mapValues { (_, games) -> games.size }
+            val played = allGames.count { it.isFinished }
             Stats(
-                played = allGames.count { it.isFinished },
-                winRate = (wonGames.size.toDouble() / allGames.size).coerceIn(0.0, 1.0),
+                played = played,
+                winRate = (wonGames.size.toDouble() / played).coerceIn(0.0, 1.0),
                 currentStreak = currentStreak,
                 maxStreak = maxStreak,
                 distributions = (1..MAX_GUESSES).associateWith { distributions[it] ?: 0 },
-                dailyFinishedGame = latestGame?.fromDb(MAX_GUESSES)
+                dailyFinishedGame = latestGame
                     ?.takeIf { it.isFinished && !it.isExpired }
             )
         }
@@ -158,14 +159,16 @@ class GameRepositoryImpl @Inject constructor(
     private val Game.isExpired: Boolean
         get() = expiredAt < LocalDateTime.now()
 
-    private val DbGame.isWon: Boolean
-        get() = word == guesses.lastOrNull()?.word
-
-    private val DbGame.isFinished: Boolean
-        get() = word == guesses.lastOrNull()?.word || guesses.size == MAX_GUESSES
-
     private val DailyWord.expiredAt: LocalDateTime
         get() = LocalDateTime.parse(expired_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+    private fun DailyWord.toGame(): Game {
+        return Game(
+            word = word,
+            expiredAt = expiredAt,
+            maxGuesses = MAX_GUESSES
+        )
+    }
 
     companion object {
         private const val MAX_GUESSES = 6

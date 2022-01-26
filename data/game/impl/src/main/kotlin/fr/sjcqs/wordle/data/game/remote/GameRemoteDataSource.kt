@@ -25,7 +25,7 @@ class GameRemoteDataSource @Inject constructor(
         dailyWordRef.keepSynced(true)
     }
 
-    private suspend fun dailyWord(): DailyWord = suspendCancellableCoroutine { continuation ->
+    suspend fun getDailyWord(): DailyWord = suspendCancellableCoroutine { continuation ->
         dailyWordRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.getValue<DailyWord>()?.let(continuation::resume)
@@ -51,7 +51,7 @@ class GameRemoteDataSource @Inject constructor(
 
         }
         dailyWordReference.addValueEventListener(listener)
-        trySendBlocking(dailyWord())
+        trySendBlocking(getDailyWord())
         awaitClose {
             dailyWordReference.removeEventListener(listener)
         }
