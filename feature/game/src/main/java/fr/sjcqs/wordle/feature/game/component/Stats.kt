@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,13 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.StatsUiModel
-import fr.sjcqs.wordle.feature.game.format
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.absent
-import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.onAbsent
-import fr.sjcqs.wordle.ui.theme.onCorrect
 
 @Composable
 internal fun StatsDialog(
@@ -88,38 +83,6 @@ internal fun StatsDialog(
                     distributions = stats.distributions,
                     wonGames = stats.distributions.values.sum().toFloat()
                 )
-                if (stats.expiredIn != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(horizontalArrangement = Arrangement.SpaceAround) {
-                        Column(
-                            modifier = Modifier.semantics(mergeDescendants = true) { },
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = stringResource(R.string.game_stats_next_word_in))
-                            Text(
-                                text = stats.expiredIn.format(),
-                                style = MaterialTheme.typography.headlineMedium
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        if (stats.sharedText != null) {
-                            Button(
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .semantics(mergeDescendants = true) { },
-                                onClick = { stats.share(stats.sharedText) },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.correct,
-                                    contentColor = MaterialTheme.colorScheme.onCorrect,
-                                )
-                            ) {
-                                Icons.Share(modifier = Modifier.clearAndSetSemantics { })
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = stringResource(R.string.game_stats_share))
-                            }
-                        }
-                    }
-                }
             }
         }
     )
