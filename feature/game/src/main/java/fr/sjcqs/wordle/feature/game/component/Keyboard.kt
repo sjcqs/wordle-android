@@ -1,5 +1,8 @@
 package fr.sjcqs.wordle.feature.game.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,18 +13,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import fr.sjcqs.wordle.haptics.LocalHapticController
 import fr.sjcqs.wordle.haptics.tick
 import fr.sjcqs.wordle.ui.components.TileUiState
@@ -146,21 +160,70 @@ private fun Key(
         null -> MaterialTheme.colorScheme.surface
     }
     val contentColor = contentColorFor(backgroundColor = color)
+    val interactionSource = remember { MutableInteractionSource() }
+    val showTooltip by interactionSource.collectIsPressedAsState()
+    Box(modifier = modifier) {
+        if (keycode is Keycode.Character && showTooltip) {
+            KeyTooltip(keycode)
+        }
         Surface(
-            modifier = modifier.padding(horizontal = 2.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp),
             onClick = onPressed,
             color = color,
+            interactionSource = interactionSource,
             contentColor = contentColor,
             shape = RoundedCornerShape(4.dp),
             shadowElevation = 4.dp,
             role = Role.Button
         ) {
-            Content(modifier = Modifier.fillMaxSize(), keycode = keycode)
+            Content(
+                modifier = Modifier.fillMaxSize(),
+                keycode = keycode,
+            )
+        }
     }
 }
 
 @Composable
-private fun Content(modifier: Modifier, keycode: Keycode) {
+private fun KeyTooltip(keycode: Keycode.Character) {
+    Popup(
+        popupPositionProvider = object : PopupPositionProvider {
+            override fun calculatePosition(
+                anchorBounds: IntRect,
+                windowSize: IntSize,
+                layoutDirection: LayoutDirection,
+                popupContentSize: IntSize
+            ): IntOffset {
+                return IntOffset(
+                    anchorBounds.left + anchorBounds.width / 2 - popupContentSize.width / 2,
+                    anchorBounds.top - anchorBounds.height
+                )
+            }
+
+        },
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Content(
+                modifier = Modifier
+                    .padding(vertical = 8.dp, horizontal = 12.dp)
+                    .align(Alignment.Center),
+                keycode = keycode,
+                textStyle = MaterialTheme.typography.headlineMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun Content(
+    keycode: Keycode,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.headlineSmall
+) {
     Box(modifier = modifier) {
         when (keycode) {
             Keycode.Backspace -> {
@@ -172,7 +235,7 @@ private fun Content(modifier: Modifier, keycode: Keycode) {
                     text = keycode.char,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = textStyle
                 )
             }
             Keycode.Enter -> {
