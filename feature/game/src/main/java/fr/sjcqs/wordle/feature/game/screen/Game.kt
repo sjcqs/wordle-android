@@ -31,6 +31,8 @@ import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.component.Guessing
 import fr.sjcqs.wordle.feature.game.model.GameUiEvent
 import fr.sjcqs.wordle.feature.game.model.GameUiState
+import fr.sjcqs.wordle.haptics.LocalHapticController
+import fr.sjcqs.wordle.haptics.doubleClick
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
@@ -51,17 +53,22 @@ fun Game(showStats: () -> Unit) {
 
     fun snackbar(message: String) {
         coroutineScope.launch {
+            snackbarState.currentSnackbarData?.dismiss()
             snackbarState.showSnackbar(message)
         }
     }
 
     val context = LocalContext.current
+    val hapticsController = LocalHapticController.current
     val (typingWord, setTypingWord) = remember(viewModel) { mutableStateOf("") }
     LaunchedEffect(key1 = viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 GameUiEvent.ClearInput -> setTypingWord("")
-                GameUiEvent.InvalidWord -> snackbar(invalidWord)
+                GameUiEvent.InvalidWord -> {
+                    hapticsController.doubleClick()
+                    snackbar(invalidWord)
+                }
                 GameUiEvent.Dismiss -> snackbarState.currentSnackbarData?.dismiss()
                 is GameUiEvent.Share -> {
                     val sendIntent: Intent = Intent().apply {
