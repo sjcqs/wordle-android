@@ -12,7 +12,6 @@ import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.data.game.remote.DailyWord
 import fr.sjcqs.wordle.data.game.remote.GameRemoteDataSource
-import fr.sjcqs.wordle.logger.Logger
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -99,7 +98,7 @@ class GameRepositoryImpl @Inject constructor(
             val played = allGames.count { it.isFinished }
             Stats(
                 played = played,
-                winRate = (wonGames.size.toDouble() / played).coerceIn(0.0, 1.0),
+                winRate = (wonGames.size.toDouble() / played.coerceAtLeast(1)),
                 currentStreak = currentStreak,
                 maxStreak = maxStreak,
                 distributions = (1..MAX_GUESSES).associateWith { distributions[it] ?: 0 },
