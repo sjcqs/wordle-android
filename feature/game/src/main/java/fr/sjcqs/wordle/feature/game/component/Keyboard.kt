@@ -1,5 +1,7 @@
 package fr.sjcqs.wordle.feature.game.component
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -52,9 +54,91 @@ internal sealed interface Keycode {
     data class Character(val char: String) : Keycode
 }
 
+internal typealias Keys = List<Pair<Keycode, Float>>
+
+internal enum class KeyboardLayout(
+    private val firstRow: Keys,
+    private val secondRow: Keys,
+    private val thirdRow: Keys,
+) : List<Keys> by listOf(firstRow, secondRow, thirdRow) {
+    Azerty(
+        listOf(
+            Keycode.Character("A") to 1f,
+            Keycode.Character("Z") to 1f,
+            Keycode.Character("E") to 1f,
+            Keycode.Character("R") to 1f,
+            Keycode.Character("T") to 1f,
+            Keycode.Character("Y") to 1f,
+            Keycode.Character("U") to 1f,
+            Keycode.Character("I") to 1f,
+            Keycode.Character("O") to 1f,
+            Keycode.Character("P") to 1f,
+        ),
+        listOf(
+            Keycode.Character("Q") to 1f,
+            Keycode.Character("S") to 1f,
+            Keycode.Character("D") to 1f,
+            Keycode.Character("F") to 1f,
+            Keycode.Character("G") to 1f,
+            Keycode.Character("H") to 1f,
+            Keycode.Character("J") to 1f,
+            Keycode.Character("K") to 1f,
+            Keycode.Character("L") to 1f,
+            Keycode.Character("M") to 1f,
+        ),
+        listOf(
+            Keycode.Enter to 1f,
+            Keycode.Character("W") to 0.5f,
+            Keycode.Character("X") to 0.5f,
+            Keycode.Character("C") to 0.5f,
+            Keycode.Character("V") to 0.5f,
+            Keycode.Character("B") to 0.5f,
+            Keycode.Character("N") to 0.5f,
+            Keycode.Backspace to 1f,
+        ),
+    ),
+    Qwerty(
+        listOf(
+            Keycode.Character("Q") to 1f,
+            Keycode.Character("W") to 1f,
+            Keycode.Character("E") to 1f,
+            Keycode.Character("R") to 1f,
+            Keycode.Character("T") to 1f,
+            Keycode.Character("Y") to 1f,
+            Keycode.Character("U") to 1f,
+            Keycode.Character("I") to 1f,
+            Keycode.Character("O") to 1f,
+            Keycode.Character("P") to 1f,
+        ),
+        listOf(
+            Keycode.Character("A") to 1f,
+            Keycode.Character("S") to 1f,
+            Keycode.Character("D") to 1f,
+            Keycode.Character("F") to 1f,
+            Keycode.Character("G") to 1f,
+            Keycode.Character("H") to 1f,
+            Keycode.Character("J") to 1f,
+            Keycode.Character("K") to 1f,
+            Keycode.Character("L") to 1f,
+            Keycode.Character("M") to 1f,
+        ),
+        listOf(
+            Keycode.Enter to 1f,
+            Keycode.Character("Z") to 0.5f,
+            Keycode.Character("X") to 0.5f,
+            Keycode.Character("C") to 0.5f,
+            Keycode.Character("V") to 0.5f,
+            Keycode.Character("B") to 0.5f,
+            Keycode.Character("N") to 0.5f,
+            Keycode.Backspace to 1f,
+        ),
+    )
+}
+
 @Composable
 internal fun Keyboard(
     modifier: Modifier = Modifier,
+    layout: KeyboardLayout = KeyboardLayout.Azerty,
     keyStates: Map<String, TileUiState> = emptyMap(),
     onKeyPressed: (key: Keycode) -> Unit
 ) {
@@ -64,83 +148,27 @@ internal fun Keyboard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Row(modifier = Modifier.width(IntrinsicSize.Min)) {
-            listOf(
-                Keycode.Character("A"),
-                Keycode.Character("Z"),
-                Keycode.Character("E"),
-                Keycode.Character("R"),
-                Keycode.Character("T"),
-                Keycode.Character("Y"),
-                Keycode.Character("U"),
-                Keycode.Character("I"),
-                Keycode.Character("O"),
-                Keycode.Character("P"),
-            ).forEach { keycode ->
-                Key(
-                    keycode = keycode,
-                    onPressed = {
-                        hapticsController.tick()
-                        onKeyPressed(keycode)
-                    },
-                    keyState = keyStates[keycode.char],
-                    modifier = Modifier
-                        .weight(1f)
-                        .width(IntrinsicSize.Min)
-                        .height(IntrinsicSize.Min)
-                )
-            }
-        }
-        Row(modifier = Modifier.width(IntrinsicSize.Min)) {
-            listOf(
-                Keycode.Character("Q"),
-                Keycode.Character("S"),
-                Keycode.Character("D"),
-                Keycode.Character("F"),
-                Keycode.Character("G"),
-                Keycode.Character("H"),
-                Keycode.Character("J"),
-                Keycode.Character("K"),
-                Keycode.Character("L"),
-                Keycode.Character("M"),
-            ).forEach { keycode ->
-                Key(
-                    keycode = keycode,
-                    onPressed = {
-                        hapticsController.tick()
-                        onKeyPressed(keycode)
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .width(IntrinsicSize.Min)
-                        .height(IntrinsicSize.Min),
-                    keyState = keyStates[keycode.char],
-                )
-            }
-        }
-        Row(modifier = Modifier.width(IntrinsicSize.Min)) {
-            listOf(
-                Keycode.Enter to 1f,
-                Keycode.Character("W") to 0.5f,
-                Keycode.Character("X") to 0.5f,
-                Keycode.Character("C") to 0.5f,
-                Keycode.Character("V") to 0.5f,
-                Keycode.Character("B") to 0.5f,
-                Keycode.Character("N") to 0.5f,
-                Keycode.Backspace to 1f,
-            ).forEach { (keycode, weight) ->
-                Key(
-                    keycode = keycode,
-                    onPressed = {
-                        hapticsController.tick()
-                        onKeyPressed(keycode)
-                    },
-                    modifier = Modifier
-                        .weight(weight)
-                        .width(IntrinsicSize.Min)
-                        .height(IntrinsicSize.Min),
-                    keyState = if (keycode is Keycode.Character) keyStates[keycode.char] else null
-                )
+        layout.forEach { row ->
+            Row(modifier = Modifier.width(IntrinsicSize.Min)) {
+                row.forEach { (keycode, weight) ->
+                    val keyState = if (keycode is Keycode.Character) {
+                        keyStates[keycode.char]
+                    } else {
+                        null
+                    }
+                    Key(
+                        keycode = keycode,
+                        onPressed = {
+                            hapticsController.tick()
+                            onKeyPressed(keycode)
+                        },
+                        keyState = keyState,
+                        modifier = Modifier
+                            .weight(weight)
+                            .width(IntrinsicSize.Min)
+                            .height(IntrinsicSize.Min)
+                    )
+                }
             }
         }
     }
@@ -153,12 +181,15 @@ private fun Key(
     modifier: Modifier,
     keyState: TileUiState?
 ) {
-    val color = when (keyState) {
-        TileUiState.Present -> MaterialTheme.colorScheme.present
-        TileUiState.Correct -> MaterialTheme.colorScheme.correct
-        TileUiState.Absent -> MaterialTheme.colorScheme.absent
-        null -> MaterialTheme.colorScheme.surface
-    }
+    val color by animateColorAsState(
+        targetValue = when (keyState) {
+            TileUiState.Present -> MaterialTheme.colorScheme.present
+            TileUiState.Correct -> MaterialTheme.colorScheme.correct
+            TileUiState.Absent -> MaterialTheme.colorScheme.absent
+            null -> MaterialTheme.colorScheme.surface
+        },
+        animationSpec = tween()
+    )
     val contentColor = contentColorFor(backgroundColor = color)
     val interactionSource = remember { MutableInteractionSource() }
     val showTooltip by interactionSource.collectIsPressedAsState()
