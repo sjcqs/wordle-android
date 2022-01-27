@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -40,7 +39,6 @@ import fr.sjcqs.wordle.ui.theme.onCorrect
 import java.time.Duration
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 internal fun Guessing(
     uiState: GameUiState.Guessing,
     modifier: Modifier = Modifier,

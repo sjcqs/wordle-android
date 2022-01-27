@@ -1,6 +1,5 @@
 package fr.sjcqs.wordle.feature.stats.screen
 
-import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,7 +35,6 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import fr.sjcqs.wordle.feature.stats.R
 import fr.sjcqs.wordle.feature.stats.StatsViewModel
-import fr.sjcqs.wordle.feature.stats.model.StatsUiEvent
 import fr.sjcqs.wordle.feature.stats.model.StatsUiModel
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.IconButton
@@ -51,23 +48,6 @@ fun Stats(onClose: () -> Unit) {
     val viewModel: StatsViewModel = hiltViewModel()
 
     val stats by viewModel.statsFlow.collectAsState()
-
-    val context = LocalContext.current
-    LaunchedEffect(key1 = viewModel.uiEvent) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                is StatsUiEvent.Share -> {
-                    val sendIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, event.text)
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-                    context.startActivity(shareIntent)
-                }
-            }
-        }
-    }
 
     Scaffold(
         topBar = {

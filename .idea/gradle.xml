@@ -58,7 +58,6 @@
             <option value="$PROJECT_DIR$/wiring" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

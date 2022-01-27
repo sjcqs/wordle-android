@@ -59,8 +59,8 @@ internal class GameViewModel @Inject constructor(
         onRetry = { events.emitIn(viewModelScope, Event.Retry) },
         onTyping = { events.emitIn(viewModelScope, Event.Typing) },
         onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
-        onStatsOpened = { events.emitIn(viewModelScope, Event.OnCountdownVisible) },
-        onStatsDismissed = { events.emitIn(viewModelScope, Event.OnCountdownVisible) },
+        onCountdownHidden = { events.emitIn(viewModelScope, Event.OnCountdownHidden) },
+        onCountdownVisible = { events.emitIn(viewModelScope, Event.OnCountdownVisible) },
         onShare = { events.emitIn(viewModelScope, Event.OnShare(it)) }
     )
 
@@ -71,6 +71,7 @@ internal class GameViewModel @Inject constructor(
             is Event.Typing -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Dismiss)
             Event.OnCountdownHidden -> isCountdownVisibleFlow.emit(false)
             Event.OnCountdownVisible -> isCountdownVisibleFlow.emit(true)
+            is Event.OnShare -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Share(event.text))
         }
     }
 

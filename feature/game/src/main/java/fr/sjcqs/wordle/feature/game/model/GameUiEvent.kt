@@ -5,4 +5,5 @@ internal sealed interface GameUiEvent {
     sealed interface Notify : GameUiEvent
     object InvalidWord : Notify
     object Dismiss : Notify
+    data class Share(val text: String) : GameUiEvent
 }

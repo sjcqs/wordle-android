@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.feature.game.screen
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,6 +55,7 @@ fun Game(showStats: () -> Unit) {
         }
     }
 
+    val context = LocalContext.current
     val (typingWord, setTypingWord) = remember(viewModel) { mutableStateOf("") }
     LaunchedEffect(key1 = viewModel) {
         viewModel.uiEvent.collect { event ->
@@ -60,6 +63,15 @@ fun Game(showStats: () -> Unit) {
                 GameUiEvent.ClearInput -> setTypingWord("")
                 GameUiEvent.InvalidWord -> snackbar(invalidWord)
                 GameUiEvent.Dismiss -> snackbarState.currentSnackbarData?.dismiss()
+                is GameUiEvent.Share -> {
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, event.text)
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    context.startActivity(shareIntent)
+                }
             }
         }
     }

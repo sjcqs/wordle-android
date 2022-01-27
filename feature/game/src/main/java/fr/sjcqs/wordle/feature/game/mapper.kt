@@ -20,8 +20,8 @@ internal fun Game.toUiModel(
     onRetry: () -> Unit,
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
-    onStatsDismissed: () -> Unit,
-    onStatsOpened: () -> Unit,
+    onCountdownVisible: () -> Unit,
+    onCountdownHidden: () -> Unit,
     onShare: (text: String) -> Unit
 ): GameUiState.Guessing {
     val guessUiModels = buildList {
@@ -50,8 +50,8 @@ internal fun Game.toUiModel(
         expiredIn = Duration.between(LocalDateTime.now(), expiredAt),
         share = onShare,
         sharedText = sharedText,
-        onCountdownHidden = onStatsDismissed,
-        onCountdownVisible = onStatsOpened
+        onCountdownVisible = onCountdownVisible,
+        onCountdownHidden = onCountdownHidden
     )
 }
 

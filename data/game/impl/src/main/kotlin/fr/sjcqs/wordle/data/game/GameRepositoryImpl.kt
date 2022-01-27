@@ -12,6 +12,7 @@ import fr.sjcqs.wordle.data.game.entity.Stats
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.data.game.remote.DailyWord
 import fr.sjcqs.wordle.data.game.remote.GameRemoteDataSource
+import fr.sjcqs.wordle.logger.Logger
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class GameRepositoryImpl @Inject constructor(
     @ApplicationContext
     private val context: Context,
     private val dbDataSource: GameDbDataSource,
-    private val remoteDataSource: GameRemoteDataSource
+    private val remoteDataSource: GameRemoteDataSource,
 ) : GameRepository {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
     private lateinit var game: Game
@@ -111,7 +112,7 @@ class GameRepositoryImpl @Inject constructor(
         return withContext(defaultDispatcher) {
             if (words.contains(word)) {
                 if (game.isFinished) {
-                    return@withContext false
+                    return@withContext true
                 }
 
                 val guess = computeGuess(expected = game.word, submitted = word)
