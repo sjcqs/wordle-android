@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
-fun Game(showStats: () -> Unit) {
+fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
     val invalidWord = stringResource(id = R.string.guessing_invalid_word)
 
     val viewModel: GameViewModel = hiltViewModel()
@@ -99,9 +99,13 @@ fun Game(showStats: () -> Unit) {
                 shadowElevation = 4.dp,
                 title = { Text(text = stringResource(id = R.string.game_title)) },
                 actions = {
-                    val onClickLabel = stringResource(id = R.string.game_open_stats_label)
-                    IconButton(onClick = showStats, onClickLabel = onClickLabel) {
+                    val statsClickLabel = stringResource(id = R.string.game_open_stats_label)
+                    IconButton(onClick = showStats, onClickLabel = statsClickLabel) {
                         Icons.Stats()
+                    }
+                    val settingsClickLabel = stringResource(id = R.string.game_open_settings_label)
+                    IconButton(onClick = showSettings, onClickLabel = settingsClickLabel) {
+                        Icons.Settings()
                     }
                 }
             )

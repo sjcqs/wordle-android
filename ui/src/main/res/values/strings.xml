@@ -13,4 +13,5 @@
     <string name="content_description_empty">pas de lettre</string>
     <string name="content_description_return">Entrée</string>
     <string name="content_description_backspace">Retour arrière</string>
+    <string name="content_description_settings">Paramètres</string>
 </resources>

@@ -63,6 +63,19 @@ object Icons {
     }
 
     @Composable
+    fun Settings(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_settings),
+            contentDescription = stringResource(id = R.string.content_description_settings),
+            tint = tint,
+        )
+    }
+
+    @Composable
     fun Share(
         modifier: Modifier = Modifier,
         tint: Color = LocalContentColor.current

@@ -25,9 +25,13 @@ include(":app")
 include(":data:game:public")
 include(":data:game:impl")
 include(":data:game:wiring")
+include(":data:settings:public")
+include(":data:settings:impl")
+include(":data:settings:wiring")
 
 include(":feature:game")
 include(":feature:stats")
+include(":feature:settings")
 
 include(":navigation")
 

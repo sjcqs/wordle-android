@@ -3,6 +3,7 @@
     <string name="guessing_invalid_word">"Ce mot n’existe pas. "</string>
     <string name="game_title">Le Mot</string>
     <string name="game_open_stats_label">Ouvrir les statistiques</string>
+    <string name="game_open_settings_label">Ouvrir les paramètres</string>
     <string name="game_share_action">Partager</string>
     <string name="game_stats_next_word_in">Prochain mot dans:</string>
 </resources>

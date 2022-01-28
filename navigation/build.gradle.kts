@@ -14,6 +14,8 @@ dependencies {
 
     implementation(projects.feature.game)
     implementation(projects.feature.stats)
+    implementation(projects.feature.settings)
+
     implementation(projects.tools.logger.compose)
 
     implementation(libs.accompanist.navigation)

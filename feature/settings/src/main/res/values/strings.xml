@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Paramètre</string>
+    <string name="settings_label_close">Fermer les paramètres</string>
+</resources>
