@@ -156,12 +156,12 @@ private fun Settings(
                 }
             }
         }
-        Spacer(modifier = Modifier.weight(1f))
+        /*Spacer(modifier = Modifier.weight(1f))
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.settings_credits_header),
             style = MaterialTheme.typography.titleLarge,
-        )
+        )*/
         Spacer(modifier = Modifier.navigationBarsHeight())
     }
 }
