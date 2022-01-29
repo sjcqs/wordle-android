@@ -1,4 +1,4 @@
-package fr.sjcqs.wordle.data.game.db
+package fr.sjcqs.wordle.data.game.db.impl
 
 import com.squareup.sqldelight.ColumnAdapter
 import java.time.LocalDate

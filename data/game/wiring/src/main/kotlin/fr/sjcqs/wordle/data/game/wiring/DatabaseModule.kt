@@ -11,8 +11,8 @@ import fr.sjcqs.wordle.annotations.ApplicationContext
 import fr.sjcqs.wordle.data.game.Database
 import fr.sjcqs.wordle.data.game.db.Game
 import fr.sjcqs.wordle.data.game.db.GameQueries
-import fr.sjcqs.wordle.data.game.db.GuessesAdapter
-import fr.sjcqs.wordle.data.game.db.LocalDateTimeAdapter
+import fr.sjcqs.wordle.data.game.db.impl.GuessesAdapter
+import fr.sjcqs.wordle.data.game.db.impl.LocalDateTimeAdapter
 import javax.inject.Singleton
 
 @Module

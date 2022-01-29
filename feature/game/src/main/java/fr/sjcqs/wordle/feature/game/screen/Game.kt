@@ -3,7 +3,6 @@ package fr.sjcqs.wordle.feature.game.screen
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +38,6 @@ import fr.sjcqs.wordle.ui.icons.Icons
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
 fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
     val invalidWord = stringResource(id = R.string.guessing_invalid_word)
@@ -103,10 +101,10 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
                     IconButton(onClick = showStats, onClickLabel = statsClickLabel) {
                         Icons.Stats()
                     }
-                    val settingsClickLabel = stringResource(id = R.string.game_open_settings_label)
+                    /*val settingsClickLabel = stringResource(id = R.string.game_open_settings_label)
                     IconButton(onClick = showSettings, onClickLabel = settingsClickLabel) {
                         Icons.Settings()
-                    }
+                    }*/
                 }
             )
         },

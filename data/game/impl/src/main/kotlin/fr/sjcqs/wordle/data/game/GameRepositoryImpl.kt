@@ -1,8 +1,7 @@
 package fr.sjcqs.wordle.data.game
 
-import android.content.Context
-import fr.sjcqs.wordle.annotations.ApplicationContext
 import fr.sjcqs.wordle.annotations.DefaultDispatcher
+import fr.sjcqs.wordle.data.game.assets.GameAssetsDataSource
 import fr.sjcqs.wordle.data.game.db.GameDbDataSource
 import fr.sjcqs.wordle.data.game.db.fromDb
 import fr.sjcqs.wordle.data.game.db.toDb
@@ -32,20 +31,12 @@ import kotlinx.coroutines.withContext
 class GameRepositoryImpl @Inject constructor(
     @DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
-    @ApplicationContext
-    private val context: Context,
     private val dbDataSource: GameDbDataSource,
     private val remoteDataSource: GameRemoteDataSource,
+    private val assetsDataSource: GameAssetsDataSource
 ) : GameRepository {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
     private lateinit var game: Game
-    private val words: HashSet<String>
-        get() {
-            return context.assets.open("words.txt")
-                .bufferedReader()
-                .readLines()
-                .toHashSet()
-        }
 
     override val maxGuesses: Int = MAX_GUESSES
 
@@ -109,7 +100,7 @@ class GameRepositoryImpl @Inject constructor(
 
     override suspend fun submit(word: String): Boolean {
         return withContext(defaultDispatcher) {
-            if (words.contains(word)) {
+            if (assetsDataSource.containsWord(word)) {
                 if (game.isFinished) {
                     return@withContext true
                 }
