@@ -17,10 +17,11 @@
             </builds>
           </compositeBuild>
         </compositeConfiguration>
+        <option name="delegatedBuild" value="true" />
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="Embedded JDK" />
+        <option name="gradleJvm" value="11" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -31,6 +32,7 @@
             <option value="$PROJECT_DIR$/data/game/public" />
             <option value="$PROJECT_DIR$/data/game/wiring" />
             <option value="$PROJECT_DIR$/data/settings" />
+            <option value="$PROJECT_DIR$/data/settings/android" />
             <option value="$PROJECT_DIR$/data/settings/impl" />
             <option value="$PROJECT_DIR$/data/settings/public" />
             <option value="$PROJECT_DIR$/data/settings/wiring" />
@@ -63,6 +65,7 @@
             <option value="$PROJECT_DIR$/wiring" />
           </set>
         </option>
+        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

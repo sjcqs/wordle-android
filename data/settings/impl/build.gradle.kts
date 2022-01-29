@@ -1,8 +1,10 @@
 plugins {
-    id("fr.sjcqs.android.lib")
-    id("com.squareup.sqldelight")
+    id("fr.sjcqs.jvm.lib")
 }
 
 dependencies {
+    implementation(libs.androidx.datastore.preferences.core)
+
     implementation(projects.data.settings.public)
+    implementation(projects.tools.annotations)
 }

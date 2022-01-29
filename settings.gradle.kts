@@ -26,6 +26,7 @@ include(":data:game:public")
 include(":data:game:impl")
 include(":data:game:wiring")
 include(":data:settings:public")
+include(":data:settings:android")
 include(":data:settings:impl")
 include(":data:settings:wiring")
 

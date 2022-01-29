@@ -44,11 +44,13 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.splashscreen)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.appcheck)
     implementation(libs.firebase.database)
 
+    implementation(projects.data.settings.android)
     implementation(projects.navigation)
     implementation(projects.ui)
     implementation(projects.wiring)

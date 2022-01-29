@@ -7,6 +7,7 @@ dependencies {
     api(projects.feature.stats)
 
     api(projects.data.game.wiring)
+    api(projects.data.settings.wiring)
 
     api(projects.tools.annotations)
     api(projects.tools.haptics.wiring)

@@ -2,4 +2,11 @@
 <resources>
     <string name="settings_title">Paramètre</string>
     <string name="settings_label_close">Fermer les paramètres</string>
+    <string name="settings_theme_header">Thème:</string>
+    <string name="settings_theme_dark">Sombre</string>
+    <string name="settings_theme_light">Clair</string>
+    <string name="settings_theme_system">Système</string>
+    <string name="settings_keyboard_layout_header">Clavier:</string>
+    <string name="settings_keyboard_layout_azerty">AZERTY</string>
+    <string name="settings_keyboard_layout_qwerty">QWERTY</string>
 </resources>
