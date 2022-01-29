@@ -15,22 +15,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-interface GameRemoteDataSource {
-    suspend fun getDailyWord(): DailyWord
-    fun watchDailyWord(): Flow<DailyWord>
-}
-
-class FirebaseGameRemoteDataSource @Inject constructor(
+class GameRemoteDataSource @Inject constructor(
     firebaseDatabase: FirebaseDatabase,
-) : GameRemoteDataSource {
-
+){
     private val dailyWordRef = firebaseDatabase.getReference(REF_DAILY_WORD)
 
     init {
         dailyWordRef.keepSynced(true)
     }
 
-    override suspend fun getDailyWord(): DailyWord = suspendCancellableCoroutine { continuation ->
+    suspend fun getDailyWord(): DailyWord = suspendCancellableCoroutine { continuation ->
         dailyWordRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.getValue<DailyWord>()?.let(continuation::resume)
@@ -43,7 +37,7 @@ class FirebaseGameRemoteDataSource @Inject constructor(
         })
     }
 
-    override fun watchDailyWord(): Flow<DailyWord> = callbackFlow {
+    fun watchDailyWord(): Flow<DailyWord> = callbackFlow {
         val dailyWordReference = dailyWordRef
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
