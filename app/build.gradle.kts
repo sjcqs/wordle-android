@@ -11,8 +11,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 9
-        versionName = "0.7"
+        versionCode = 10
+        versionName = "0.8"
     }
 
     signingConfigs {
