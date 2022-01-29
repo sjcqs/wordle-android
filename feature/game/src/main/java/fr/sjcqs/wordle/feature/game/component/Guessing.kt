@@ -68,6 +68,7 @@ internal fun Guessing(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(horizontal = 12.dp),
+                layout = uiState.keyboardLayout,
                 keyStates = uiState.keyStates,
                 onKeyPressed = { keycode ->
                     when (keycode) {

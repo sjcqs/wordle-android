@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.data.game.entity.Game
+import fr.sjcqs.wordle.data.settings.SettingsRepository
+import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.feature.game.model.GameUiEvent
 import fr.sjcqs.wordle.feature.game.model.GameUiState
@@ -17,12 +19,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GameUiState>(
@@ -35,27 +39,33 @@ internal class GameViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
+    private val keyboardLayoutFlow = settingsRepository.settingsFlow.map { it.keyboardLayout }
+
     private val events = MutableSharedFlow<Event>()
 
     init {
-        gameRepository.dailyGameFlow
-            .combineTransform(isCountdownVisibleFlow) { game, isCountdownVisible ->
-                val uiModel = map(game)
-                emit(uiModel)
-                if (isCountdownVisible) {
-                    while (currentCoroutineContext().isActive) {
-                        emit(uiModel.updateExpiredIn(game.expiredAt))
-                        delay(1000)
-                    }
+        combineTransform(
+            gameRepository.dailyGameFlow,
+            isCountdownVisibleFlow,
+            keyboardLayoutFlow
+        ) { game, isCountdownVisible, keyboardLayout ->
+            val uiModel = map(game, keyboardLayout)
+            emit(uiModel)
+            if (isCountdownVisible) {
+                while (currentCoroutineContext().isActive) {
+                    emit(uiModel.updateExpiredIn(game.expiredAt))
+                    delay(1000)
                 }
-            }.onEach(_uiState::emit)
+            }
+        }.onEach(_uiState::emit)
             .launchIn(viewModelScope)
 
         events.onEach(::handleEvent)
             .launchIn(viewModelScope)
     }
 
-    private fun map(game: Game) = game.toUiModel(
+    private fun map(game: Game, keyboardLayout: KeyboardLayout) = game.toUiModel(
+        keyboardLayout = keyboardLayout,
         onRetry = { events.emitIn(viewModelScope, Event.Retry) },
         onTyping = { events.emitIn(viewModelScope, Event.Typing) },
         onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },

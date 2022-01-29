@@ -56,7 +56,7 @@ internal sealed interface Keycode {
 
 internal typealias Keys = List<Pair<Keycode, Float>>
 
-internal enum class KeyboardLayout(
+internal enum class KeyboardLayoutUiModel(
     private val firstRow: Keys,
     private val secondRow: Keys,
     private val thirdRow: Keys,
@@ -138,7 +138,7 @@ internal enum class KeyboardLayout(
 @Composable
 internal fun Keyboard(
     modifier: Modifier = Modifier,
-    layout: KeyboardLayout = KeyboardLayout.Azerty,
+    layout: KeyboardLayoutUiModel = KeyboardLayoutUiModel.Azerty,
     keyStates: Map<String, TileUiState> = emptyMap(),
     onKeyPressed: (key: Keycode) -> Unit
 ) {

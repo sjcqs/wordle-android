@@ -1,6 +1,7 @@
 package fr.sjcqs.wordle.feature.game.model
 
 import androidx.compose.runtime.Immutable
+import fr.sjcqs.wordle.feature.game.component.KeyboardLayoutUiModel
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
 import java.time.LocalDateTime
@@ -13,6 +14,7 @@ internal sealed interface GameUiState {
     data class Guessing(
         val guesses: List<GuessUiModel>,
         val word: String,
+        val keyboardLayout: KeyboardLayoutUiModel = KeyboardLayoutUiModel.Azerty,
         val keyStates: Map<String, TileUiState>,
         val isFinished: Boolean = false,
         val isWon: Boolean = false,

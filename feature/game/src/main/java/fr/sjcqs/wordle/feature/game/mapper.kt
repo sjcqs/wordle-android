@@ -3,6 +3,8 @@ package fr.sjcqs.wordle.feature.game
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.data.game.entity.TileState
+import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
+import fr.sjcqs.wordle.feature.game.component.KeyboardLayoutUiModel
 import fr.sjcqs.wordle.feature.game.model.GameUiState
 import fr.sjcqs.wordle.feature.game.model.GuessUiModel
 import fr.sjcqs.wordle.ui.components.TileUiState
@@ -16,7 +18,13 @@ internal fun TileState.toUiModel(): TileUiState = when (this) {
     TileState.Present -> TileUiState.Present
 }
 
+private fun KeyboardLayout.toUiModel() = when (this) {
+    KeyboardLayout.Qwerty -> KeyboardLayoutUiModel.Qwerty
+    KeyboardLayout.Azerty -> KeyboardLayoutUiModel.Azerty
+}
+
 internal fun Game.toUiModel(
+    keyboardLayout: KeyboardLayout,
     onRetry: () -> Unit,
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
@@ -39,6 +47,7 @@ internal fun Game.toUiModel(
 
     return GameUiState.Guessing(
         guesses = guessUiModels,
+        keyboardLayout = keyboardLayout.toUiModel(),
         keyStates = keyStates,
         onTyping = onTyping,
         onSubmit = onSubmit,
