@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -108,7 +110,9 @@ private fun Settings(
     ) {
         Column {
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { heading() },
                 text = stringResource(id = R.string.settings_preferences_header),
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -139,6 +143,9 @@ private fun Settings(
             Spacer(modifier = Modifier.height(16.dp))
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { heading() },
                     text = stringResource(id = R.string.settings_keyboard_layout_header),
                     style = MaterialTheme.typography.bodyLarge,
                 )

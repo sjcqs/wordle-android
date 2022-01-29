@@ -47,6 +47,22 @@ internal fun Guessing(
 ) {
     var currentValue by remember(value) { mutableStateOf(value) }
 
+    val onBackspace = fun() {
+        currentValue = currentValue.dropLast(1)
+        onValueChanged(currentValue)
+    }
+    val onEnter = fun() {
+        if (currentValue.length == uiState.word.length) {
+            uiState.onSubmit(currentValue)
+        }
+    }
+    val onCharacter = fun(character: String) {
+        if (currentValue.length < uiState.word.length) {
+            currentValue += character
+            onValueChanged(currentValue)
+        }
+
+    }
     Column(modifier = modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
         Spacer(modifier = Modifier.height(24.dp))
         Guessing(
@@ -72,21 +88,9 @@ internal fun Guessing(
                 keyStates = uiState.keyStates,
                 onKeyPressed = { keycode ->
                     when (keycode) {
-                        Keycode.Backspace -> {
-                            currentValue = currentValue.dropLast(1)
-                            onValueChanged(currentValue)
-                        }
-                        is Keycode.Character -> {
-                            if (currentValue.length < uiState.word.length) {
-                                currentValue += keycode.char
-                                onValueChanged(currentValue)
-                            }
-                        }
-                        Keycode.Enter -> {
-                            if (currentValue.length == uiState.word.length) {
-                                uiState.onSubmit(currentValue)
-                            }
-                        }
+                        is Keycode.Backspace -> onBackspace()
+                        is Keycode.Character -> onCharacter(keycode.char)
+                        is Keycode.Enter -> onEnter()
                     }
                 })
         } else {

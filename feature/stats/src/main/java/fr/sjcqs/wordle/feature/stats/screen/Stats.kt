@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
@@ -121,6 +122,7 @@ private fun StatsPerformances(
                 .align(Alignment.CenterHorizontally)
         ) {
             Text(
+                modifier = Modifier.semantics { heading() },
                 text = stringResource(R.string.stats_performances_header),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -140,11 +142,9 @@ private fun StatsPerformances(
             }
             Row(modifier = Modifier
                 .padding(vertical = 4.dp)
-                .semantics {
-                    this.stateDescription = stateDescription
-                }) {
+                .clearAndSetSemantics { this.stateDescription = stateDescription }
+            ) {
                 Text(
-                    modifier = Modifier.clearAndSetSemantics { },
                     text = "$guessCount",
                     style = MaterialTheme.typography.titleLarge
                 )
@@ -162,8 +162,7 @@ private fun StatsPerformances(
                     Text(
                         color = MaterialTheme.colorScheme.onAbsent,
                         modifier = Modifier
-                            .align(if (count > 0) Alignment.CenterEnd else Alignment.Center)
-                            .clearAndSetSemantics { },
+                            .align(if (count > 0) Alignment.CenterEnd else Alignment.Center),
                         text = "$count",
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -177,18 +176,16 @@ private fun StatsPerformances(
 private fun Stat(@StringRes labelId: Int, value: String) {
     val label = stringResource(labelId)
     Column(
-        modifier = Modifier.semantics(mergeDescendants = true) {
+        modifier = Modifier.clearAndSetSemantics {
             stateDescription = "$label: $value"
         },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            modifier = Modifier.clearAndSetSemantics { },
             text = value,
             style = MaterialTheme.typography.headlineSmall
         )
         Text(
-            modifier = Modifier.clearAndSetSemantics { },
             textAlign = TextAlign.Center,
             text = label,
             style = MaterialTheme.typography.labelLarge

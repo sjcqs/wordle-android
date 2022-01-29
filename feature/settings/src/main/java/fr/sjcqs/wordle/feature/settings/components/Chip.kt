@@ -26,6 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import fr.sjcqs.wordle.ui.icons.Icons
 
@@ -35,6 +40,7 @@ internal val ChipShape = RoundedCornerShape(50)
 internal fun Chip(
     text: String,
     isSelected: Boolean,
+    onClickLabel: String? = null,
     onClick: () -> Unit
 ) {
     val selectedColor by animateColorAsState(
@@ -52,11 +58,15 @@ internal fun Chip(
     Box(
         modifier = chipModifier
             .clip(ChipShape)
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick, onClickLabel = onClickLabel)
+            .clearAndSetSemantics {
+                role = Role.Checkbox
+                toggleableState = ToggleableState(isSelected)
+            }
             .padding(vertical = 8.dp, horizontal = 12.dp)
-            .animateContentSize()
+            .animateContentSize(),
 
-    ) {
+        ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             var height by remember { mutableStateOf(0.dp) }
             val density = LocalDensity.current
@@ -66,7 +76,10 @@ internal fun Chip(
                 MaterialTheme.colorScheme.onBackground
             }
             AnimatedVisibility(visible = isSelected) {
-                Icons.Check(modifier = Modifier.height(height), tint = contentColor)
+                Icons.Check(
+                    modifier = Modifier.height(height),
+                    tint = contentColor
+                )
             }
             if (isSelected) {
                 Spacer(modifier = Modifier.width(2.dp))
