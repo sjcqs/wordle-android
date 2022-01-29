@@ -101,10 +101,10 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
                     IconButton(onClick = showStats, onClickLabel = statsClickLabel) {
                         Icons.Stats()
                     }
-                    /*val settingsClickLabel = stringResource(id = R.string.game_open_settings_label)
+                    val settingsClickLabel = stringResource(id = R.string.game_open_settings_label)
                     IconButton(onClick = showSettings, onClickLabel = settingsClickLabel) {
                         Icons.Settings()
-                    }*/
+                    }
                 }
             )
         },

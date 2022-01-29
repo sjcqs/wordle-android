@@ -2,6 +2,7 @@
 <resources>
     <string name="content_description_stats">Stats</string>
     <string name="content_description_close">Fermer</string>
+    <string name="content_description_check">Check</string>
     <string name="content_description_share">Partager</string>
     <string name="content_description_present">Essai numéro %1$d, lettre %2$d, cette lettre est présente</string>
     <string name="content_description_correct">Essai numéro %1$d, lettre %2$d, cette lettre est correctement placée</string>

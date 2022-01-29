@@ -47,7 +47,6 @@ fun WordleTheme(
     LocalTileColors.provides(tileColorScheme)
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
         content = content
     )
 }

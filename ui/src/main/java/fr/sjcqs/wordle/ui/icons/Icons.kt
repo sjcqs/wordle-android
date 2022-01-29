@@ -37,6 +37,19 @@ object Icons {
     }
 
     @Composable
+    fun Check(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_check),
+            contentDescription = stringResource(id = R.string.content_description_check),
+            tint = tint,
+        )
+    }
+
+    @Composable
     fun Enter(
         modifier: Modifier = Modifier,
         tint: Color = LocalContentColor.current

@@ -24,23 +24,30 @@ internal object Colors {
     val Cuttyshark = Color(0xFF546E7A)
     val Montecarlo = Color(0xFF80CBC4)
     val Offwhite = Color(0xFFFBFCFA)
-    val Oslogray = Color(0xFF808E95)
+    val Oslogray = Color(0xFF878A8C)
     val Persiangray = Color(0xFF007167)
     val Red200 = Color(0xFFCF6679)
     val Red600 = Color(0xFFB00020)
     val Sherpablue = Color(0xFF00534C)
     val White = Color(0xFFFFFFFF)
+    val Tussock = Color(0xFFB59F3B)
+    val HippieGreen = Color(0xFF538D4E)
+    val PixieGreen = Color(0xFFB8D8B6)
+    val Tuna = Color(0xFF3A3A3C)
+    val Sundance = Color(0xFFC9B458)
+    val AquaForest = Color(0xFF6AAA64)
+    val RollingStone = Color(0xFF84888A)
 }
 
 internal val LocalTileColors = staticCompositionLocalOf { TileColorScheme() }
 
 @Stable
 internal class TileColorScheme(
-    present: Color = Color(201, 180, 88),
+    present: Color = Colors.Sundance,
     onPresent: Color = Color.White,
-    correct: Color = Color(106, 170, 100),
+    correct: Color = Colors.AquaForest,
     onCorrect: Color = Color.White,
-    absent: Color = Color(120, 124, 126),
+    absent: Color = Colors.RollingStone,
     onAbsent: Color = Color.White,
 ) {
     var present by mutableStateOf(present, structuralEqualityPolicy())
@@ -74,9 +81,9 @@ fun ColorScheme.contentColorFor(backgroundColor: Color) = when (backgroundColor)
 }
 
 internal val DarkTileColorScheme = TileColorScheme(
-    present = Color(181, 159, 59),
-    correct = Color(83, 141, 78),
-    absent = Color(58, 58, 60),
+    present = Colors.Tussock,
+    correct = Colors.HippieGreen,
+    absent = Colors.Tuna,
 )
 
 internal val DarkColorScheme = darkColorScheme(
@@ -84,18 +91,27 @@ internal val DarkColorScheme = darkColorScheme(
     error = Colors.Red200,
     onBackground = Colors.White,
     onError = Colors.Black,
-    onPrimary = Colors.Black,
-    onSecondary = Color.Black,
+    onPrimary = Colors.White,
+    onSecondary = Color.White,
     onSurface = Colors.White,
-    primary = Colors.Persiangray,
-    primaryContainer = Colors.Breakerbay,
-    secondary = Colors.Oslogray,
+    primary = Colors.HippieGreen,
+    primaryContainer = Colors.PixieGreen,
+    secondary = Colors.Tussock,
     secondaryContainer = Colors.Cuttyshark,
     surface = Colors.Black800,
-    outline = Color(135, 138, 140)
+    outline = Colors.Oslogray,
+    tertiary = Colors.RollingStone,
+    onTertiary = Colors.White,
 )
 
-internal val LightTileColorScheme = TileColorScheme()
+internal val LightTileColorScheme = TileColorScheme(
+    present = Colors.Sundance,
+    onPresent = Color.White,
+    correct = Colors.AquaForest,
+    onCorrect = Color.White,
+    absent = Colors.RollingStone,
+    onAbsent = Color.White,
+)
 
 internal val LightColorScheme = lightColorScheme(
     background = Colors.Offwhite,
@@ -105,10 +121,12 @@ internal val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onSurface = Color.Black,
-    primary = Colors.Montecarlo,
-    primaryContainer = Colors.Sherpablue,
+    primary = Colors.AquaForest,
+    primaryContainer = Colors.Offwhite,
     secondary = Colors.Oslogray,
     secondaryContainer = Colors.Cuttyshark,
     surface = Colors.White,
-    outline = Color(58, 58, 60)
+    outline = Colors.Tuna,
+    tertiary = Colors.RollingStone,
+    onTertiary = Colors.White,
 )
