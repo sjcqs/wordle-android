@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,6 +34,7 @@ import fr.sjcqs.wordle.feature.settings.model.SettingsUiModel
 import fr.sjcqs.wordle.feature.settings.model.SettingsUiModelParameterProvider
 import fr.sjcqs.wordle.feature.settings.model.ThemeUiModel
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
+import fr.sjcqs.wordle.ui.components.Divider
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.WordleTheme
@@ -161,9 +161,9 @@ private fun Settings(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Divider(modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+        Divider()
+        Spacer(modifier = Modifier.height(24.dp))
         Column(modifier = Modifier.alpha(0f)) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
