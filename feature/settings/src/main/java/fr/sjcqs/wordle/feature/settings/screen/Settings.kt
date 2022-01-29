@@ -1,6 +1,5 @@
 package fr.sjcqs.wordle.feature.settings.screen
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -101,67 +102,76 @@ private fun Settings(
     setLayout: (KeyboardLayoutUiModel) -> Unit,
 ) {
     Column(
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.Top
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 24.dp),
     ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(id = R.string.settings_preferences_header),
-            style = MaterialTheme.typography.titleLarge,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column {
             Text(
-                text = stringResource(id = R.string.settings_theme_header),
-                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.settings_preferences_header),
+                style = MaterialTheme.typography.titleLarge,
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                val themes = ThemeUiModel.values()
-                themes.forEachIndexed { index, theme ->
-                    Chip(
-                        text = stringResource(id = theme.labelRes),
-                        isSelected = theme == currentTheme,
-                        onClick = { setTheme(theme) }
-                    )
-                    if (index + 1 < themes.size) {
-                        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.settings_theme_header),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val themes = ThemeUiModel.values()
+                    themes.forEachIndexed { index, theme ->
+                        Chip(
+                            text = stringResource(id = theme.labelRes),
+                            isSelected = theme == currentTheme,
+                            onClick = { setTheme(theme) }
+                        )
+                        if (index + 1 < themes.size) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.settings_keyboard_layout_header),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val layouts = KeyboardLayoutUiModel.values()
+                    layouts.forEachIndexed { index, layout ->
+                        Chip(
+                            text = stringResource(id = layout.labelRes),
+                            isSelected = layout == currentLayout,
+                            onClick = { setLayout(layout) }
+                        )
+                        if (index + 1 < layouts.size) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
                     }
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Divider(modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.alpha(0f)) {
             Text(
-                text = stringResource(id = R.string.settings_keyboard_layout_header),
-                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.settings_credits_header),
+                style = MaterialTheme.typography.titleLarge,
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                val layouts = KeyboardLayoutUiModel.values()
-                layouts.forEachIndexed { index, layout ->
-                    Chip(
-                        text = stringResource(id = layout.labelRes),
-                        isSelected = layout == currentLayout,
-                        onClick = { setLayout(layout) }
-                    )
-                    if (index + 1 < layouts.size) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
-        /*Spacer(modifier = Modifier.weight(1f))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(id = R.string.settings_credits_header),
-            style = MaterialTheme.typography.titleLarge,
-        )*/
         Spacer(modifier = Modifier.navigationBarsHeight())
     }
 }
