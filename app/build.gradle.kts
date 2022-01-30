@@ -11,8 +11,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 11
-        versionName = "0.8b"
+        versionCode = 15
+        versionName = "0.8f"
     }
 
     signingConfigs {

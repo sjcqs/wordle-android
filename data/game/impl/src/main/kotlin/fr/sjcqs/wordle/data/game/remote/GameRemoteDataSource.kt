@@ -6,7 +6,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlinx.coroutines.channels.awaitClose
@@ -17,7 +16,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 
 class GameRemoteDataSource @Inject constructor(
     firebaseDatabase: FirebaseDatabase,
-){
+) {
     private val dailyWordRef = firebaseDatabase.getReference(REF_DAILY_WORD)
 
     init {
@@ -27,7 +26,8 @@ class GameRemoteDataSource @Inject constructor(
     suspend fun getDailyWord(): DailyWord = suspendCancellableCoroutine { continuation ->
         dailyWordRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.getValue<DailyWord>()?.let(continuation::resume)
+                snapshot.toDailyWordOrNull()
+                    ?.let(continuation::resume)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -41,7 +41,8 @@ class GameRemoteDataSource @Inject constructor(
         val dailyWordReference = dailyWordRef
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.getValue<DailyWord>()?.let { trySendBlocking(it) }
+                snapshot.toDailyWordOrNull()
+                    ?.let { trySendBlocking(it) }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -53,6 +54,16 @@ class GameRemoteDataSource @Inject constructor(
         trySendBlocking(getDailyWord())
         awaitClose {
             dailyWordReference.removeEventListener(listener)
+        }
+    }
+
+    private fun DataSnapshot.toDailyWordOrNull(): DailyWord? {
+        val expiredAt = child("expired_at").value as? String
+        val word = child("word").value as? String
+        return if (expiredAt != null && word != null) {
+            DailyWord(word, expiredAt)
+        } else {
+            null
         }
     }
 
