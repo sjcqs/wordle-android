@@ -31,6 +31,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -38,10 +40,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import com.google.accompanist.placeholder.PlaceholderHighlight
 import fr.sjcqs.wordle.haptics.LocalHapticController
 import fr.sjcqs.wordle.haptics.tick
 import fr.sjcqs.wordle.ui.components.TileUiState
 import fr.sjcqs.wordle.ui.icons.Icons
+import fr.sjcqs.wordle.ui.modifier.fade
+import fr.sjcqs.wordle.ui.modifier.placeholder
 import fr.sjcqs.wordle.ui.theme.WordleTheme
 import fr.sjcqs.wordle.ui.theme.absent
 import fr.sjcqs.wordle.ui.theme.contentColorFor
@@ -140,7 +145,8 @@ internal fun Keyboard(
     modifier: Modifier = Modifier,
     layout: KeyboardLayoutUiModel = KeyboardLayoutUiModel.Azerty,
     keyStates: Map<String, TileUiState> = emptyMap(),
-    onKeyPressed: (key: Keycode) -> Unit
+    onKeyPressed: (key: Keycode) -> Unit,
+    showPlaceholder: Boolean = false
 ) {
     val hapticsController = LocalHapticController.current
     Column(
@@ -167,6 +173,8 @@ internal fun Keyboard(
                             .weight(weight)
                             .width(IntrinsicSize.Min)
                             .height(IntrinsicSize.Min)
+                            .padding(horizontal = 2.dp, vertical = 4.dp)
+                            .placeholder(showPlaceholder, highlight = PlaceholderHighlight.fade())
                     )
                 }
             }
@@ -198,7 +206,6 @@ private fun Key(
             KeyTooltip(keycode)
         }
         Surface(
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp),
             onClick = onPressed,
             color = color,
             interactionSource = interactionSource,
@@ -276,9 +283,17 @@ private fun Content(
     }
 }
 
+private class BooleanPreviewParameterProvider : PreviewParameterProvider<Boolean> {
+    override val values: Sequence<Boolean>
+        get() = sequenceOf(true, false)
+
+}
+
 @Preview
 @Composable
-internal fun KeyboardPreview() {
+internal fun KeyboardPreview(
+    @PreviewParameter(BooleanPreviewParameterProvider::class) showPlaceholder: Boolean
+) {
     WordleTheme {
         Keyboard(
             modifier = Modifier.fillMaxWidth(),
@@ -290,13 +305,16 @@ internal fun KeyboardPreview() {
                 "J" to TileUiState.Absent,
             ),
             onKeyPressed = {},
+            showPlaceholder = showPlaceholder
         )
     }
 }
 
 @Preview
 @Composable
-internal fun KeyboardPreviewDark() {
+internal fun KeyboardPreviewDark(
+    @PreviewParameter(BooleanPreviewParameterProvider::class) showPlaceholder: Boolean
+) {
     WordleTheme(true) {
         Keyboard(
             modifier = Modifier.fillMaxWidth(),
@@ -307,7 +325,8 @@ internal fun KeyboardPreviewDark() {
                 "H" to TileUiState.Absent,
                 "J" to TileUiState.Absent,
             ),
-            onKeyPressed = {}
+            onKeyPressed = {},
+            showPlaceholder = showPlaceholder
         )
     }
 }

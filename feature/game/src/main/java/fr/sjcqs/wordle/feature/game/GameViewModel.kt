@@ -26,7 +26,7 @@ import kotlinx.coroutines.isActive
 @HiltViewModel
 internal class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val settingsRepository: SettingsRepository,
+    settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GameUiState>(

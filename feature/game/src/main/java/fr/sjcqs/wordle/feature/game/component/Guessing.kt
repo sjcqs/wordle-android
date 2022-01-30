@@ -44,6 +44,7 @@ internal fun Guessing(
     modifier: Modifier = Modifier,
     value: String,
     onValueChanged: (String) -> Unit,
+    isLoading: Boolean = false,
 ) {
     var currentValue by remember(value) { mutableStateOf(value) }
 
@@ -75,6 +76,7 @@ internal fun Guessing(
             value = currentValue,
             onRetry = uiState.onRetry,
             canRetry = uiState.canRetry,
+            isLoading = isLoading,
         )
         if (!uiState.isFinished) {
             SideEffect { uiState.onCountdownHidden() }
@@ -92,7 +94,9 @@ internal fun Guessing(
                         is Keycode.Character -> onCharacter(keycode.char)
                         is Keycode.Enter -> onEnter()
                     }
-                })
+                },
+                showPlaceholder = isLoading
+            )
         } else {
             Footer(
                 expiredIn = uiState.expiredIn,
@@ -154,6 +158,7 @@ private fun Guessing(
     isFinished: Boolean,
     canRetry: Boolean,
     onRetry: () -> Unit,
+    isLoading: Boolean,
 ) {
     Column(
         modifier = modifier,
@@ -166,8 +171,9 @@ private fun Guessing(
         guesses.forEachIndexed { index, guess ->
             Word(
                 word = if (guess.isEditable) value else guess.word,
+                number = index + 1,
                 tileStates = if (guess.isEditable) emptyMap() else guess.tileState,
-                number = index + 1
+                showPlaceholder = isLoading
             )
             if (index < guesses.lastIndex) {
                 Spacer(modifier = Modifier.height(SpaceBetweenGuesses))

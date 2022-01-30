@@ -23,8 +23,8 @@ dependencies {
 
     api(libs.accompanist.insets)
     api(libs.accompanist.insetsui)
+    api(libs.accompanist.placeholder)
     api(libs.accompanist.systemuicontroller)
-    api(libs.accompanist.pager)
 
     api(libs.compose.ui.preview)
     debugApi(libs.compose.ui.tooling)

@@ -30,7 +30,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.placeholder.PlaceholderHighlight
 import fr.sjcqs.wordle.ui.R
+import fr.sjcqs.wordle.ui.modifier.fade
+import fr.sjcqs.wordle.ui.modifier.placeholder
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 import fr.sjcqs.wordle.ui.theme.absent
 import fr.sjcqs.wordle.ui.theme.contentColorFor
@@ -52,6 +55,7 @@ fun Word(
     number: Int,
     tileStates: Map<Int, TileUiState> = emptyMap(),
     length: Int = 5,
+    showPlaceholder: Boolean = false,
 ) {
     require(word.length <= length) {
         "$word is too long (max $length, current: ${word.length})"
@@ -112,7 +116,10 @@ fun Word(
                         value = letter,
                         backgroundColor = MaterialTheme.colorScheme.absent,
                     )
-                    null -> OutlinedTile(value = letter)
+                    null -> OutlinedTile(
+                        modifier = Modifier.placeholder(showPlaceholder, highlight = PlaceholderHighlight.fade()),
+                        value = letter
+                    )
                 }
             }
             if (index + 1 < length) {
@@ -165,10 +172,11 @@ private fun BackgroundedTile(
 @Composable
 private fun Tile(
     value: String,
+    modifier: Modifier = Modifier,
     contentColor: Color = LocalContentColor.current,
 ) {
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         AutoSizeText(
             modifier = Modifier
                 .align(Alignment.Center)

@@ -11,8 +11,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 15
-        versionName = "0.8f"
+        versionCode = 16
+        versionName = "0.9"
     }
 
     signingConfigs {
@@ -44,7 +44,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.splashscreen)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics.ktx)
     implementation(libs.firebase.appcheck)

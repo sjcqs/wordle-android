@@ -12,7 +12,6 @@ import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.data.game.remote.DailyWord
 import fr.sjcqs.wordle.data.game.remote.GameRemoteDataSource
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -149,9 +148,6 @@ class GameRepositoryImpl @Inject constructor(
 
     private val Game.isExpired: Boolean
         get() = expiredAt < LocalDateTime.now()
-
-    private val DailyWord.expiredAt: LocalDateTime
-        get() = LocalDateTime.parse(expired_at, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
     private fun DailyWord.toGame(): Game {
         return Game(

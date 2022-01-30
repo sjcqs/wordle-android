@@ -30,6 +30,7 @@ import fr.sjcqs.wordle.feature.game.R
 import fr.sjcqs.wordle.feature.game.component.Guessing
 import fr.sjcqs.wordle.feature.game.model.GameUiEvent
 import fr.sjcqs.wordle.feature.game.model.GameUiState
+import fr.sjcqs.wordle.feature.game.model.GuessUiModel
 import fr.sjcqs.wordle.haptics.LocalHapticController
 import fr.sjcqs.wordle.haptics.doubleClick
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
@@ -135,11 +136,20 @@ private fun Game(
 ) {
     when (state) {
         is GameUiState.Guessing -> Guessing(
-            modifier = modifier,
             uiState = state,
+            modifier = modifier,
             value = typingWord,
             onValueChanged = onValueChanged,
         )
-        is GameUiState.Loading -> Unit
+        is GameUiState.Loading -> Guessing(
+            modifier = modifier,
+            uiState = GameUiState.Guessing(
+                buildList { repeat(state.maxGuesses) { add(GuessUiModel("TESTE")) } },
+                "TESTE"
+            ),
+            value = typingWord,
+            onValueChanged = onValueChanged,
+            isLoading = true
+        )
     }
 }

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="Theme.Wordle.Starting" parent="Theme.SplashScreen">
-        <item name="postSplashScreenTheme">@style/Theme.Wordle</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        <item name="windowSplashScreenBackground">@color/offwhite</item>
-    </style>
-</resources>

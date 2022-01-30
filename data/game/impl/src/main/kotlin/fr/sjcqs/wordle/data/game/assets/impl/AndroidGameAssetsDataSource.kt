@@ -9,7 +9,7 @@ class AndroidGameAssetsDataSource @Inject constructor(
     @ApplicationContext
     private val context: Context,
 ) : GameAssetsDataSource {
-    override val words: HashSet<String>
+    private val words: HashSet<String>
         get() {
             return context.assets.open("words.txt")
                 .bufferedReader()

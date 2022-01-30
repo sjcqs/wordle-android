@@ -4,10 +4,11 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.data.game.public)
-    implementation(libs.sqldelight.driver)
-    implementation(libs.sqldelight.coroutines)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.kotlin.coroutines.playServices)
     implementation(libs.firebase.database)
+    implementation(libs.kotlin.coroutines.playServices)
+
+    implementation(libs.sqldelight.coroutines)
+
+    implementation(projects.data.game.public)
 }
