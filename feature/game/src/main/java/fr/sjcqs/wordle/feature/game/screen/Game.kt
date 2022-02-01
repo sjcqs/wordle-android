@@ -1,6 +1,7 @@
 package fr.sjcqs.wordle.feature.game.screen
 
 import android.content.Intent
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.SnackbarHost
@@ -91,10 +92,9 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
             )
         },
         topBar = {
+            val insets = LocalWindowInsets.current.statusBars
             CenterAlignedTopAppBar(
-                contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.statusBars
-                ),
+                contentPadding = rememberInsetsPaddingValues(insets = insets),
                 shadowElevation = 4.dp,
                 title = { Text(text = stringResource(id = R.string.game_title)) },
                 actions = {
@@ -117,7 +117,9 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
                 color = MaterialTheme.colorScheme.background
             ) {
                 Game(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 24.dp),
                     state = uiState,
                     typingWord = typingWord,
                     onValueChanged = setTypingWord,
@@ -134,22 +136,24 @@ private fun Game(
     typingWord: String,
     onValueChanged: (String) -> Unit,
 ) {
-    when (state) {
-        is GameUiState.Guessing -> Guessing(
-            uiState = state,
-            modifier = modifier,
-            value = typingWord,
-            onValueChanged = onValueChanged,
-        )
-        is GameUiState.Loading -> Guessing(
-            modifier = modifier,
-            uiState = GameUiState.Guessing(
-                buildList { repeat(state.maxGuesses) { add(GuessUiModel("TESTE")) } },
-                "TESTE"
-            ),
-            value = typingWord,
-            onValueChanged = onValueChanged,
-            isLoading = true
-        )
+    Crossfade(targetState = state) { currentState ->
+        when (currentState) {
+            is GameUiState.Guessing -> Guessing(
+                uiState = currentState,
+                modifier = modifier,
+                value = typingWord,
+                onValueChanged = onValueChanged,
+            )
+            is GameUiState.Loading -> Guessing(
+                modifier = modifier,
+                uiState = GameUiState.Guessing(
+                    word = "",
+                    guesses = buildList { repeat(currentState.maxGuesses) { add(GuessUiModel()) } }
+                ),
+                value = typingWord,
+                onValueChanged = onValueChanged,
+                isLoading = true
+            )
+        }
     }
 }

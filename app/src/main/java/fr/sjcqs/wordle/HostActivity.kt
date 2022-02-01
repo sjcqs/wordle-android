@@ -41,6 +41,7 @@ internal class HostActivity : ComponentActivity() {
     lateinit var hapticsController: HapticsController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         AppCompatDelegate.setDefaultNightMode(
             when (settings.theme) {
                 Theme.Dark -> AppCompatDelegate.MODE_NIGHT_YES
@@ -49,7 +50,6 @@ internal class HostActivity : ComponentActivity() {
             }
         )
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             val settings by settingsFlow.collectAsState(settings)

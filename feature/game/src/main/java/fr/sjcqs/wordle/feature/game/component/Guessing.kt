@@ -65,7 +65,6 @@ internal fun Guessing(
 
     }
     Column(modifier = modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
-        Spacer(modifier = Modifier.height(24.dp))
         Guessing(
             modifier = Modifier
                 .align(CenterHorizontally)
