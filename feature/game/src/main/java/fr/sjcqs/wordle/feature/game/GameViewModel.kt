@@ -10,6 +10,8 @@ import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.feature.game.model.GameUiEvent
 import fr.sjcqs.wordle.feature.game.model.GameUiState
+import java.time.Duration
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -34,8 +36,6 @@ internal class GameViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    private val isCountdownVisibleFlow = MutableStateFlow(false)
-
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
@@ -46,14 +46,14 @@ internal class GameViewModel @Inject constructor(
     init {
         combineTransform(
             gameRepository.dailyGameFlow,
-            isCountdownVisibleFlow,
             keyboardLayoutFlow
-        ) { game, isCountdownVisible, keyboardLayout ->
-            val uiModel = map(game, keyboardLayout)
+        ) { game, keyboardLayout ->
+            val expiredInFlow = MutableStateFlow(game.expiredIn)
+            val uiModel = map(game, keyboardLayout, expiredInFlow)
             emit(uiModel)
-            if (isCountdownVisible) {
+            if (game.isFinished) {
                 while (currentCoroutineContext().isActive) {
-                    emit(uiModel.updateExpiredIn(game.expiredAt))
+                    expiredInFlow.emit(game.expiredIn)
                     delay(1000)
                 }
             }
@@ -64,13 +64,19 @@ internal class GameViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun map(game: Game, keyboardLayout: KeyboardLayout) = game.toUiModel(
+    private val Game.expiredIn: Duration
+        get() = Duration.between(LocalDateTime.now(), expiredAt)
+
+    private fun map(
+        game: Game,
+        keyboardLayout: KeyboardLayout,
+        expiredInFlow: MutableStateFlow<Duration>
+    ) = game.toUiModel(
         keyboardLayout = keyboardLayout,
+        expiredInFlow = expiredInFlow,
         onRetry = { events.emitIn(viewModelScope, Event.Retry) },
         onTyping = { events.emitIn(viewModelScope, Event.Typing) },
         onSubmit = { word -> events.emitIn(viewModelScope, Event.Submit(word)) },
-        onCountdownHidden = { events.emitIn(viewModelScope, Event.OnCountdownHidden) },
-        onCountdownVisible = { events.emitIn(viewModelScope, Event.OnCountdownVisible) },
         onShare = { events.emitIn(viewModelScope, Event.OnShare(it)) }
     )
 
@@ -79,8 +85,6 @@ internal class GameViewModel @Inject constructor(
             is Event.Retry -> retry()
             is Event.Submit -> submit(event.word)
             is Event.Typing -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Dismiss)
-            Event.OnCountdownHidden -> isCountdownVisibleFlow.emit(false)
-            Event.OnCountdownVisible -> isCountdownVisibleFlow.emit(true)
             is Event.OnShare -> _uiEvent.emitIn(viewModelScope, GameUiEvent.Share(event.text))
         }
     }
@@ -103,8 +107,6 @@ internal class GameViewModel @Inject constructor(
         data class OnShare(val text: String) : Event
         object Retry : Event
         object Typing : Event
-        object OnCountdownVisible : Event
-        object OnCountdownHidden : Event
     }
 }
 

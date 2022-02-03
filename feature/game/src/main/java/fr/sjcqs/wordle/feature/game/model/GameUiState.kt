@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import fr.sjcqs.wordle.feature.game.component.KeyboardLayoutUiModel
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
-import java.time.LocalDateTime
+import kotlinx.coroutines.flow.StateFlow
 
 internal sealed interface GameUiState {
     @Immutable
@@ -20,18 +20,10 @@ internal sealed interface GameUiState {
         val isWon: Boolean = false,
         val canRetry: Boolean = true,
         val sharedText: String = "",
-        val expiredIn: Duration = Duration.ZERO,
+        val expiredInFlow: StateFlow<Duration>? = null,
         val onTyping: () -> Unit = {},
         val onSubmit: (word: String) -> Unit = {},
         val onRetry: () -> Unit = {},
-        val onCountdownVisible: () -> Unit = {},
-        val onCountdownHidden: () -> Unit = {},
         val share: (text: String) -> Unit = {}
-    ) : GameUiState {
-        fun updateExpiredIn(expiredAt: LocalDateTime) = copy(
-            expiredIn = expiredAt.let {
-                Duration.between(LocalDateTime.now(), expiredAt)
-            }
-        )
-    }
+    ) : GameUiState
 }

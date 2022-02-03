@@ -17,12 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
@@ -37,6 +37,7 @@ import fr.sjcqs.wordle.haptics.doubleClick
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
+import fr.sjcqs.wordle.ui.insets.statusBarAndDisplayCutoutInsets
 import kotlinx.coroutines.launch
 
 
@@ -60,11 +61,11 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
 
     val context = LocalContext.current
     val hapticsController = LocalHapticController.current
-    val (typingWord, setTypingWord) = remember(viewModel) { mutableStateOf("") }
+    var typingWord by remember(viewModel) { mutableStateOf("") }
     LaunchedEffect(key1 = viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                GameUiEvent.ClearInput -> setTypingWord("")
+                GameUiEvent.ClearInput -> typingWord = ""
                 GameUiEvent.InvalidWord -> {
                     hapticsController.doubleClick()
                     snackbar(invalidWord)
@@ -92,7 +93,7 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
             )
         },
         topBar = {
-            val insets = LocalWindowInsets.current.statusBars
+            val insets = statusBarAndDisplayCutoutInsets()
             CenterAlignedTopAppBar(
                 contentPadding = rememberInsetsPaddingValues(insets = insets),
                 shadowElevation = 4.dp,
@@ -122,7 +123,6 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
                         .padding(top = 24.dp),
                     state = uiState,
                     typingWord = typingWord,
-                    onValueChanged = setTypingWord,
                 )
             }
         }
@@ -134,7 +134,6 @@ private fun Game(
     state: GameUiState,
     modifier: Modifier = Modifier,
     typingWord: String,
-    onValueChanged: (String) -> Unit,
 ) {
     Crossfade(targetState = state) { currentState ->
         when (currentState) {
@@ -142,16 +141,15 @@ private fun Game(
                 uiState = currentState,
                 modifier = modifier,
                 value = typingWord,
-                onValueChanged = onValueChanged,
             )
             is GameUiState.Loading -> Guessing(
                 modifier = modifier,
                 uiState = GameUiState.Guessing(
                     word = "",
-                    guesses = buildList { repeat(currentState.maxGuesses) { add(GuessUiModel()) } }
+                    guesses = buildList { repeat(currentState.maxGuesses) { add(GuessUiModel()) } },
+
                 ),
                 value = typingWord,
-                onValueChanged = onValueChanged,
                 isLoading = true
             )
         }

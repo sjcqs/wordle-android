@@ -14,7 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,15 +43,11 @@ internal fun Guessing(
     uiState: GameUiState.Guessing,
     modifier: Modifier = Modifier,
     value: String,
-    onValueChanged: (String) -> Unit,
     isLoading: Boolean = false,
 ) {
     var currentValue by remember(value) { mutableStateOf(value) }
 
-    val onBackspace = fun() {
-        currentValue = currentValue.dropLast(1)
-        onValueChanged(currentValue)
-    }
+    val onBackspace = fun() { currentValue = currentValue.dropLast(1) }
     val onEnter = fun() {
         if (currentValue.length == uiState.word.length) {
             uiState.onSubmit(currentValue)
@@ -60,7 +56,6 @@ internal fun Guessing(
     val onCharacter = fun(character: String) {
         if (currentValue.length < uiState.word.length) {
             currentValue += character
-            onValueChanged(currentValue)
         }
 
     }
@@ -77,8 +72,17 @@ internal fun Guessing(
             canRetry = uiState.canRetry,
             isLoading = isLoading,
         )
-        if (!uiState.isFinished) {
-            SideEffect { uiState.onCountdownHidden() }
+        if (uiState.isFinished) {
+            if (uiState.expiredInFlow != null) {
+                val expiredIn by uiState.expiredInFlow.collectAsState()
+                Footer(
+                    expiredIn = expiredIn,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp),
+                    onShare = { uiState.share(uiState.sharedText) }
+                )
+            }
+        } else {
             Spacer(modifier = Modifier.height(16.dp))
             Keyboard(
                 modifier = Modifier
@@ -96,14 +100,6 @@ internal fun Guessing(
                 },
                 showPlaceholder = isLoading
             )
-        } else {
-            Footer(
-                expiredIn = uiState.expiredIn,
-                modifier = Modifier
-                    .padding(horizontal = 12.dp),
-                onExpiredInVisible = { uiState.onCountdownVisible() },
-                onShare = { uiState.share(uiState.sharedText) }
-            )
         }
         Spacer(modifier = Modifier.navigationBarsHeight())
     }
@@ -113,10 +109,8 @@ internal fun Guessing(
 private fun Footer(
     expiredIn: Duration,
     modifier: Modifier,
-    onExpiredInVisible: () -> Unit,
     onShare: () -> Unit
 ) {
-    SideEffect(onExpiredInVisible)
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,

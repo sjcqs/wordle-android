@@ -17,6 +17,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -41,7 +42,6 @@ internal class HostActivity : ComponentActivity() {
     lateinit var hapticsController: HapticsController
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         AppCompatDelegate.setDefaultNightMode(
             when (settings.theme) {
                 Theme.Dark -> AppCompatDelegate.MODE_NIGHT_YES
@@ -49,6 +49,8 @@ internal class HostActivity : ComponentActivity() {
                 Theme.System -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
         )
+        installSplashScreen()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
         setContent {

@@ -9,8 +9,8 @@ import fr.sjcqs.wordle.feature.game.model.GameUiState
 import fr.sjcqs.wordle.feature.game.model.GuessUiModel
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.flow.MutableStateFlow
 
 internal fun TileState.toUiModel(): TileUiState = when (this) {
     TileState.Correct -> TileUiState.Correct
@@ -28,9 +28,8 @@ internal fun Game.toUiModel(
     onRetry: () -> Unit,
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
-    onCountdownVisible: () -> Unit,
-    onCountdownHidden: () -> Unit,
-    onShare: (text: String) -> Unit
+    onShare: (text: String) -> Unit,
+    expiredInFlow: MutableStateFlow<Duration>
 ): GameUiState.Guessing {
     val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
@@ -56,11 +55,9 @@ internal fun Game.toUiModel(
         isWon = isWon,
         onRetry = onRetry,
         canRetry = true,
-        expiredIn = Duration.between(LocalDateTime.now(), expiredAt),
+        expiredInFlow = expiredInFlow,
         share = onShare,
         sharedText = sharedText,
-        onCountdownVisible = onCountdownVisible,
-        onCountdownHidden = onCountdownHidden
     )
 }
 
