@@ -11,6 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.navigationBarsPadding
@@ -51,6 +53,9 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
     val coroutineScope = rememberCoroutineScope()
+    val keyboardHeight = remember {
+        mutableStateOf(0.dp)
+    }
 
     fun snackbar(message: String) {
         coroutineScope.launch {
@@ -89,7 +94,9 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
         snackbarHost = {
             SnackbarHost(
                 hostState = it,
-                modifier = Modifier.navigationBarsPadding()
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = keyboardHeight.value)
             )
         },
         topBar = {
@@ -123,6 +130,7 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
                         .padding(top = 24.dp),
                     state = uiState,
                     typingWord = typingWord,
+                    keyboardHeight = keyboardHeight
                 )
             }
         }
@@ -134,6 +142,7 @@ private fun Game(
     state: GameUiState,
     modifier: Modifier = Modifier,
     typingWord: String,
+    keyboardHeight: MutableState<Dp>,
 ) {
     Crossfade(targetState = state) { currentState ->
         when (currentState) {
@@ -141,6 +150,7 @@ private fun Game(
                 uiState = currentState,
                 modifier = modifier,
                 value = typingWord,
+                keyboardHeight = keyboardHeight
             )
             is GameUiState.Loading -> Guessing(
                 modifier = modifier,
@@ -148,7 +158,7 @@ private fun Game(
                     word = "",
                     guesses = buildList { repeat(currentState.maxGuesses) { add(GuessUiModel()) } },
 
-                ),
+                    ),
                 value = typingWord,
                 isLoading = true
             )

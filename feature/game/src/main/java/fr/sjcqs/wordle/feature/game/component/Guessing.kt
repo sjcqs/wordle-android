@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import fr.sjcqs.wordle.feature.game.R
@@ -43,6 +48,7 @@ internal fun Guessing(
     uiState: GameUiState.Guessing,
     modifier: Modifier = Modifier,
     value: String,
+    keyboardHeight: MutableState<Dp> = mutableStateOf(0.dp),
     isLoading: Boolean = false,
 ) {
     var currentValue by remember(value) { mutableStateOf(value) }
@@ -91,23 +97,30 @@ internal fun Guessing(
                 )
             }
         } else {
-            Spacer(modifier = Modifier.height(16.dp))
-            Keyboard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(horizontal = 12.dp),
-                layout = uiState.keyboardLayout,
-                keyStates = uiState.keyStates,
-                onKeyPressed = { keycode ->
-                    when (keycode) {
-                        is Keycode.Backspace -> onBackspace()
-                        is Keycode.Character -> onCharacter(keycode.char)
-                        is Keycode.Enter -> onEnter()
+            val density = LocalDensity.current
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .onGloballyPositioned {
+                    keyboardHeight.value = with(density) {
+                        it.boundsInRoot().height.toDp() + 16.dp
                     }
-                },
-                showPlaceholder = isLoading
-            )
+                }) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Keyboard(
+                    modifier = Modifier.fillMaxWidth(),
+                    layout = uiState.keyboardLayout,
+                    keyStates = uiState.keyStates,
+                    onKeyPressed = { keycode ->
+                        when (keycode) {
+                            is Keycode.Backspace -> onBackspace()
+                            is Keycode.Character -> onCharacter(keycode.char)
+                            is Keycode.Enter -> onEnter()
+                        }
+                    },
+                    showPlaceholder = isLoading
+                )
+            }
         }
         Spacer(modifier = Modifier.navigationBarsHeight())
     }
