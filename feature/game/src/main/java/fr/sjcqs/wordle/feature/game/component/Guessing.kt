@@ -59,7 +59,15 @@ internal fun Guessing(
         }
 
     }
-    Column(modifier = modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
+    val verticalArrangement = if (uiState.isFinished) {
+        Arrangement.SpaceEvenly
+    } else {
+        Arrangement.SpaceBetween
+    }
+    Column(
+        modifier = modifier.fillMaxHeight(),
+        verticalArrangement = verticalArrangement
+    ) {
         Guessing(
             modifier = Modifier
                 .align(CenterHorizontally)

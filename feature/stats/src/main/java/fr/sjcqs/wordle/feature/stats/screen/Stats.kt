@@ -88,7 +88,7 @@ private fun Stats(stats: StatsUiModel, modifier: Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
