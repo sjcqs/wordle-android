@@ -76,7 +76,7 @@ val Game.sharedText: String
                 .format(DateTimeFormatter.ofPattern("DD MMM"))
             val guesses = guesses
             val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
-            appendLine("Le Mot (Wordle FR)")
+            appendLine("Wordle 🇫🇷")
             appendLine("le $date - $performance")
             appendLine()
             guesses.forEach { guess ->
