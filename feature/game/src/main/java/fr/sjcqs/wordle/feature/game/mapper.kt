@@ -73,7 +73,8 @@ val Game.sharedText: String
     get() {
         return buildString {
             val date = expiredAt.minusDays(1)
-                .format(DateTimeFormatter.ofPattern("DD MMM"))
+                .format(DateTimeFormatter.ofPattern("dd MMM"))
+            println("${expiredAt.minusDays(1)}")
             val guesses = guesses
             val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
             appendLine("Wordle 🇫🇷")
