@@ -77,7 +77,7 @@ val Game.sharedText: String
             println("${expiredAt.minusDays(1)}")
             val guesses = guesses
             val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
-            appendLine("Wordle 🇫🇷")
+            appendLine("Quel Mot ? ")
             appendLine("le $date - $performance")
             appendLine()
             guesses.forEach { guess ->
