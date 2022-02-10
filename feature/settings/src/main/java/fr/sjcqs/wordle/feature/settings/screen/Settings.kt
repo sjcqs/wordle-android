@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -142,6 +143,12 @@ private fun Settings(
             onValueSelected = setMode,
             values = GameModeUiModel.values().toList(),
             getLabel = { mode -> stringResource(id = mode.labelRes) }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            modifier = Modifier.align(CenterHorizontally),
+            text = stringResource(id = currentMode.descriptionRes),
+            style = MaterialTheme.typography.labelMedium
         )
         Spacer(modifier = Modifier.height(24.dp))
         Divider()

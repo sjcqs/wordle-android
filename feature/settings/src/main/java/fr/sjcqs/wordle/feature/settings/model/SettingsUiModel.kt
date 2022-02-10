@@ -26,9 +26,12 @@ internal enum class ThemeUiModel(@StringRes val labelRes: Int) {
     }
 }
 
-internal enum class GameModeUiModel(@StringRes val labelRes: Int) {
-    Daily(R.string.settings_mode_daily),
-    Infinite(R.string.settings_mode_infinite);
+internal enum class GameModeUiModel(
+    @StringRes val labelRes: Int,
+    @StringRes val descriptionRes: Int
+) {
+    Daily(R.string.settings_mode_daily, R.string.settings_mode_daily_description),
+    Infinite(R.string.settings_mode_infinite, R.string.settings_mode_infinite_description);
 
     companion object {
         val Default
