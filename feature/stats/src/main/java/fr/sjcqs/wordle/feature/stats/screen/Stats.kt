@@ -38,6 +38,7 @@ import fr.sjcqs.wordle.feature.stats.R
 import fr.sjcqs.wordle.feature.stats.StatsViewModel
 import fr.sjcqs.wordle.feature.stats.model.StatsUiModel
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
+import fr.sjcqs.wordle.ui.components.Divider
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.absent
@@ -88,7 +89,7 @@ private fun Stats(stats: StatsUiModel, modifier: Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.Center
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -99,6 +100,8 @@ private fun Stats(stats: StatsUiModel, modifier: Modifier) {
             Stat(labelId = R.string.stats_current_streak, value = stats.currentStreak)
             Stat(labelId = R.string.stats_max_streak, value = stats.maxStreak)
         }
+        Spacer(modifier = Modifier.height(24.dp))
+        Divider()
         Spacer(modifier = Modifier.height(24.dp))
         StatsPerformances(
             modifier = Modifier,
