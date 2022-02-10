@@ -87,15 +87,16 @@ internal fun Guessing(
             isLoading = isLoading,
         )
         if (uiState.isFinished) {
-            if (uiState.expiredInFlow != null) {
-                val expiredIn by uiState.expiredInFlow.collectAsState()
-                Footer(
-                    expiredIn = expiredIn,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp),
-                    onShare = { uiState.share(uiState.sharedText) }
-                )
-            }
+            val expiredIn by uiState.expiredInFlow.collectAsState()
+            Footer(
+                expiredIn = expiredIn,
+                canRetry = uiState.canRetry,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp),
+                onRetry = uiState.onRetry,
+                onShare = { uiState.share(uiState.sharedText) }
+
+            )
         } else {
             val density = LocalDensity.current
             Column(modifier = Modifier
@@ -129,8 +130,10 @@ internal fun Guessing(
 
 @Composable
 private fun Footer(
-    expiredIn: Duration,
+    expiredIn: Duration?,
     modifier: Modifier,
+    canRetry: Boolean,
+    onRetry: () -> Unit,
     onShare: () -> Unit
 ) {
     Column(
@@ -138,28 +141,36 @@ private fun Footer(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.semantics(mergeDescendants = true) { },
-            horizontalAlignment = CenterHorizontally
-        ) {
-            Text(text = stringResource(R.string.game_stats_next_word_in))
-            Text(
-                text = expiredIn.format(),
-                style = MaterialTheme.typography.headlineMedium
-            )
+        if (expiredIn != null) {
+            Column(
+                modifier = Modifier.semantics(mergeDescendants = true) { },
+                horizontalAlignment = CenterHorizontally
+            ) {
+                Text(text = stringResource(R.string.game_stats_next_word_in))
+                Text(
+                    text = expiredIn.format(),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             modifier = Modifier.semantics(mergeDescendants = true) { },
-            onClick = onShare,
+            onClick = if (canRetry) onRetry else onShare,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.correct,
                 contentColor = MaterialTheme.colorScheme.onCorrect,
             )
         ) {
-            Icons.Share(modifier = Modifier.clearAndSetSemantics { })
+            if (canRetry) {
+                Icons.Replay(modifier = Modifier.clearAndSetSemantics { })
+            } else {
+                Icons.Share(modifier = Modifier.clearAndSetSemantics { })
+            }
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = stringResource(R.string.game_share_action))
+            val text =
+                if (canRetry) stringResource(R.string.game_replay_action) else stringResource(R.string.game_share_action)
+            Text(text = text)
         }
     }
 }

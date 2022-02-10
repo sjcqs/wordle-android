@@ -44,30 +44,29 @@ internal class GameViewModel @Inject constructor(
     private val events = MutableSharedFlow<Event>()
 
     init {
-        val gameFlow = settingsRepository.settingsFlow.flatMapLatest {
+        settingsRepository.settingsFlow.flatMapLatest {
             val isInfinite = when (it.gameMode) {
                 GameMode.Infinite -> true
                 GameMode.Daily -> false
             }
             gameRepository.getCurrentGame(isInfinite)
-        }
-        combineTransform(
-            gameFlow,
-            settingsRepository.settingsFlow.map { it.keyboardLayout }
-        ) { game, keyboardLayout ->
-            val expiredInFlow = MutableStateFlow(game.expiredIn)
-            val uiModel = map(
-                game = game,
-                keyboardLayout = keyboardLayout,
-                expiredInFlow = expiredInFlow
-            )
-            emit(uiModel)
-            if (game.isFinished) {
-                while (currentCoroutineContext().isActive) {
-                    expiredInFlow.emit(game.expiredIn)
-                    delay(1000)
+                .combineTransform(
+                    settingsRepository.settingsFlow.map { settings -> settings.keyboardLayout }
+                ) { game, keyboardLayout ->
+                    val expiredInFlow = MutableStateFlow(game.expiredIn)
+                    val uiModel = map(
+                        game = game,
+                        keyboardLayout = keyboardLayout,
+                        expiredInFlow = expiredInFlow
+                    )
+                    emit(uiModel)
+                    if (game.isFinished && !game.isInfinite) {
+                        while (currentCoroutineContext().isActive) {
+                            expiredInFlow.emit(game.expiredIn)
+                            delay(1000)
+                        }
+                    }
                 }
-            }
         }.onEach(_uiState::emit)
             .launchIn(viewModelScope)
 
@@ -75,13 +74,13 @@ internal class GameViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private val Game.expiredIn: Duration
-        get() = Duration.between(LocalDateTime.now(), expiredAt)
+    private val Game.expiredIn: Duration?
+        get() = if (isInfinite) null else Duration.between(LocalDateTime.now(), expiredAt)
 
     private fun map(
         game: Game,
         keyboardLayout: KeyboardLayout,
-        expiredInFlow: MutableStateFlow<Duration>
+        expiredInFlow: MutableStateFlow<Duration?>
     ) = game.toUiModel(
         keyboardLayout = keyboardLayout,
         expiredInFlow = expiredInFlow,

@@ -29,7 +29,7 @@ internal fun Game.toUiModel(
     onSubmit: (String) -> Unit,
     onTyping: () -> Unit,
     onShare: (text: String) -> Unit,
-    expiredInFlow: MutableStateFlow<Duration>
+    expiredInFlow: MutableStateFlow<Duration?>
 ): GameUiState.Guessing {
     val guessUiModels = buildList {
         addAll(guesses.map(Guess::toUiModel))
@@ -54,7 +54,7 @@ internal fun Game.toUiModel(
         isFinished = isFinished,
         isWon = isWon,
         onRetry = onRetry,
-        canRetry = true,
+        canRetry = isInfinite,
         expiredInFlow = expiredInFlow,
         share = onShare,
         sharedText = sharedText,

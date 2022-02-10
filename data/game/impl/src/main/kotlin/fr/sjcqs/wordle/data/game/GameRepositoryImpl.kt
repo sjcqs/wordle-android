@@ -93,13 +93,7 @@ class GameRepositoryImpl @Inject constructor(
         return dbDataSource.watchLatest(isInfinite)
             .map { latestGame ->
                 if (isInfinite && latestGame == null) {
-                    val newGame = Game(
-                        word = assetsDataSource.randomWord(),
-                        expiredAt = LocalDateTime.now(),
-                        isInfinite = true,
-                        maxGuesses = maxGuesses
-                    ).toDb()
-                    dbDataSource.insertOrUpdate(newGame)
+                    val newGame = newRandomGame()
                     newGame
                 } else {
                     latestGame
@@ -115,6 +109,17 @@ class GameRepositoryImpl @Inject constructor(
             }
             .distinctUntilChanged()
             .onEach { game = it }
+    }
+
+    private suspend fun newRandomGame(): fr.sjcqs.wordle.data.game.db.Game {
+        val newGame = Game(
+            word = assetsDataSource.randomWord(),
+            expiredAt = LocalDateTime.now(),
+            isInfinite = true,
+            maxGuesses = maxGuesses
+        ).toDb()
+        dbDataSource.insertOrUpdate(newGame)
+        return newGame
     }
 
     override suspend fun submit(word: String): Boolean {
@@ -135,6 +140,9 @@ class GameRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refresh() {
+        if (game.isInfinite) {
+            newRandomGame()
+        }
     }
 
     private fun computeGuess(expected: String, submitted: String): Guess {

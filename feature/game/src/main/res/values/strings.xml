@@ -5,5 +5,6 @@
     <string name="game_open_stats_label">Ouvrir les statistiques</string>
     <string name="game_open_settings_label">Ouvrir les paramètres</string>
     <string name="game_share_action">Partager</string>
+    <string name="game_replay_action">Rejouer</string>
     <string name="game_stats_next_word_in">Prochain mot dans:</string>
 </resources>

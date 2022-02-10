@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import fr.sjcqs.wordle.feature.game.component.KeyboardLayoutUiModel
 import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 internal sealed interface GameUiState {
@@ -18,9 +19,9 @@ internal sealed interface GameUiState {
         val keyStates: Map<String, TileUiState> = emptyMap(),
         val isFinished: Boolean = false,
         val isWon: Boolean = false,
-        val canRetry: Boolean = true,
+        val canRetry: Boolean = false,
         val sharedText: String = "",
-        val expiredInFlow: StateFlow<Duration>? = null,
+        val expiredInFlow: StateFlow<Duration?> = MutableStateFlow(null),
         val onTyping: () -> Unit = {},
         val onSubmit: (word: String) -> Unit = {},
         val onRetry: () -> Unit = {},

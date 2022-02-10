@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.ui.icons
 
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
@@ -13,7 +14,7 @@ object Icons {
     @Composable
     fun Stats(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
@@ -26,7 +27,7 @@ object Icons {
     @Composable
     fun Close(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
@@ -39,7 +40,7 @@ object Icons {
     @Composable
     fun Check(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
@@ -52,7 +53,7 @@ object Icons {
     @Composable
     fun Enter(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
@@ -65,7 +66,7 @@ object Icons {
     @Composable
     fun Backspace(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
@@ -78,7 +79,7 @@ object Icons {
     @Composable
     fun Settings(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
@@ -91,12 +92,25 @@ object Icons {
     @Composable
     fun Share(
         modifier: Modifier = Modifier,
-        tint: Color = LocalContentColor.current
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
     ) {
         Icon(
             modifier = modifier,
             painter = painterResource(id = R.drawable.ic_share),
             contentDescription = stringResource(id = R.string.content_description_share),
+            tint = tint,
+        )
+    }
+
+    @Composable
+    fun Replay(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_replay),
+            contentDescription = stringResource(id = R.string.content_description_replay),
             tint = tint,
         )
     }

@@ -157,8 +157,7 @@ private fun Game(
                 uiState = GameUiState.Guessing(
                     word = "",
                     guesses = buildList { repeat(currentState.maxGuesses) { add(GuessUiModel()) } },
-
-                    ),
+                ),
                 value = typingWord,
                 isLoading = true
             )
