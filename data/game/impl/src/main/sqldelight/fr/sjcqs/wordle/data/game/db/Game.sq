@@ -1,23 +1,27 @@
 import fr.sjcqs.wordle.data.game.entity.Guess;
+import java.lang.Boolean;
 import java.time.LocalDateTime;
 import kotlin.collections.List;
 
 CREATE TABLE game (
   word TEXT NOT NULL,
   expiredAt TEXT AS LocalDateTime NOT NULL PRIMARY KEY,
-  guesses TEXT AS List<Guess> NOT NULL
+  guesses TEXT AS List<Guess> NOT NULL,
+  isInfinite INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
 insertOrReplace:
 INSERT OR REPLACE
-INTO game(word, expiredAt, guesses)
-VALUES (?, ?, ?);
+INTO game(word, expiredAt, guesses, isInfinite)
+VALUES (?, ?, ?, ?);
 
 getAll:
 SELECT * FROM game
+WHERE isInfinite = ?
 ORDER BY expiredAt DESC;
 
 lastGame:
 SELECT * FROM game
+WHERE isInfinite = ?
 ORDER BY expiredAt DESC
 LIMIT 1;

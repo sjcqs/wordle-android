@@ -17,16 +17,16 @@ class SqldelightGameDbDataSource @Inject constructor(
     @DefaultDispatcher
     private val dispatcherDispatcher: CoroutineDispatcher,
 ): GameDbDataSource {
-    override suspend fun getLatest(): Game? = withContext(dispatcherDispatcher) {
-        gameQueries.lastGame()
+    override suspend fun getLatest(isInfinite: Boolean): Game? = withContext(dispatcherDispatcher) {
+        gameQueries.lastGame(isInfinite)
             .executeAsOneOrNull()
     }
 
-    override fun watchAll(): Flow<List<Game>> = gameQueries.getAll()
+    override fun watchAll(isInfinite: Boolean): Flow<List<Game>> = gameQueries.getAll(isInfinite)
         .asFlow()
         .mapToList(dispatcherDispatcher)
 
-    override fun watchLatest(): Flow<Game?> = gameQueries.lastGame()
+    override fun watchLatest(isInfinite: Boolean): Flow<Game?> = gameQueries.lastGame(isInfinite)
         .asFlow()
         .mapToOneOrNull(dispatcherDispatcher)
 
@@ -35,6 +35,7 @@ class SqldelightGameDbDataSource @Inject constructor(
             word = game.word,
             expiredAt = game.expiredAt,
             guesses = game.guesses,
+            isInfinite = game.isInfinite
         )
     }
 }

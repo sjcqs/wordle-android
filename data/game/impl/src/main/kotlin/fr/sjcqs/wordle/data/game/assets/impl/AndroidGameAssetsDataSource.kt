@@ -19,4 +19,6 @@ class AndroidGameAssetsDataSource @Inject constructor(
 
     override fun containsWord(word: String) = words.contains(word)
 
+    override fun randomWord() = words.random()
+
 }

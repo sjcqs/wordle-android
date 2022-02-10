@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -52,14 +53,6 @@ class GameRepositoryImpl @Inject constructor(
                 .launchIn(scope)
         }
     }
-
-    override val dailyGameFlow: Flow<Game> = dbDataSource.watchLatest()
-        .filterNotNull()
-        .map { it.fromDb(MAX_GUESSES) }
-        .map {
-            if (it.isExpired) remoteDataSource.getDailyWord().toGame() else it
-        }.onEach { game = it }
-        .distinctUntilChanged()
 
     override val statsFlow: Flow<Stats> = dbDataSource.watchAll()
         .map { games -> games.map { it.fromDb(MAX_GUESSES) } }
@@ -97,7 +90,36 @@ class GameRepositoryImpl @Inject constructor(
             )
         }
 
+    override fun getCurrentGame(isInfinite: Boolean): Flow<Game> {
+        return if (isInfinite) {
+            flowOf(
+                Game(
+                    word = assetsDataSource.randomWord(),
+                    maxGuesses = 6,
+                    expiredAt = LocalDateTime.MAX,
+                    isInfinite = true
+                )
+            )
+        } else {
+            dbDataSource.watchLatest()
+                .filterNotNull()
+                .map { it.fromDb(MAX_GUESSES) }
+                .map { latestGame ->
+                    if (latestGame.isExpired) {
+                        remoteDataSource.getDailyWord().toGame()
+                    } else {
+                        latestGame
+                    }
+                }
+        }.distinctUntilChanged()
+            .onEach { game = it }
+    }
+
     override suspend fun submit(word: String): Boolean {
+        if (game.isInfinite) {
+            // TODO: handle infinite games
+            return true
+        }
         return withContext(defaultDispatcher) {
             if (assetsDataSource.containsWord(word)) {
                 if (game.isFinished) {

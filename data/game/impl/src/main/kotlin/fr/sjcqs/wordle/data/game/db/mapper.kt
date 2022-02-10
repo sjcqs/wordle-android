@@ -14,4 +14,5 @@ internal fun Game.toDb() = DbGame(
     word = word,
     expiredAt = expiredAt,
     guesses = guesses,
+    isInfinite = isInfinite,
 )

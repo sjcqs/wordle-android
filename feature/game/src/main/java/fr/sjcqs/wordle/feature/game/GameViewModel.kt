@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.game.GameRepository
 import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.settings.SettingsRepository
+import fr.sjcqs.wordle.data.settings.entity.GameMode
 import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.feature.game.model.GameUiEvent
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -39,17 +41,26 @@ internal class GameViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    private val keyboardLayoutFlow = settingsRepository.settingsFlow.map { it.keyboardLayout }
-
     private val events = MutableSharedFlow<Event>()
 
     init {
+        val gameFlow = settingsRepository.settingsFlow.flatMapLatest {
+            val isInfinite = when (it.gameMode) {
+                GameMode.Infinite -> true
+                GameMode.Daily -> false
+            }
+            gameRepository.getCurrentGame(isInfinite)
+        }
         combineTransform(
-            gameRepository.dailyGameFlow,
-            keyboardLayoutFlow
+            gameFlow,
+            settingsRepository.settingsFlow.map { it.keyboardLayout }
         ) { game, keyboardLayout ->
             val expiredInFlow = MutableStateFlow(game.expiredIn)
-            val uiModel = map(game, keyboardLayout, expiredInFlow)
+            val uiModel = map(
+                game = game,
+                keyboardLayout = keyboardLayout,
+                expiredInFlow = expiredInFlow
+            )
             emit(uiModel)
             if (game.isFinished) {
                 while (currentCoroutineContext().isActive) {

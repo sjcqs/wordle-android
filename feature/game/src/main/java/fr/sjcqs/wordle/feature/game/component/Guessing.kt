@@ -120,6 +120,7 @@ internal fun Guessing(
                     },
                     showPlaceholder = isLoading
                 )
+                Spacer(modifier = Modifier.navigationBarsHeight())
             }
         }
         Spacer(modifier = Modifier.navigationBarsHeight())
