@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -91,35 +90,34 @@ class GameRepositoryImpl @Inject constructor(
         }
 
     override fun getCurrentGame(isInfinite: Boolean): Flow<Game> {
-        return if (isInfinite) {
-            flowOf(
-                Game(
-                    word = assetsDataSource.randomWord(),
-                    maxGuesses = 6,
-                    expiredAt = LocalDateTime.MAX,
-                    isInfinite = true
-                )
-            )
-        } else {
-            dbDataSource.watchLatest()
-                .filterNotNull()
-                .map { it.fromDb(MAX_GUESSES) }
-                .map { latestGame ->
-                    if (latestGame.isExpired) {
-                        remoteDataSource.getDailyWord().toGame()
-                    } else {
-                        latestGame
-                    }
+        return dbDataSource.watchLatest(isInfinite)
+            .map { latestGame ->
+                if (isInfinite && latestGame == null) {
+                    val newGame = Game(
+                        word = assetsDataSource.randomWord(),
+                        expiredAt = LocalDateTime.now(),
+                        isInfinite = true,
+                        maxGuesses = maxGuesses
+                    ).toDb()
+                    dbDataSource.insertOrUpdate(newGame)
+                    newGame
+                } else {
+                    latestGame
                 }
-        }.distinctUntilChanged()
+            }.filterNotNull()
+            .map { it.fromDb(MAX_GUESSES) }
+            .map { latestGame ->
+                if (latestGame.isExpired) {
+                    remoteDataSource.getDailyWord().toGame()
+                } else {
+                    latestGame
+                }
+            }
+            .distinctUntilChanged()
             .onEach { game = it }
     }
 
     override suspend fun submit(word: String): Boolean {
-        if (game.isInfinite) {
-            // TODO: handle infinite games
-            return true
-        }
         return withContext(defaultDispatcher) {
             if (assetsDataSource.containsWord(word)) {
                 if (game.isFinished) {
@@ -169,13 +167,14 @@ class GameRepositoryImpl @Inject constructor(
     }
 
     private val Game.isExpired: Boolean
-        get() = expiredAt < LocalDateTime.now()
+        get() = !isInfinite && expiredAt < LocalDateTime.now()
 
     private fun DailyWord.toGame(): Game {
         return Game(
             word = word,
             expiredAt = expiredAt,
-            maxGuesses = MAX_GUESSES
+            maxGuesses = MAX_GUESSES,
+            isInfinite = false
         )
     }
 

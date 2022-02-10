@@ -7,6 +7,7 @@ internal fun DbGame.fromDb(maxGuesses: Int) = Game(
     word = word,
     expiredAt = expiredAt,
     guesses = guesses,
+    isInfinite = isInfinite,
     maxGuesses = maxGuesses
 )
 

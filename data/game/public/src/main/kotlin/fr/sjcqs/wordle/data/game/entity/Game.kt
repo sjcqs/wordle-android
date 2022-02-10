@@ -6,8 +6,8 @@ data class Game(
     val word: String,
     val maxGuesses: Int,
     val expiredAt: LocalDateTime,
-    val guesses: List<Guess> = emptyList(),
-    val isInfinite: Boolean = false
+    val isInfinite: Boolean,
+    val guesses: List<Guess> = emptyList()
 ) {
     val isFinished: Boolean = guesses.lastOrNull()?.word == word || guesses.size >= maxGuesses
     val isWon: Boolean = word == guesses.lastOrNull()?.word
