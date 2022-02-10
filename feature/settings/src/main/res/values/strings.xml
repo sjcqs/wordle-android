@@ -11,4 +11,7 @@
     <string name="settings_keyboard_layout_header">Clavier</string>
     <string name="settings_keyboard_layout_azerty">AZERTY</string>
     <string name="settings_keyboard_layout_qwerty">QWERTY</string>
+    <string name="settings_mode_header">Mode du jeu</string>
+    <string name="settings_mode_daily">Quotidien</string>
+    <string name="settings_mode_infinite">Infini</string>
 </resources>

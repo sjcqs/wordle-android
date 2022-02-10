@@ -1,5 +1,6 @@
 package fr.sjcqs.wordle.data.settings
 
+import fr.sjcqs.wordle.data.settings.entity.GameMode
 import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
 import fr.sjcqs.wordle.data.settings.entity.Settings
 import fr.sjcqs.wordle.data.settings.entity.Theme
@@ -11,4 +12,5 @@ interface SettingsRepository {
 
     suspend fun setKeyboardLayout(keyboardLayout: KeyboardLayout)
     suspend fun setTheme(theme: Theme)
+    suspend fun setMode(mode: GameMode)
 }

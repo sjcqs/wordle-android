@@ -16,7 +16,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -31,6 +30,7 @@ import com.google.accompanist.insets.ui.Scaffold
 import fr.sjcqs.wordle.feature.settings.R
 import fr.sjcqs.wordle.feature.settings.SettingsViewModel
 import fr.sjcqs.wordle.feature.settings.components.Chip
+import fr.sjcqs.wordle.feature.settings.model.GameModeUiModel
 import fr.sjcqs.wordle.feature.settings.model.KeyboardLayoutUiModel
 import fr.sjcqs.wordle.feature.settings.model.SettingsUiModel
 import fr.sjcqs.wordle.feature.settings.model.SettingsUiModelParameterProvider
@@ -90,8 +90,10 @@ private fun Settings(
         modifier = modifier,
         currentTheme = uiModel.theme,
         currentLayout = uiModel.keyboardLayout,
+        currentMode = uiModel.mode,
         setTheme = uiModel.setTheme,
-        setLayout = uiModel.setLayout
+        setLayout = uiModel.setLayout,
+        setMode = uiModel.setGameMode
     )
 }
 
@@ -100,86 +102,82 @@ private fun Settings(
     modifier: Modifier = Modifier,
     currentTheme: ThemeUiModel,
     currentLayout: KeyboardLayoutUiModel,
+    currentMode: GameModeUiModel,
     setTheme: (ThemeUiModel) -> Unit,
     setLayout: (KeyboardLayoutUiModel) -> Unit,
+    setMode: (GameModeUiModel) -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 24.dp),
     ) {
-        Column {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .semantics { heading() },
-                text = stringResource(id = R.string.settings_preferences_header),
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(id = R.string.settings_theme_header),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val themes = ThemeUiModel.values()
-                    themes.forEachIndexed { index, theme ->
-                        Chip(
-                            text = stringResource(id = theme.labelRes),
-                            isSelected = theme == currentTheme,
-                            onClick = { setTheme(theme) }
-                        )
-                        if (index + 1 < themes.size) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { heading() },
-                    text = stringResource(id = R.string.settings_keyboard_layout_header),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val layouts = KeyboardLayoutUiModel.values()
-                    layouts.forEachIndexed { index, layout ->
-                        Chip(
-                            text = stringResource(id = layout.labelRes),
-                            isSelected = layout == currentLayout,
-                            onClick = { setLayout(layout) }
-                        )
-                        if (index + 1 < layouts.size) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                    }
-                }
-            }
-        }
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { heading() },
+            text = stringResource(id = R.string.settings_preferences_header),
+            style = MaterialTheme.typography.titleLarge,
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        SelectablePreference(
+            title = stringResource(id = R.string.settings_theme_header),
+            currentValue = currentTheme,
+            onValueSelected = setTheme,
+            values = ThemeUiModel.values().toList(),
+            getLabel = { theme -> stringResource(id = theme.labelRes) }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        SelectablePreference(
+            title = stringResource(id = R.string.settings_keyboard_layout_header),
+            currentValue = currentLayout,
+            onValueSelected = setLayout,
+            values = KeyboardLayoutUiModel.values().toList(),
+            getLabel = { layout -> stringResource(id = layout.labelRes) }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        SelectablePreference(
+            title = stringResource(id = R.string.settings_mode_header),
+            currentValue = currentMode,
+            onValueSelected = setMode,
+            values = GameModeUiModel.values().toList(),
+            getLabel = { mode -> stringResource(id = mode.labelRes) }
+        )
         Spacer(modifier = Modifier.height(24.dp))
         Divider()
-        Spacer(modifier = Modifier.height(24.dp))
-        Column(modifier = Modifier.alpha(0f)) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.settings_credits_header),
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-        }
         Spacer(modifier = Modifier.navigationBarsHeight())
+    }
+}
+
+@Composable
+private fun <T : Any> SelectablePreference(
+    title: String,
+    currentValue: T,
+    onValueSelected: (T) -> Unit,
+    values: Collection<T>,
+    getLabel: @Composable (value: T) -> String
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            values.forEachIndexed { index, theme ->
+                Chip(
+                    text = getLabel(theme),
+                    isSelected = currentValue == theme,
+                    onClick = { onValueSelected(theme) }
+                )
+                if (index + 1 < values.size) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
     }
 }
 

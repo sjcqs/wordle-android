@@ -16,9 +16,8 @@ class PreferencesLocalSettingsDataSource @Inject constructor(
     private val preferences: DataStore<Preferences>
 ) : LocalSettingsDataSource {
     private val settingsFlow = preferences.data
-        .map { preferences ->
-            preferences.toSettings()
-        }.onEmpty { emit(initialSettings) }
+        .map(Preferences::toSettings)
+        .onEmpty { emit(initialSettings) }
 
     override suspend fun getSettings() = settingsFlow.first()
 
@@ -26,6 +25,7 @@ class PreferencesLocalSettingsDataSource @Inject constructor(
         preferences.edit { preferences ->
             preferences[Keys.keyboardLayout] = settings.keyboardLayout.name
             preferences[Keys.theme] = settings.theme.name
+            preferences[Keys.gameMode] = settings.gameMode.name
         }
     }
 

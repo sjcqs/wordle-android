@@ -1,10 +1,10 @@
 package fr.sjcqs.wordle.data.settings.entity
 
-enum class KeyboardLayout {
-    Qwerty, Azerty;
+enum class GameMode {
+    Infinite, Daily;
 
     companion object {
         val Default
-            get() = Azerty
+            get() = Daily
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.sjcqs.wordle.data.settings.SettingsRepository
 import fr.sjcqs.wordle.extensions.emitIn
+import fr.sjcqs.wordle.feature.settings.model.GameModeUiModel
 import fr.sjcqs.wordle.feature.settings.model.KeyboardLayoutUiModel
 import fr.sjcqs.wordle.feature.settings.model.SettingsUiModel
 import fr.sjcqs.wordle.feature.settings.model.ThemeUiModel
@@ -27,12 +28,9 @@ internal class SettingsViewModel @Inject constructor(
     val settingsFlow = repository.settingsFlow
         .map { settings ->
             settings.toUiModel(
-                setTheme = {
-                    events.emitIn(viewModelScope, Event.SetTheme(it))
-                },
-                setLayout = {
-                    events.emitIn(viewModelScope, Event.SetKeyboardLayout(it))
-                }
+                setTheme = { events.emitIn(viewModelScope, Event.SetTheme(it)) },
+                setLayout = { events.emitIn(viewModelScope, Event.SetKeyboardLayout(it)) },
+                setGameMode = { events.emitIn(viewModelScope, Event.SetGameMode(it)) }
             )
         }.stateIn(viewModelScope, SharingStarted.Eagerly, SettingsUiModel())
 
@@ -44,11 +42,13 @@ internal class SettingsViewModel @Inject constructor(
         when (event) {
             is Event.SetKeyboardLayout -> repository.setKeyboardLayout(event.layout.toEntity())
             is Event.SetTheme -> repository.setTheme(event.theme.toEntity())
+            is Event.SetGameMode -> repository.setMode(event.mode.toEntity())
         }
     }
 
 
     private sealed interface Event {
+        data class SetGameMode(val mode: GameModeUiModel) : Event
         data class SetTheme(val theme: ThemeUiModel) : Event
         data class SetKeyboardLayout(val layout: KeyboardLayoutUiModel) : Event
     }
