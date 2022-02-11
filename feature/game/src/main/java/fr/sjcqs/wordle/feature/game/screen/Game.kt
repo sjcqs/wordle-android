@@ -2,6 +2,7 @@ package fr.sjcqs.wordle.feature.game.screen
 
 import android.content.Intent
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.SnackbarHost
@@ -19,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -49,6 +51,7 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
 
     val viewModel: GameViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val isInfinite by viewModel.isInfiniteFlow.collectAsState()
 
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
@@ -104,7 +107,23 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
             CenterAlignedTopAppBar(
                 contentPadding = rememberInsetsPaddingValues(insets = insets),
                 shadowElevation = 4.dp,
-                title = { Text(text = stringResource(id = R.string.game_title)) },
+                title = {
+                    Column {
+                        Text(text = stringResource(id = R.string.game_title))
+                        val label = stringResource(
+                            id = if (isInfinite) {
+                                R.string.game_mode_infinite
+                            } else {
+                                R.string.game_mode_daily
+                            }
+                        )
+                        Text(
+                            modifier = Modifier.align(CenterHorizontally),
+                            text = label,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                },
                 actions = {
                     val statsClickLabel = stringResource(id = R.string.game_open_stats_label)
                     IconButton(onClick = showStats, onClickLabel = statsClickLabel) {

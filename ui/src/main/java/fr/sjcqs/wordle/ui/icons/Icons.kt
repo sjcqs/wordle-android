@@ -114,4 +114,30 @@ object Icons {
             tint = tint,
         )
     }
+
+    @Composable
+    fun Repeat(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_repeat),
+            contentDescription = stringResource(id = R.string.content_description_repeat),
+            tint = tint,
+        )
+    }
+
+    @Composable
+    fun Today(
+        modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current.copy(LocalContentAlpha.current)
+    ) {
+        Icon(
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.ic_today),
+            contentDescription = stringResource(id = R.string.content_description_today),
+            tint = tint,
+        )
+    }
 }

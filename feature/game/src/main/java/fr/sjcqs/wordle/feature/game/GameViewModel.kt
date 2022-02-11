@@ -8,6 +8,7 @@ import fr.sjcqs.wordle.data.game.entity.Game
 import fr.sjcqs.wordle.data.settings.SettingsRepository
 import fr.sjcqs.wordle.data.settings.entity.GameMode
 import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
+import fr.sjcqs.wordle.extensions.collectLatestIn
 import fr.sjcqs.wordle.extensions.emitIn
 import fr.sjcqs.wordle.feature.game.model.GameUiEvent
 import fr.sjcqs.wordle.feature.game.model.GameUiState
@@ -18,13 +19,15 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 
 @HiltViewModel
@@ -38,21 +41,30 @@ internal class GameViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    val isInfiniteFlow: StateFlow<Boolean> = settingsRepository.settingsFlow.map {
+        it.gameMode == GameMode.Infinite
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        settingsRepository.settings.gameMode == GameMode.Infinite
+    )
+
     private val _uiEvent = MutableSharedFlow<GameUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     private val events = MutableSharedFlow<Event>()
 
     init {
-        settingsRepository.settingsFlow.flatMapLatest {
+        settingsRepository.settingsFlow.collectLatestIn(viewModelScope) {
             val isInfinite = when (it.gameMode) {
                 GameMode.Infinite -> true
                 GameMode.Daily -> false
             }
+            val keyboardLayoutFlow = settingsRepository.settingsFlow.map { settings ->
+                settings.keyboardLayout
+            }
             gameRepository.getCurrentGame(isInfinite)
-                .combineTransform(
-                    settingsRepository.settingsFlow.map { settings -> settings.keyboardLayout }
-                ) { game, keyboardLayout ->
+                .combineTransform(keyboardLayoutFlow) { game, keyboardLayout ->
                     val expiredInFlow = MutableStateFlow(game.expiredIn)
                     val uiModel = map(
                         game = game,
@@ -66,9 +78,9 @@ internal class GameViewModel @Inject constructor(
                             delay(1000)
                         }
                     }
-                }
-        }.onEach(_uiState::emit)
-            .launchIn(viewModelScope)
+                }.onEach(_uiState::emit)
+                .launchIn(viewModelScope)
+        }
 
         events.onEach(::handleEvent)
             .launchIn(viewModelScope)

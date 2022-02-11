@@ -16,4 +16,6 @@
     <string name="content_description_backspace">Retour arrière</string>
     <string name="content_description_settings">Paramètres</string>
     <string name="content_description_replay">Réessayer</string>
+    <string name="content_description_repeat">Répeté</string>
+    <string name="content_description_today">Quotidien</string>
 </resources>

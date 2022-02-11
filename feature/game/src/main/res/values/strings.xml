@@ -7,4 +7,6 @@
     <string name="game_share_action">Partager</string>
     <string name="game_replay_action">Rejouer</string>
     <string name="game_stats_next_word_in">Prochain mot dans:</string>
+    <string name="game_mode_infinite">Infini</string>
+    <string name="game_mode_daily">Quotidien</string>
 </resources>
