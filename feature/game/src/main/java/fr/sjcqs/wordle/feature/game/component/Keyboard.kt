@@ -2,9 +2,11 @@ package fr.sjcqs.wordle.feature.game.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -153,9 +156,11 @@ internal fun Keyboard(
         verticalArrangement = Arrangement.Center
     ) {
         layout.forEach { row ->
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
                 row.forEach { (keycode, weight) ->
                     val keyState = if (keycode is Keycode.Character) {
                         keyStates[keycode.char]
@@ -198,11 +203,20 @@ private fun Key(
     )
     val contentColor = contentColorFor(backgroundColor = color)
     val interactionSource = remember { MutableInteractionSource() }
+    val showTooltip by interactionSource.collectIsPressedAsState()
     Box(modifier = modifier) {
+        if (keycode is Keycode.Character && showTooltip) {
+            KeyTooltip(keycode)
+        }
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable(onClick = onPressed, role = Role.Button),
+                .clickable(
+                    onClick = onPressed,
+                    role = Role.Button,
+                    indication = LocalIndication.current,
+                    interactionSource = interactionSource,
+                ),
             color = color,
             interactionSource = interactionSource,
             contentColor = contentColor,
@@ -237,6 +251,7 @@ private fun KeyTooltip(keycode: Keycode.Character) {
     ) {
         Box(
             modifier = Modifier
+                .wrapContentSize()
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
@@ -257,7 +272,7 @@ private fun Content(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.headlineSmall
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier) {
         when (keycode) {
             Keycode.Backspace -> {
                 Icons.Backspace(modifier = Modifier.align(Alignment.Center))
