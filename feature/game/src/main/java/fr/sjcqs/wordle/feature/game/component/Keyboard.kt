@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import com.google.accompanist.placeholder.PlaceholderHighlight
+import fr.sjcqs.wordle.feature.game.model.TileUiState
 import fr.sjcqs.wordle.haptics.LocalHapticController
 import fr.sjcqs.wordle.haptics.tick
-import fr.sjcqs.wordle.ui.components.TileUiState
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.modifier.fade
 import fr.sjcqs.wordle.ui.modifier.placeholder

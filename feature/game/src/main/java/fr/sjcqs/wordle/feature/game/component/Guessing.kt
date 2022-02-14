@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +38,6 @@ import fr.sjcqs.wordle.feature.game.SpaceBetweenGuesses
 import fr.sjcqs.wordle.feature.game.format
 import fr.sjcqs.wordle.feature.game.model.GameUiState
 import fr.sjcqs.wordle.feature.game.model.GuessUiModel
-import fr.sjcqs.wordle.ui.components.Word
 import fr.sjcqs.wordle.ui.icons.Icons
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
 import fr.sjcqs.wordle.ui.theme.correct
@@ -51,7 +52,7 @@ internal fun Guessing(
     keyboardHeight: MutableState<Dp> = mutableStateOf(0.dp),
     isLoading: Boolean = false,
 ) {
-    var currentValue by remember(value) { mutableStateOf(value) }
+    var currentValue by remember(uiState) { mutableStateOf(value) }
 
     val onBackspace = fun() { currentValue = currentValue.dropLast(1) }
     val onEnter = fun() {
@@ -194,15 +195,17 @@ private fun Guessing(
             DailyWord(word)
             Spacer(modifier = Modifier.height(24.dp))
         }
-        guesses.forEachIndexed { index, guess ->
-            Word(
-                word = if (guess.isEditable) value else guess.word,
-                number = index + 1,
-                tileStates = if (guess.isEditable) emptyMap() else guess.tileState,
-                showPlaceholder = isLoading
-            )
-            if (index < guesses.lastIndex) {
-                Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
+        LazyColumn {
+            itemsIndexed(guesses, key = { index, _ -> index }) { index, guess ->
+                Word(
+                    word = if (guess.isEditable) value else guess.word,
+                    number = index + 1,
+                    tileStates = if (guess.isEditable) emptyMap() else guess.tileState,
+                    showPlaceholder = isLoading
+                )
+                if (index < guesses.lastIndex) {
+                    Spacer(modifier = Modifier.height(SpaceBetweenGuesses))
+                }
             }
         }
     }

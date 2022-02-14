@@ -1,4 +1,4 @@
-package fr.sjcqs.wordle.ui.components
+package fr.sjcqs.wordle.feature.game.component
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -31,7 +30,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.placeholder.PlaceholderHighlight
+import fr.sjcqs.wordle.feature.game.model.TileUiState
 import fr.sjcqs.wordle.ui.R
+import fr.sjcqs.wordle.ui.components.AutoSizeText
 import fr.sjcqs.wordle.ui.modifier.fade
 import fr.sjcqs.wordle.ui.modifier.placeholder
 import fr.sjcqs.wordle.ui.theme.Shapes.TileShape
@@ -40,14 +41,7 @@ import fr.sjcqs.wordle.ui.theme.contentColorFor
 import fr.sjcqs.wordle.ui.theme.correct
 import fr.sjcqs.wordle.ui.theme.present
 
-enum class TileUiState {
-    Present,
-    Correct,
-    Absent,
-}
 
-
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun Word(
     modifier: Modifier = Modifier,
@@ -85,46 +79,69 @@ fun Word(
             val tileModifier = Modifier
                 .weight(1f)
                 .aspectRatio(1f)
-            AnimatedContent(
-                modifier = tileModifier.semantics(mergeDescendants = true) {
+                .semantics(mergeDescendants = true) {
                     stateDescription = letterStateDescription
-                },
-                contentAlignment = Alignment.Center,
-                targetState = tileState,
-                transitionSpec = {
-                    when (targetState) {
-                        TileUiState.Present,
-                        TileUiState.Correct,
-                        TileUiState.Absent -> slideIntoContainer(
-                            towards = AnimatedContentScope.SlideDirection.Up,
-                            animationSpec = tween(delayMillis = index * 100)
-                        ) with fadeOut(targetAlpha = 1f)
-                        null -> hold()
-                    }
                 }
-            ) { targetState ->
-                when (targetState) {
-                    TileUiState.Present -> BackgroundedTile(
-                        value = letter,
-                        backgroundColor = MaterialTheme.colorScheme.present,
-                    )
-                    TileUiState.Correct -> BackgroundedTile(
-                        value = letter,
-                        backgroundColor = MaterialTheme.colorScheme.correct,
-                    )
-                    TileUiState.Absent -> BackgroundedTile(
-                        value = letter,
-                        backgroundColor = MaterialTheme.colorScheme.absent,
-                    )
-                    null -> OutlinedTile(
-                        modifier = Modifier.placeholder(showPlaceholder, highlight = PlaceholderHighlight.fade()),
-                        value = letter
-                    )
-                }
-            }
+            Letter(
+                modifier = tileModifier,
+                letterStateDescription = letterStateDescription,
+                tileState = tileState,
+                index = index,
+                letter = letter,
+                showPlaceholder = showPlaceholder
+            )
             if (index + 1 < length) {
                 Spacer(modifier = Modifier.size(8.dp))
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun Letter(
+    modifier: Modifier,
+    letterStateDescription: String,
+    tileState: TileUiState?,
+    index: Int,
+    letter: String,
+    showPlaceholder: Boolean
+) {
+    AnimatedContent(
+        targetState = tileState,
+        modifier = modifier,
+        transitionSpec = {
+            when (targetState) {
+                TileUiState.Present,
+                TileUiState.Correct,
+                TileUiState.Absent -> slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Up,
+                    animationSpec = tween(delayMillis = index * 100)
+                ) with fadeOut(targetAlpha = 1f)
+                null -> hold()
+            }
+        }
+    ) { targetState ->
+        when (targetState) {
+            TileUiState.Present -> BackgroundedTile(
+                value = letter,
+                backgroundColor = MaterialTheme.colorScheme.present,
+            )
+            TileUiState.Correct -> BackgroundedTile(
+                value = letter,
+                backgroundColor = MaterialTheme.colorScheme.correct,
+            )
+            TileUiState.Absent -> BackgroundedTile(
+                value = letter,
+                backgroundColor = MaterialTheme.colorScheme.absent,
+            )
+            null -> OutlinedTile(
+                modifier = Modifier.placeholder(
+                    visible = showPlaceholder,
+                    highlight = PlaceholderHighlight.fade()
+                ),
+                value = letter
+            )
         }
     }
 }
@@ -136,11 +153,13 @@ private fun OutlinedTile(
     outlineColor: Color = MaterialTheme.colorScheme.outline,
     contentColor: Color = LocalContentColor.current,
 ) {
-    Box(modifier = modifier.border(
-        width = 1.5.dp,
-        outlineColor.copy(alpha = if (value.isEmpty()) 0.38f else 1f),
-        TileShape
-    )) {
+    Box(
+        modifier = modifier.border(
+            width = 1.5.dp,
+            color = outlineColor.copy(alpha = if (value.isEmpty()) 0.38f else 1f),
+            shape = TileShape
+        )
+    ) {
         Tile(
             value = value,
             contentColor = contentColor,
@@ -168,7 +187,6 @@ private fun BackgroundedTile(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Tile(
     value: String,
@@ -188,5 +206,5 @@ private fun Tile(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@ExperimentalAnimationApi
 private fun hold(): ContentTransform = fadeIn(initialAlpha = 1f) with fadeOut(targetAlpha = 1f)

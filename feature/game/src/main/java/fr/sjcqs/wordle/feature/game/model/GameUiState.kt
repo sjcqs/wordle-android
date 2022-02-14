@@ -2,7 +2,6 @@ package fr.sjcqs.wordle.feature.game.model
 
 import androidx.compose.runtime.Immutable
 import fr.sjcqs.wordle.feature.game.component.KeyboardLayoutUiModel
-import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

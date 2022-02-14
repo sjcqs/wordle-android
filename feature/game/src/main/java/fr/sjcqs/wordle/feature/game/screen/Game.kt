@@ -38,6 +38,7 @@ import fr.sjcqs.wordle.feature.game.model.GameUiState
 import fr.sjcqs.wordle.feature.game.model.GuessUiModel
 import fr.sjcqs.wordle.haptics.LocalHapticController
 import fr.sjcqs.wordle.haptics.doubleClick
+import fr.sjcqs.wordle.logger.LocalLogger
 import fr.sjcqs.wordle.ui.components.CenterAlignedTopAppBar
 import fr.sjcqs.wordle.ui.components.IconButton
 import fr.sjcqs.wordle.ui.icons.Icons
@@ -56,9 +57,7 @@ fun Game(showStats: () -> Unit, showSettings: () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     val snackbarState by derivedStateOf { scaffoldState.snackbarHostState }
     val coroutineScope = rememberCoroutineScope()
-    val keyboardHeight = remember {
-        mutableStateOf(0.dp)
-    }
+    val keyboardHeight = remember { mutableStateOf(0.dp) }
 
     fun snackbar(message: String) {
         coroutineScope.launch {
@@ -163,10 +162,10 @@ private fun Game(
     typingWord: String,
     keyboardHeight: MutableState<Dp>,
 ) {
-    Crossfade(targetState = state) { currentState ->
-        when (currentState) {
+    Crossfade(targetState = state is GameUiState.Guessing) {
+        when (state) {
             is GameUiState.Guessing -> Guessing(
-                uiState = currentState,
+                uiState = state,
                 modifier = modifier,
                 value = typingWord,
                 keyboardHeight = keyboardHeight
@@ -175,7 +174,7 @@ private fun Game(
                 modifier = modifier,
                 uiState = GameUiState.Guessing(
                     word = "",
-                    guesses = buildList { repeat(currentState.maxGuesses) { add(GuessUiModel()) } },
+                    guesses = buildList { repeat(state.maxGuesses) { add(GuessUiModel()) } },
                 ),
                 value = typingWord,
                 isLoading = true

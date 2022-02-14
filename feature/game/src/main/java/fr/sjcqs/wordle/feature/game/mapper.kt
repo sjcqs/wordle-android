@@ -5,9 +5,9 @@ import fr.sjcqs.wordle.data.game.entity.Guess
 import fr.sjcqs.wordle.data.game.entity.TileState
 import fr.sjcqs.wordle.data.settings.entity.KeyboardLayout
 import fr.sjcqs.wordle.feature.game.component.KeyboardLayoutUiModel
+import fr.sjcqs.wordle.feature.game.model.TileUiState
 import fr.sjcqs.wordle.feature.game.model.GameUiState
 import fr.sjcqs.wordle.feature.game.model.GuessUiModel
-import fr.sjcqs.wordle.ui.components.TileUiState
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,7 +74,6 @@ val Game.sharedText: String
         return buildString {
             val date = expiredAt.minusDays(1)
                 .format(DateTimeFormatter.ofPattern("dd MMM"))
-            println("${expiredAt.minusDays(1)}")
             val guesses = guesses
             val performance = "${if (isWon) guesses.size else "\uD83D\uDC80"}/${maxGuesses}"
             appendLine("Quel Mot ? ")
