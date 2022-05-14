@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp(functions.getConfig().firebase);
 
 const REF_ALL_WORDS = "/all_words";
 const REF_WORDS = "/words";

@@ -10,8 +10,6 @@
               <build path="$PROJECT_DIR$/plugins" name="plugins">
                 <projects>
                   <project path="$PROJECT_DIR$/plugins" />
-                  <project path="$PROJECT_DIR$/plugins/config" />
-                  <project path="$PROJECT_DIR$/plugins/conventions" />
                 </projects>
               </build>
             </builds>
@@ -42,8 +40,6 @@
             <option value="$PROJECT_DIR$/feature/stats" />
             <option value="$PROJECT_DIR$/navigation" />
             <option value="$PROJECT_DIR$/plugins" />
-            <option value="$PROJECT_DIR$/plugins/config" />
-            <option value="$PROJECT_DIR$/plugins/conventions" />
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools/annotations" />
             <option value="$PROJECT_DIR$/tools/extensions" />

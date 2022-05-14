@@ -1,3 +1,5 @@
+package extensions
+
 import org.gradle.api.Project
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -11,7 +13,7 @@ internal val Project.libs: VersionCatalog
 internal operator fun VersionCatalog.get(
     name: String
 ): Provider<MinimalExternalModuleDependency> {
-    val optionalDependency = findDependency(name)
+    val optionalDependency = findLibrary(name)
     if(optionalDependency.isEmpty) {
         error("$name is not a valid dependency, check your version catalog")
     }

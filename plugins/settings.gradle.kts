@@ -14,5 +14,3 @@ dependencyResolutionManagement {
     }
 }
 
-include(":config")
-include(":conventions")

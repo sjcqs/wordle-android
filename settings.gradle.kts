@@ -4,11 +4,16 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "Wordle"
 
 pluginManagement {
-    includeBuild("plugins")
     repositories {
         google()
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+buildCache {
+    local {
+        removeUnusedEntriesAfterDays = 3
     }
 }
 
@@ -20,35 +25,60 @@ dependencyResolutionManagement {
     }
 }
 
-include(":app")
+val (projects, modules) = rootDir.projectsAndModules()
+println("Projects:\n\t- ${projects.sortedBy { it }.joinToString("\n\t- ") { it }}")
+println("Modules:\n\t- ${modules.sortedBy { it }.joinToString("\n\t- ") { it }}")
 
-include(":data:game:public")
-include(":data:game:impl")
-include(":data:game:wiring")
-include(":data:settings:public")
-include(":data:settings:android")
-include(":data:settings:impl")
-include(":data:settings:wiring")
+for (project in projects) includeBuild(project)
+for (module in modules) include(module)
 
-include(":feature:game")
-include(":feature:stats")
-include(":feature:settings")
 
-include(":navigation")
+fun File.projectsAndModules(): Pair<Set<String>, Set<String>> {
+    val blacklist = setOf(
+        ".git",
+        ".gradle",
+        ".idea",
+        "buildSrc",
+        "config",
+        "build",
+        "src",
+        "molecule-viewmodel"
+    )
 
-include(":tools:annotations")
-include(":tools:extensions:coroutines")
-include(":tools:haptics:compose")
-include(":tools:haptics:public")
-include(":tools:haptics:impl")
-include(":tools:haptics:wiring")
-include(":tools:logger:compose")
-include(":tools:logger:public")
-include(":tools:logger:impl")
-include(":tools:logger:wiring")
-include(":tools:lifecycle-logging:public")
-include(":tools:lifecycle-logging:wiring")
-//include(":tools:molecule-viewmodel")
+    fun File.childrenDirectories() = listFiles { _, name -> name !in blacklist }
+        ?.filter { it.isDirectory }
+        .orEmpty()
 
-include(":ui")
-include(":wiring")
+    fun File.isProject() = File(this, "settings.gradle.kts").exists() ||
+        File(this, "settings.gradle").exists()
+
+    fun File.isModule() = !isProject() &&
+        (File(this, "build.gradle.kts").exists() || File(this, "build.gradle").exists())
+
+
+    val modules = mutableSetOf<String>()
+    val projects = mutableSetOf<String>()
+
+    fun File.find(name: String? = null, includeModules: Boolean = true): List<File> {
+        return childrenDirectories().flatMap {
+            val newName = (name ?: "") + it.name
+            when {
+                it.isProject() -> {
+                    projects += newName
+                    it.find("$newName:", includeModules = false)
+                }
+                it.isModule() && includeModules -> {
+                    modules += ":$newName"
+                    it.find("$newName:")
+                }
+                else -> it.find("$newName:")
+            }
+        }
+    }
+
+    find()
+
+    // we need to replace here since some Projects have a Module as a parent folder
+    val formattedProjects = projects.map { it.replace(":", "/") }.toSet()
+    return Pair(formattedProjects, modules)
+}
