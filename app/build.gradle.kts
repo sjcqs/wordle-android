@@ -1,16 +1,20 @@
 plugins {
     id("fr.sjcqs.android.app")
+    kotlin("kapt")
     id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
 
 android {
+    buildFeatures.compose = true
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 
     defaultConfig {
+        applicationId = "fr.sjcqs.wordle"
+        namespace = "fr.sjcqs.wordle"
         versionCode = 20
         versionName = "0.12"
     }
@@ -39,6 +43,17 @@ android {
         }
         release {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+        }
+    }
+
+    kapt {
+        correctErrorTypes = true
+        useBuildCache = true
+    }
+
+    androidComponents {
+        finalizeDsl {
+            buildFeatures.compose
         }
     }
 }

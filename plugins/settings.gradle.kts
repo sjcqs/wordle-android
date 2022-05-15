@@ -7,6 +7,7 @@ dependencyResolutionManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+    // Sharing the root project version catalog
     versionCatalogs {
         create("libs") {
             from(files("../gradle/libs.versions.toml"))

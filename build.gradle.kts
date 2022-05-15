@@ -44,7 +44,7 @@ interface Injected {
 }
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = "7.4-rc-1"
+    gradleVersion = "7.4"
     val injected = project.objects.newInstance<Injected>()
     doLast {
         injected.fs.copy {
