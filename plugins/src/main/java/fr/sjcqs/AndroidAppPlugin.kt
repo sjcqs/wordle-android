@@ -24,21 +24,6 @@ class AndroidAppPlugin : Plugin<Project> {
                 defaultConfig.targetSdk = Config.android.targetSdk
 
                 buildFeatures.buildConfig = true
-
-                buildTypes {
-                    getByName("debug") {
-                        isMinifyEnabled = false
-                        matchingFallbacks.add("release")
-                    }
-
-                    getByName("release") {
-                        isMinifyEnabled = true
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
             }
         }
 

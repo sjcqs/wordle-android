@@ -1,12 +1,6 @@
 plugins {
     id("fr.sjcqs.android.feature")
-}
-
-android {
-    buildFeatures.compose = true
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
+    id("fr.sjcqs.android.compose.lib")
 }
 
 dependencies {
