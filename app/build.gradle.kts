@@ -1,5 +1,6 @@
 plugins {
     id("fr.sjcqs.android.app")
+    id("fr.sjcqs.android.compose.app")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
@@ -7,10 +8,6 @@ plugins {
 }
 
 android {
-    buildFeatures.compose = true
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
 
     defaultConfig {
         applicationId = "fr.sjcqs.wordle"

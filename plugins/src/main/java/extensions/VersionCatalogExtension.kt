@@ -14,8 +14,16 @@ internal operator fun VersionCatalog.get(
     name: String
 ): Provider<MinimalExternalModuleDependency> {
     val optionalDependency = findLibrary(name)
-    if(optionalDependency.isEmpty) {
+    if (optionalDependency.isEmpty) {
         error("$name is not a valid dependency, check your version catalog")
     }
     return optionalDependency.get()
+}
+
+internal fun VersionCatalog.requireVersion(alias: String): String {
+    val optionalVersion = findVersion(alias)
+    if (optionalVersion.isEmpty) {
+        error("$alias is not a valid version, check your version catalog")
+    }
+    return optionalVersion.get().toString()
 }

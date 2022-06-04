@@ -40,6 +40,17 @@ gradlePlugin {
             id = "fr.sjcqs.android.wiring.lib"
             implementationClass = "fr.sjcqs.AndroidWiringLibPlugin"
         }
+
+        register("fr.sjcqs.android.compose.app") {
+            id = "fr.sjcqs.android.compose.app"
+            implementationClass = "fr.sjcqs.AndroidApplicationWithComposePlugin"
+        }
+
+        register("fr.sjcqs.android.compose.lib") {
+            id = "fr.sjcqs.android.compose.lib"
+            implementationClass = "fr.sjcqs.AndroidLibraryWithComposePlugin"
+        }
+
         register("fr.sjcqs.jvm.lib") {
             id = "fr.sjcqs.jvm.lib"
             implementationClass = "fr.sjcqs.JvmLibPlugin"
